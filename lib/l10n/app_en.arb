@@ -1,0 +1,124 @@
+{
+  "@@locale": "en",
+  "appName": "BasaLINO",
+  "@appName": { "description": "Application name" },
+
+  "continueLabel": "Continue",
+  "cancelLabel": "Cancel",
+  "saveLabel": "Save",
+  "retryLabel": "Retry",
+  "closeLabel": "Close",
+  "nextLabel": "Next",
+  "backLabel": "Back",
+  "submitLabel": "Submit",
+  "loadingLabel": "Loading…",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "errorNoInternet": "No internet connection. Please check your network.",
+  "errorUnauthorized": "You are not authorized to perform this action.",
+
+  "authSignIn": "Sign In",
+  "authSignUp": "Create Account",
+  "authSignOut": "Sign Out",
+  "authEmail": "Email",
+  "authPassword": "Password",
+  "authNickname": "Nickname",
+  "authForgotPassword": "Forgot password?",
+  "authResetPassword": "Reset Password",
+  "authResetPasswordSent": "Password reset email sent. Check your inbox.",
+  "authNoAccount": "Don't have an account? Sign up",
+  "authHaveAccount": "Already have an account? Sign in",
+  "authEmailInvalid": "Enter a valid email address.",
+  "authPasswordTooShort": "Password must be at least 8 characters.",
+  "authNicknameTooShort": "Nickname must be at least 2 characters.",
+  "authErrorEmailInUse": "This email is already in use.",
+  "authErrorWrongPassword": "Incorrect email or password.",
+  "authErrorUserNotFound": "No account found with this email.",
+  "authErrorTooManyRequests": "Too many attempts. Please wait and try again.",
+
+  "consentTitle": "Parental Approval Required",
+  "consentBody": "BasaLINO is designed for learners under 18. A parent or guardian must approve your account before you can access stories and challenges. Your parent or guardian will receive an email with instructions.",
+  "consentPending": "Your account is pending guardian approval. Please ask your parent or guardian to check their email.",
+  "consentContactSupport": "Contact support",
+
+  "profileTitle": "My Profile",
+  "profileLanguagePreference": "Reading Language",
+  "profileLanguageEn": "English",
+  "profileLanguageTl": "Tagalog",
+  "profileLanguageBik": "Bikol",
+
+  "libraryTitle": "Stories",
+  "libraryEmpty": "No stories available yet.",
+  "libraryChapterCount": "{count, plural, =1{1 chapter} other{{count} chapters}}",
+  "@libraryChapterCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "libraryAvailableIn": "Available in:",
+  "libraryProgressLabel": "{completed} of {total} chapters",
+  "@libraryProgressLabel": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+
+  "chaptersTitle": "Chapters",
+  "chapterLocked": "Locked",
+  "chapterCompleted": "Completed",
+  "chapterUnlocked": "Start Reading",
+  "chapterCurrent": "Continue",
+  "chapterLockedHint": "Complete the previous chapter to unlock.",
+
+  "readerTextSizeLabel": "Text Size",
+  "readerVocabHintTitle": "Vocabulary",
+  "readerStartChallenge": "Take the Quiz",
+  "readerAlreadyCompleted": "Chapter Completed ✓",
+  "readerChapterComplete": "Chapter complete! You earned {xp} XP.",
+  "@readerChapterComplete": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+
+  "challengeTitle": "Reading Check",
+  "challengeQuestion": "Question {current} of {total}",
+  "@challengeQuestion": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "challengeSubmit": "Submit Answers",
+  "challengeSubmitting": "Checking your answers…",
+  "challengeResultPass": "Well done! You scored {score}%.",
+  "@challengeResultPass": {
+    "placeholders": { "score": { "type": "int" } }
+  },
+  "challengeResultFail": "You scored {score}%. Try again to unlock the next chapter.",
+  "@challengeResultFail": {
+    "placeholders": { "score": { "type": "int" } }
+  },
+  "challengeXpEarned": "+{xp} XP",
+  "@challengeXpEarned": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "challengeAlreadyCompleted": "You have already completed this quiz.",
+  "challengeErrorNotEligible": "You are not eligible to attempt this quiz.",
+  "challengeNextChapter": "Next Chapter",
+  "challengeRetry": "Try Again",
+  "challengeBackToStory": "Back to Story",
+
+  "progressTitle": "My Progress",
+  "progressXpTotal": "{xp} XP earned",
+  "@progressXpTotal": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "progressStoriesStarted": "Stories started",
+  "progressChaptersCompleted": "Chapters completed",
+  "progressRecentAttempts": "Recent Quiz Results",
+  "progressNoAttempts": "No quiz results yet.",
+  "progressAttemptScore": "{score}% on {chapter}",
+  "@progressAttemptScore": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "chapter": { "type": "String" }
+    }
+  }
+}

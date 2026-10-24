@@ -1,0 +1,125 @@
+{
+  "@@locale": "bik",
+  "@@x-needs-review": "true",
+  "@@x-reviewer-note": "This Bikol (Central Bikol) translation needs review by a fluent Bikol speaker before production use. Some strings use English fallbacks where Bikol phrasing is uncertain.",
+
+  "appName": "BasaLINO",
+  "continueLabel": "Padagos",
+  "cancelLabel": "Kanselaon",
+  "saveLabel": "I-save",
+  "retryLabel": "Subukan giraray",
+  "closeLabel": "Isara",
+  "nextLabel": "Sunod",
+  "backLabel": "Bumalik",
+  "submitLabel": "Ipadara",
+  "loadingLabel": "Naglo-load…",
+  "errorGeneric": "May nangyari. Subukan giraray.",
+  "errorNoInternet": "Mayong koneksyon sa internet. Suriin an imo network.",
+  "errorUnauthorized": "Dai ka awtorisado na gibohon ini.",
+
+  "authSignIn": "Mag-sign In",
+  "authSignUp": "Gumibo nin Account",
+  "authSignOut": "Mag-sign Out",
+  "authEmail": "Email",
+  "authPassword": "Password",
+  "authNickname": "Palayaw",
+  "authForgotPassword": "Nalingawan an password?",
+  "authResetPassword": "I-reset an Password",
+  "authResetPasswordSent": "Naipadara na an email para i-reset an password. Suriin an imo inbox.",
+  "authNoAccount": "Mayong account? Mag-sign up",
+  "authHaveAccount": "Igwa nang account? Mag-sign in",
+  "authEmailInvalid": "Maglagay nin tamang email address.",
+  "authPasswordTooShort": "An password dapat may 8 man sanang karakter.",
+  "authNicknameTooShort": "An palayaw dapat may 2 man sanang karakter.",
+  "authErrorEmailInUse": "Ginagamit na ini na email.",
+  "authErrorWrongPassword": "Salang email o password.",
+  "authErrorUserNotFound": "Mayong account na igwa kaining email.",
+  "authErrorTooManyRequests": "Dakul na pagsubuk. Maghuwat asin subukan giraray.",
+
+  "consentTitle": "Kaipuhan an Permiso nin Maggurang",
+  "consentBody": "An BasaLINO para sa mga estudyante na mas bata sa 18 taon. An maggurang o tagapag-alaga dapat aprubahan an imo account bago ka maka-access kan mga istorya.",
+  "consentPending": "An imo account naghihulat kan permiso kan tagapag-alaga. Pakihingi sa imo maggurang na suriin an saindang email.",
+  "consentContactSupport": "Makipag-ugnayan sa suporta",
+
+  "profileTitle": "Sakong Profile",
+  "profileLanguagePreference": "Lenggwahe sa Pagbasa",
+  "profileLanguageEn": "Ingles",
+  "profileLanguageTl": "Tagalog",
+  "profileLanguageBik": "Bikol",
+
+  "libraryTitle": "Mga Istorya",
+  "libraryEmpty": "Mayong mga istorya pa.",
+  "libraryChapterCount": "{count, plural, =1{1 kapitulo} other{{count} na kapitulo}}",
+  "@libraryChapterCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "libraryAvailableIn": "Maabot sa:",
+  "libraryProgressLabel": "{completed} sa {total} na kapitulo",
+  "@libraryProgressLabel": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+
+  "chaptersTitle": "Mga Kapitulo",
+  "chapterLocked": "Naka-lock",
+  "chapterCompleted": "Natapos",
+  "chapterUnlocked": "Magtukdo",
+  "chapterCurrent": "Padagos",
+  "chapterLockedHint": "Tapuson an nakaaging kapitulo para ma-unlock.",
+
+  "readerTextSizeLabel": "Sukat kan Teksto",
+  "readerVocabHintTitle": "Bokabularyo",
+  "readerStartChallenge": "Kumuha nin Quiz",
+  "readerAlreadyCompleted": "Natapos an Kapitulo ✓",
+  "readerChapterComplete": "Natapos an kapitulo! Nakakuha ka nin {xp} XP.",
+  "@readerChapterComplete": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+
+  "challengeTitle": "Pagsuri sa Pagbasa",
+  "challengeQuestion": "Hapot {current} sa {total}",
+  "@challengeQuestion": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "challengeSubmit": "Ipadara an mga Simbag",
+  "challengeSubmitting": "Sinusuri an imo mga simbag…",
+  "challengeResultPass": "Maray! Nakakuha ka nin {score}%.",
+  "@challengeResultPass": {
+    "placeholders": { "score": { "type": "int" } }
+  },
+  "challengeResultFail": "Nakakuha ka nin {score}%. Subukan giraray para ma-unlock an sunod na kapitulo.",
+  "@challengeResultFail": {
+    "placeholders": { "score": { "type": "int" } }
+  },
+  "challengeXpEarned": "+{xp} XP",
+  "@challengeXpEarned": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "challengeAlreadyCompleted": "Natapos mo na ini na quiz.",
+  "challengeErrorNotEligible": "Dai ka karapat-dapat na sumubok kaining quiz.",
+  "challengeNextChapter": "Sunod na Kapitulo",
+  "challengeRetry": "Subukan Giraray",
+  "challengeBackToStory": "Bumalik sa Istorya",
+
+  "progressTitle": "Sakong Pag-asenso",
+  "progressXpTotal": "{xp} XP na nakuha",
+  "@progressXpTotal": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "progressStoriesStarted": "Mga istoryang sinimulan",
+  "progressChaptersCompleted": "Mga kapitulong natapos",
+  "progressRecentAttempts": "Mga Kaibabang Resulta nin Quiz",
+  "progressNoAttempts": "Mayong mga resulta pa.",
+  "progressAttemptScore": "{score}% sa {chapter}",
+  "@progressAttemptScore": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "chapter": { "type": "String" }
+    }
+  }
+}

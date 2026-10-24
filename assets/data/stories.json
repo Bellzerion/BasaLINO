@@ -1,0 +1,18 @@
+[
+  {
+    "id": "ibalong",
+    "titleEn": "Ibalong",
+    "descriptionEn": "An ancient Bikol epic poem recounting the heroic battles of Handiong, Bantong, and Baltog against mythical monsters in the land of Ibalong.",
+    "availableLanguages": ["en", "tl", "bik"],
+    "chapterCount": 3,
+    "coverImageAsset": "assets/images/placeholder_ibalong.png"
+  },
+  {
+    "id": "mayon",
+    "titleEn": "The Legend of Mount Mayon",
+    "descriptionEn": "A beautiful love story that tells of Magayon and Panganoron, and how their tragic fate gave birth to the perfect cone of Mount Mayon.",
+    "availableLanguages": ["en", "tl", "bik"],
+    "chapterCount": 3,
+    "coverImageAsset": "assets/images/placeholder_mayon.png"
+  }
+]

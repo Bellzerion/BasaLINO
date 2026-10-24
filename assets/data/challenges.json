@@ -1,0 +1,153 @@
+[
+  {
+    "id": "chal_ibalong_ch1_en",
+    "chapterId": "ibalong_ch1",
+    "languageCode": "en",
+    "questions": [
+      {
+        "id": "q1",
+        "questionText": "Who was the first hero to bring hope to the people of Ibalong?",
+        "choices": ["Handiong", "Baltog", "Bantong", "Makusog"]
+      },
+      {
+        "id": "q2",
+        "questionText": "What monstrous creature did Baltog defeat with his bare hands?",
+        "choices": ["Tandayag the wild boar", "Oryol the serpent", "Rabot the half-man", "The winged Tiburones"]
+      },
+      {
+        "id": "q3",
+        "questionText": "Where did Baltog display the tusks of the defeated beast as a sign of triumph?",
+        "choices": ["On a village gate", "On a tree", "In a sacred cave", "At the mountain peak"]
+      }
+    ]
+  },
+  {
+    "id": "chal_ibalong_ch1_tl",
+    "chapterId": "ibalong_ch1",
+    "languageCode": "tl",
+    "questions": [
+      {
+        "id": "q1",
+        "questionText": "Sino ang unang bayani na nagdala ng pag-asa sa mga tao ng Ibalong?",
+        "choices": ["Handiong", "Baltog", "Bantong", "Makusog"]
+      },
+      {
+        "id": "q2",
+        "questionText": "Anong halimaw ang tinalo ni Baltog gamit ang kanyang sariling mga kamay?",
+        "choices": ["Tandayag na baboy-ramo", "Oryol na ahas", "Rabot na kalahating tao", "Mga may pakpak na Tiburones"]
+      },
+      {
+        "id": "q3",
+        "questionText": "Saan isinabit ni Baltog ang mga pangil ng napatay na nilalang bilang tanda ng tagumpay?",
+        "choices": ["Sa tarangkahan ng nayon", "Sa isang puno", "Sa sagradong kuweba", "Sa tuktok ng bundok"]
+      }
+    ]
+  },
+  {
+    "id": "chal_ibalong_ch1_bik",
+    "chapterId": "ibalong_ch1",
+    "languageCode": "bik",
+    "questions": [
+      {
+        "id": "q1",
+        "questionText": "Siisay an enot na bayani na nagdara nin paglaom sa banwaan kan Ibalong?",
+        "choices": ["Handiong", "Baltog", "Bantong", "Makusog"]
+      },
+      {
+        "id": "q2",
+        "questionText": "Anong halimaw an dinaog ni Baltog gamit an saiyang mga kamot?",
+        "choices": ["Tandayag na baboy-ihalas", "Oryol na halas", "Rabot", "Tiburones"]
+      },
+      {
+        "id": "q3",
+        "questionText": "Saen ibinitay ni Baltog an mga ngipon kan hayop bilang tanda kan kapangganahan?",
+        "choices": ["Sa pinto kan banwa", "Sa sarong kahoy", "Sa kuweba", "Sa alituktok kan bukid"]
+      }
+    ]
+  },
+  {
+    "id": "chal_ibalong_ch2_en",
+    "chapterId": "ibalong_ch2",
+    "languageCode": "en",
+    "questions": [
+      {
+        "id": "q1",
+        "questionText": "Which hero fought monsters over many years and subdued the enchanting Oryol?",
+        "choices": ["Baltog", "Handiong", "Bantong", "Parotpot"]
+      },
+      {
+        "id": "q2",
+        "questionText": "What special power did Oryol use against approaching warriors?",
+        "choices": ["Breathing fire", "Enchanting voice", "Poisonous fangs", "Superhuman strength"]
+      }
+    ]
+  },
+  {
+    "id": "chal_ibalong_ch3_en",
+    "chapterId": "ibalong_ch3",
+    "languageCode": "en",
+    "questions": [
+      {
+        "id": "q1",
+        "questionText": "What was the key weakness of the monster Rabot discovered by Bantong?",
+        "choices": ["It fell into a deep sleep every afternoon", "It feared water", "It could not see in sunlight", "It was vulnerable to silver"]
+      },
+      {
+        "id": "q2",
+        "questionText": "What kind of fighter was Bantong primarily described as?",
+        "choices": ["A reckless berserker", "A patient, observant hunter", "A naval commander", "A magic chanter"]
+      }
+    ]
+  },
+  {
+    "id": "chal_mayon_ch1_en",
+    "chapterId": "mayon_ch1",
+    "languageCode": "en",
+    "questions": [
+      {
+        "id": "q1",
+        "questionText": "What does the name 'Magayon' mean in the Bikol language?",
+        "choices": ["Strong", "Beautiful", "Gentle", "Golden"]
+      },
+      {
+        "id": "q2",
+        "questionText": "Where did Panganoron first catch sight of Magayon?",
+        "choices": ["At a village harvest festival", "At the clear spring of Yawa", "In the royal palace", "During a mountain storm"]
+      }
+    ]
+  },
+  {
+    "id": "chal_mayon_ch2_en",
+    "chapterId": "mayon_ch2",
+    "languageCode": "en",
+    "questions": [
+      {
+        "id": "q1",
+        "questionText": "Who was the arrogant rival who threatened to burn the village to possess Magayon?",
+        "choices": ["Baltog", "Rabot", "Parotpot", "Makusog"]
+      },
+      {
+        "id": "q2",
+        "questionText": "How did Panganoron respond to Parotpot's ultimatum?",
+        "choices": ["He paid gold ransom", "He fought and defeated Parotpot's men", "He fled to the northern mountains", "He challenged Makusog to a duel"]
+      }
+    ]
+  },
+  {
+    "id": "chal_mayon_ch3_en",
+    "chapterId": "mayon_ch3",
+    "languageCode": "en",
+    "questions": [
+      {
+        "id": "q1",
+        "questionText": "What tragic event happened on the wedding day of Magayon and Panganoron?",
+        "choices": ["A storm swept the village", "Parotpot's arrow struck Panganoron", "The mountain collapsed", "Magayon was captured"]
+      },
+      {
+        "id": "q2",
+        "questionText": "According to legend, what does the eruption of Mount Mayon signify?",
+        "choices": ["The anger of village elders", "Magayon weeping for her lost beloved", "Celebration of ancient battles", "A warning to distant tribes"]
+      }
+    ]
+  }
+]

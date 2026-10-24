@@ -1,0 +1,125 @@
+{
+  "@@locale": "tl",
+  "@@x-needs-review": "true",
+  "@@x-reviewer-note": "This Tagalog translation needs review by a fluent Tagalog speaker before production use.",
+
+  "appName": "BasaLINO",
+  "continueLabel": "Magpatuloy",
+  "cancelLabel": "Kanselahin",
+  "saveLabel": "I-save",
+  "retryLabel": "Subukan muli",
+  "closeLabel": "Isara",
+  "nextLabel": "Susunod",
+  "backLabel": "Bumalik",
+  "submitLabel": "Isumite",
+  "loadingLabel": "Naglo-load…",
+  "errorGeneric": "May nangyaring mali. Pakisubukan muli.",
+  "errorNoInternet": "Walang koneksyon sa internet. Suriin ang iyong network.",
+  "errorUnauthorized": "Wala kang pahintulot na gawin ito.",
+
+  "authSignIn": "Mag-sign In",
+  "authSignUp": "Lumikha ng Account",
+  "authSignOut": "Mag-sign Out",
+  "authEmail": "Email",
+  "authPassword": "Password",
+  "authNickname": "Palayaw",
+  "authForgotPassword": "Nakalimutan ang password?",
+  "authResetPassword": "I-reset ang Password",
+  "authResetPasswordSent": "Naipadala ang email para i-reset ang password. Suriin ang iyong inbox.",
+  "authNoAccount": "Wala pang account? Mag-sign up",
+  "authHaveAccount": "Mayroon nang account? Mag-sign in",
+  "authEmailInvalid": "Maglagay ng wastong email address.",
+  "authPasswordTooShort": "Ang password ay dapat na may hindi bababa sa 8 na karakter.",
+  "authNicknameTooShort": "Ang palayaw ay dapat na may hindi bababa sa 2 na karakter.",
+  "authErrorEmailInUse": "Ginagamit na ang email na ito.",
+  "authErrorWrongPassword": "Mali ang email o password.",
+  "authErrorUserNotFound": "Walang account na may email na ito.",
+  "authErrorTooManyRequests": "Masyadong maraming pagtatangka. Mangyaring maghintay at subukan muli.",
+
+  "consentTitle": "Kailangan ang Pahintulot ng Magulang",
+  "consentBody": "Ang BasaLINO ay para sa mga mag-aaral na wala pang 18 taong gulang. Ang isang magulang o tagapag-alaga ay kailangang aprubahan ang iyong account bago mo ma-access ang mga kwento at hamon.",
+  "consentPending": "Ang iyong account ay naghihintay ng pahintulot ng tagapag-alaga. Hilingin sa iyong magulang o tagapag-alaga na suriin ang kanilang email.",
+  "consentContactSupport": "Makipag-ugnayan sa suporta",
+
+  "profileTitle": "Aking Profile",
+  "profileLanguagePreference": "Wika sa Pagbabasa",
+  "profileLanguageEn": "Ingles",
+  "profileLanguageTl": "Tagalog",
+  "profileLanguageBik": "Bikol",
+
+  "libraryTitle": "Mga Kwento",
+  "libraryEmpty": "Wala pang mga kwento.",
+  "libraryChapterCount": "{count, plural, =1{1 kabanata} other{{count} na kabanata}}",
+  "@libraryChapterCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "libraryAvailableIn": "Makukuha sa:",
+  "libraryProgressLabel": "{completed} sa {total} na kabanata",
+  "@libraryProgressLabel": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+
+  "chaptersTitle": "Mga Kabanata",
+  "chapterLocked": "Naka-lock",
+  "chapterCompleted": "Natapos",
+  "chapterUnlocked": "Simulan ang Pagbabasa",
+  "chapterCurrent": "Magpatuloy",
+  "chapterLockedHint": "Tapusin ang nakaraang kabanata para ma-unlock.",
+
+  "readerTextSizeLabel": "Laki ng Teksto",
+  "readerVocabHintTitle": "Talasalitaan",
+  "readerStartChallenge": "Kumuha ng Quiz",
+  "readerAlreadyCompleted": "Natapos ang Kabanata ✓",
+  "readerChapterComplete": "Natapos ang kabanata! Nakakuha ka ng {xp} XP.",
+  "@readerChapterComplete": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+
+  "challengeTitle": "Pagsusuri sa Pagbabasa",
+  "challengeQuestion": "Tanong {current} sa {total}",
+  "@challengeQuestion": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "challengeSubmit": "Isumite ang mga Sagot",
+  "challengeSubmitting": "Sinusuri ang iyong mga sagot…",
+  "challengeResultPass": "Magaling! Nakakuha ka ng {score}%.",
+  "@challengeResultPass": {
+    "placeholders": { "score": { "type": "int" } }
+  },
+  "challengeResultFail": "Nakakuha ka ng {score}%. Subukan muli para ma-unlock ang susunod na kabanata.",
+  "@challengeResultFail": {
+    "placeholders": { "score": { "type": "int" } }
+  },
+  "challengeXpEarned": "+{xp} XP",
+  "@challengeXpEarned": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "challengeAlreadyCompleted": "Natapos mo na ang quiz na ito.",
+  "challengeErrorNotEligible": "Hindi ka karapat-dapat na sumubok ng quiz na ito.",
+  "challengeNextChapter": "Susunod na Kabanata",
+  "challengeRetry": "Subukan Muli",
+  "challengeBackToStory": "Bumalik sa Kwento",
+
+  "progressTitle": "Aking Pag-unlad",
+  "progressXpTotal": "{xp} XP na nakuha",
+  "@progressXpTotal": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "progressStoriesStarted": "Mga kwentong sinimulan",
+  "progressChaptersCompleted": "Mga kabanatang natapos",
+  "progressRecentAttempts": "Mga Kamakailang Resulta ng Quiz",
+  "progressNoAttempts": "Wala pang mga resulta ng quiz.",
+  "progressAttemptScore": "{score}% sa {chapter}",
+  "@progressAttemptScore": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "chapter": { "type": "String" }
+    }
+  }
+}

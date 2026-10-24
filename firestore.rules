@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isApproved(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.approvalStatus == 'approved';
+    }
+
+    // Default: Deny all reads and writes
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Users collection:
+    // Learners can read their own profile; cannot alter their approvalStatus or totalXp.
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+                    && request.resource.data.approvalStatus == 'pending'
+                    && request.resource.data.totalXp == 0;
+      allow update: if isOwner(userId)
+                    && request.resource.data.approvalStatus == resource.data.approvalStatus
+                    && request.resource.data.totalXp == resource.data.totalXp;
+    }
+
+    // Stories and Chapters: Authenticated users can read story metadata and chapters
+    match /stories/{storyId} {
+      allow read: if isAuthenticated();
+    }
+
+    match /chapters/{chapterId} {
+      allow read: if isAuthenticated();
+    }
+
+    match /chapterTranslations/{transId} {
+      allow read: if isAuthenticated();
+    }
+
+    // Challenges: Authenticated users can read question prompts and choices
+    match /challenges/{challengeId} {
+      allow read: if isAuthenticated();
+    }
+
+    // ChallengeKeys: Strictly server-only. CLIENTS CAN NEVER READ OR WRITE.
+    match /challengeKeys/{challengeId} {
+      allow read, write: if false;
+    }
+
+    // Progress: Learner can read their own progress; writes must go through trusted Cloud Functions.
+    match /users/{userId}/progress/{storyId} {
+      allow read: if isOwner(userId);
+      allow write: if false;
+    }
+
+    // Attempts: Learners can read their own attempts; writes occur via trusted submitAttempt function.
+    match /attempts/{attemptId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow write: if false;
+    }
+  }
+}
