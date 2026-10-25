@@ -2,6 +2,7 @@
     <application
         android:label="basalino"
         android:name="${applicationName}"
+        android:forceDarkAllowed="false"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

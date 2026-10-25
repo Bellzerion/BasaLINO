@@ -5,6 +5,7 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/consent/presentation/consent_gate_screen.dart';
 import '../../features/stories/presentation/home_screen.dart';
+import '../../features/stories/presentation/cleared_stories_screen.dart';
 import '../../features/stories/presentation/chapter_list_screen.dart';
 import '../../features/reader/presentation/reader_screen.dart';
 import '../../features/challenges/presentation/challenge_screen.dart';
@@ -52,6 +53,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/library',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/cleared-stories',
+        builder: (context, state) => const ClearedStoriesScreen(),
       ),
       GoRoute(
         path: '/story/:storyId',

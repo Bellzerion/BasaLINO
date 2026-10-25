@@ -60,7 +60,11 @@ class HomeScreen extends ConsumerWidget {
                   ]),
                 ),
               ),
-              _Nav(onProgress: () => context.push('/progress'), onProfile: () => context.push('/profile')),
+              _Nav(
+                onClearedStories: () => context.push('/cleared-stories'),
+                onProgress: () => context.push('/progress'),
+                onProfile: () => context.push('/profile'),
+              ),
             ]),
               );
             },
@@ -177,11 +181,32 @@ class _ChapterMapItem extends StatelessWidget {
 }
 
 class _Nav extends StatelessWidget {
-  const _Nav({required this.onProgress, required this.onProfile});
-  final VoidCallback onProgress; final VoidCallback onProfile;
+  const _Nav({
+    required this.onClearedStories,
+    required this.onProgress,
+    required this.onProfile,
+  });
+
+  final VoidCallback onClearedStories;
+  final VoidCallback onProgress;
+  final VoidCallback onProfile;
+
   @override
-  Widget build(BuildContext context) => Container(height: 62, color: const Color(0xFFDCEDE7), child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-    const Icon(Icons.home_rounded, color: Color(0xFF075C31)), const Icon(Icons.menu_book_rounded, color: Color(0xFF075C31)),
-    IconButton(onPressed: onProgress, icon: const Icon(Icons.star_rounded, color: Color(0xFF075C31))), IconButton(onPressed: onProfile, icon: const Icon(Icons.person_rounded, color: Color(0xFF075C31))),
-  ]));
+  Widget build(BuildContext context) => Container(
+        height: 62,
+        color: const Color(0xFFDCEDE7),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            const Icon(Icons.home_rounded, color: Color(0xFF075C31)),
+            IconButton(
+              tooltip: 'Cleared stories',
+              onPressed: onClearedStories,
+              icon: const Icon(Icons.menu_book_rounded, color: Color(0xFF075C31)),
+            ),
+            IconButton(onPressed: onProgress, icon: const Icon(Icons.star_rounded, color: Color(0xFF075C31))),
+            IconButton(onPressed: onProfile, icon: const Icon(Icons.person_rounded, color: Color(0xFF075C31))),
+          ],
+        ),
+      );
 }
