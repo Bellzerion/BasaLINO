@@ -1,3 +1,5 @@
+// THIS IS RESPONSIBLE FOR OVERALL BACKGROUND THEME
+
 import 'package:flutter/material.dart';
 
 /// Shared illustrated canvas used behind every BasaLINO screen.  The shapes are

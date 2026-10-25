@@ -4,7 +4,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/router/app_router.dart';
 import 'app/theme/app_theme.dart';
-import 'app/bootstrap/providers.dart';
 import 'core/widgets/brand_background.dart';
 
 void main() async {
@@ -29,7 +28,6 @@ class BasaLinoApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-    final langCode = ref.watch(appLanguageProvider);
 
     return MaterialApp.router(
       title: 'BasaLINO',
@@ -37,11 +35,12 @@ class BasaLinoApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       builder: (context, child) => BrandBackground(child: child ?? const SizedBox()),
       routerConfig: router,
-      locale: Locale(langCode),
+      // The reader's language controls the story content. Flutter does not
+      // bundle Material localizations for Tagalog or Central Bikol, so keep
+      // framework controls in English instead of crashing on those choices.
+      locale: const Locale('en'),
       supportedLocales: const [
         Locale('en', ''),
-        Locale('tl', ''),
-        Locale('bik', ''),
       ],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

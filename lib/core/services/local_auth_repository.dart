@@ -81,7 +81,9 @@ class LocalAuthRepository implements AuthRepository {
   void updateLanguage(String lang) {
     if (_currentUser != null) {
       _currentUser = _currentUser!.copyWith(preferredLanguage: lang);
-      _controller.add(_currentUser);
+      // A language choice is presentation state, not an authentication
+      // change. Emitting here rebuilt GoRouter and reset the active reader
+      // route to its initial home location.
     }
   }
 
