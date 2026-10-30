@@ -22,6 +22,7 @@ class HomeScreen extends ConsumerWidget {
       // gives Android an opaque light surface and prevents its window color
       // from showing through the transparent scaffold.
       backgroundColor: const Color(0xFFF7F3E9),
+      extendBody: true,
       body: BrandBackground(
         child: FutureBuilder<List<StoryModel>>(
         future: repo.getStories(),
