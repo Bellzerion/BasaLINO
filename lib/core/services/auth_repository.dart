@@ -19,5 +19,5 @@ abstract class AuthRepository {
 
   void updateLanguage(String lang);
 
-  void addXp(int xp);
+  Future<void> addXp(int xp);
 }

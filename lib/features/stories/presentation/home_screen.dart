@@ -7,7 +7,6 @@ import '../../../app/bootstrap/providers.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/models/chapter_model.dart';
 import '../../../core/models/story_model.dart';
-import '../../../core/widgets/brand_background.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -18,13 +17,8 @@ class HomeScreen extends ConsumerWidget {
     final progressRepo = ref.watch(progressRepositoryProvider);
     final user = ref.watch(currentUserProvider);
     return Scaffold(
-      // Paint the canvas inside this route as well as at the app level. This
-      // gives Android an opaque light surface and prevents its window color
-      // from showing through the transparent scaffold.
-      backgroundColor: const Color(0xFFF7F3E9),
       extendBody: true,
-      body: BrandBackground(
-        child: FutureBuilder<List<StoryModel>>(
+      body: FutureBuilder<List<StoryModel>>(
         future: repo.getStories(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
@@ -80,7 +74,6 @@ class HomeScreen extends ConsumerWidget {
           );
         },
         ),
-      ),
     );
   }
 }

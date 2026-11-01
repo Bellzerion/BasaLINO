@@ -79,7 +79,7 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  void addXp(int xp) {
+  Future<void> addXp(int xp) async {
     // In production, XP is awarded strictly server-side in Cloud Function transactions
   }
 }

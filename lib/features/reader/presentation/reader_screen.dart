@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/bootstrap/providers.dart';
 import '../../../core/models/chapter_translation_model.dart';
 import '../../../core/models/vocab_hint_model.dart';
+import '../../../core/services/local_progress_repository.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({
@@ -22,6 +25,100 @@ class ReaderScreen extends ConsumerStatefulWidget {
 
 class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   double _fontSize = 17.0;
+  final ScrollController _readingController = ScrollController();
+  Timer? _readingSaveTimer;
+  LocalProgressRepository? _localProgressRepository;
+  String? _readingUserId;
+  String? _restoringReadingKey;
+  bool _isRestoringReadingPosition = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _readingController.addListener(_scheduleReadingPositionSave);
+  }
+
+  @override
+  void dispose() {
+    _readingSaveTimer?.cancel();
+    if (_readingController.hasClients) {
+      unawaited(_saveReadingPosition());
+    }
+    _readingController
+      ..removeListener(_scheduleReadingPositionSave)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _reportReadingStorageError(Object error, StackTrace stackTrace) {
+    FlutterError.reportError(FlutterErrorDetails(
+      exception: error,
+      stack: stackTrace,
+      library: 'reader progress persistence',
+    ));
+  }
+
+  void _restoreReadingPosition(String userId) {
+    final key = '$userId/${widget.storyId}/${widget.chapterId}';
+    if (_restoringReadingKey == key) return;
+    _restoringReadingKey = key;
+    _readingUserId = userId;
+    final progressRepository = ref.read(progressRepositoryProvider);
+    if (progressRepository is! LocalProgressRepository) return;
+    _localProgressRepository = progressRepository;
+    _isRestoringReadingPosition = true;
+
+    unawaited(() async {
+      try {
+        final savedPosition = await progressRepository.getReadingPosition(
+          userId: userId,
+          storyId: widget.storyId,
+          chapterId: widget.chapterId,
+        );
+        if (!mounted || _restoringReadingKey != key) return;
+        if (savedPosition != null) {
+          await WidgetsBinding.instance.endOfFrame;
+          if (!mounted || !_readingController.hasClients) return;
+          final maxExtent = _readingController.position.maxScrollExtent;
+          _readingController.jumpTo(savedPosition.clamp(0, maxExtent));
+        }
+        _isRestoringReadingPosition = false;
+      } catch (error, stackTrace) {
+        _isRestoringReadingPosition = false;
+        _reportReadingStorageError(error, stackTrace);
+      }
+    }());
+  }
+
+  void _scheduleReadingPositionSave() {
+    if (_isRestoringReadingPosition ||
+        !_readingController.hasClients ||
+        _localProgressRepository == null ||
+        _readingUserId == null) {
+      return;
+    }
+    _readingSaveTimer?.cancel();
+    _readingSaveTimer = Timer(const Duration(milliseconds: 500), () {
+      unawaited(_saveReadingPosition());
+    });
+  }
+
+  Future<void> _saveReadingPosition() async {
+    final repository = _localProgressRepository;
+    final userId = _readingUserId;
+    if (repository == null || userId == null || !_readingController.hasClients) return;
+
+    try {
+      await repository.saveReadingPosition(
+        userId: userId,
+        storyId: widget.storyId,
+        chapterId: widget.chapterId,
+        position: _readingController.offset,
+      );
+    } catch (error, stackTrace) {
+      _reportReadingStorageError(error, stackTrace);
+    }
+  }
 
   void _showVocabSheet(VocabHintModel hint) {
     showModalBottomSheet(
@@ -150,6 +247,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   Widget build(BuildContext context) {
     final storyRepo = ref.watch(storyRepositoryProvider);
     final currentLang = ref.watch(appLanguageProvider);
+    final userId = ref.watch(currentUserProvider)?.uid ?? 'guest';
 
     return Scaffold(
       appBar: AppBar(
@@ -211,8 +309,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           }
 
           final trans = snapshot.data!;
+          _restoreReadingPosition(userId);
 
           return SingleChildScrollView(
+            controller: _readingController,
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

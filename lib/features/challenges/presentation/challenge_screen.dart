@@ -64,7 +64,7 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
 
       // Add XP to user profile
       if (res.xpAwarded > 0) {
-        ref.read(authRepositoryProvider).addXp(res.xpAwarded);
+        await ref.read(authRepositoryProvider).addXp(res.xpAwarded);
       }
 
       setState(() {
