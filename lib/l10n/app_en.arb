@@ -120,5 +120,151 @@
       "score": { "type": "int" },
       "chapter": { "type": "String" }
     }
+  },
+
+  "loginTagline": "Reading becomes an adventure.",
+  "loginIntroduction": "Discover Philippine stories, one chapter at a time.",
+  "authEmailLabel": "Email Address",
+  "authCompleteRequired": "Please complete all required fields.",
+  "registerIntroduction": "Join BasaLINO and start your reading quest.",
+  "authLearnerNicknameLabel": "Learner Nickname",
+
+  "homeStoriesUnavailable": "Stories are unavailable right now.",
+  "homeExplorer": "Explorer",
+  "homeAdventureMap": "Adventure Map",
+  "homeMoreStories": "More stories to explore",
+  "homeGreeting": "Hi, {name}!",
+  "@homeGreeting": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "homeGreetingPrompt": "Ready for your next Adventure?",
+  "homeAdventureFilipino": "Adventure - Filipino Story",
+  "homeFirstChapterReady": "Your first chapter is ready",
+  "homeChapterProgress": "Chapter {current} of {total}",
+  "@homeChapterProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "homeClearedStories": "Cleared stories",
+  "homeChapterStart": "Start",
+
+  "progressJourneyTitle": "My Learning Journey",
+  "progressLearner": "Learner: {name}",
+  "@progressLearner": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "progressStoriesInProgress": "Stories in Progress",
+  "progressStartPrompt": "Start reading stories to track your progress!",
+  "progressChapterCount": "{count, plural, =1{1 chapter completed} other{{count} chapters completed}}",
+  "@progressChapterCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "progressNoQuizAttemptsRecorded": "No quiz attempts recorded yet.",
+  "progressScoreAndXp": "Score: {score}% • +{xp} XP",
+  "@progressScoreAndXp": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "xp": { "type": "int" }
+    }
+  },
+  "progressPassed": "PASSED",
+  "progressRetry": "RETRY",
+  "progressExplorer": "Explorer",
+  "progressMayonStoryTitle": "The Legend of Mount Mayon",
+
+  "profileLearner": "Learner",
+  "profileEnglishDescription": "Default content & quizzes",
+  "profileTagalogDescription": "Wikang Pambansa",
+  "profileBikolCentral": "Bikol (Central)",
+  "profileBikolDescription": "Bikol Sentral Translation",
+
+  "challengeIncompleteQuestions": "Please answer all questions before submitting.",
+  "challengeUnavailable": "Challenge content currently unavailable.",
+  "challengeInstructions": "Answer all {count} questions correctly to earn XP and unlock the next chapter.",
+  "@challengeInstructions": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "challengeSubmitFailed": "Failed to submit: {error}",
+  "@challengeSubmitFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "challengeResultAwesome": "Awesome Job!",
+  "challengeResultKeepPracticing": "Keep Practicing!",
+  "challengeResultPassDetail": "You scored {score}% ({correct}/{total} correct)!",
+  "@challengeResultPassDetail": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "correct": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "challengeResultFailDetail": "You scored {score}%. Score at least {threshold}% to unlock the next chapter.",
+  "@challengeResultFailDetail": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "threshold": { "type": "int" }
+    }
+  },
+  "challengeXpEarned": "+{xp} XP Earned!",
+  "@challengeXpEarned": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "challengeBackToChapters": "Back to Chapters",
+  "challengeReadNextChapter": "Read Next Chapter",
+
+  "readerTitle": "Story Reader",
+  "readerAdjustTextSize": "Adjust text size",
+  "readerSelectLanguage": "Select Language",
+  "readerLanguageEnglish": "English (EN)",
+  "readerLanguageTagalog": "Tagalog (TL)",
+  "readerLanguageBikol": "Bikol (BIK)",
+  "readerUnavailable": "Chapter content unavailable in selected language.",
+  "readerReadInEnglish": "Read in English",
+  "readerTranslationReview": "This translation is in review by language specialists.",
+  "readerFallbackVocabularyDefinition": "A key story vocabulary term.",
+
+  "chapterListDescription": "Read each chapter in order and pass the reading check to unlock the next chapter.",
+  "chapterError": "Error: {error}",
+  "@chapterError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "chapterEmpty": "No chapters found.",
+  "chapterLabel": "Chapter {number}",
+  "@chapterLabel": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "chapterStatusUnlocked": "Unlocked",
+  "chapterQuizUnlockHint": "Complete the previous chapter quiz to unlock this chapter.",
+  "chapterFallbackStory": "Story",
+
+  "clearedStoriesTitle": "Cleared Stories",
+  "clearedStoriesLoadError": "Your cleared stories could not be loaded.",
+  "clearedStoryChapterCount": "{count, plural, =1{1 chapter cleared} other{{count} chapters cleared}}",
+  "@clearedStoryChapterCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "clearedStoriesEmptyTitle": "No cleared stories yet",
+  "clearedStoriesEmptyDescription": "Finish every chapter and its reading check to add a story to your collection.",
+  "clearedStoriesContinueReading": "Continue reading",
+
+  "consentInformation": "BasaLINO takes child safety and privacy seriously. An email was sent to your registered guardian with instructions to approve your learner access.",
+  "consentApprovalStillPending": "Approval status checked: still pending.",
+  "consentCheckApproval": "Check Approval Status",
+
+  "libraryAppBarTitle": "BasaLINO Library",
+  "libraryProgressTooltip": "My Progress",
+  "libraryProfileTooltip": "Profile & Language",
+  "libraryLoadError": "Error loading stories: {error}",
+  "@libraryLoadError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "libraryCompletedChapterCount": "{completed} of {total} chapters completed",
+  "@libraryCompletedChapterCount": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
   }
 }

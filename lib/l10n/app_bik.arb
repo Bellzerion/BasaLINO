@@ -121,5 +121,151 @@
       "score": { "type": "int" },
       "chapter": { "type": "String" }
     }
+  },
+
+  "loginTagline": "An pagbasa nagigin pakikipagsapalaran.",
+  "loginIntroduction": "Diskubrehon an mga istoryang Pilipino, sarong kapitulo sa kada pagkakataon.",
+  "authEmailLabel": "Email Address",
+  "authCompleteRequired": "Pakiaran an gabos na kaipuhan na field.",
+  "registerIntroduction": "Mag-iba sa BasaLINO asin umagihan an saimong pakikipagsapalaran sa pagbasa.",
+  "authLearnerNicknameLabel": "Palayaw kan Estudyante",
+
+  "homeStoriesUnavailable": "Dai pa maabot an mga istorya sa ngunyan.",
+  "homeExplorer": "Parasiyasat",
+  "homeAdventureMap": "Mapa kan Pakikipagsapalaran",
+  "homeMoreStories": "Dugang pang mga istoryang sisiyasaton",
+  "homeGreeting": "Kumusta, {name}!",
+  "@homeGreeting": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "homeGreetingPrompt": "Handa ka na sa sunod mong pakikipagsapalaran?",
+  "homeAdventureFilipino": "Pakikipagsapalaran - Istoryang Pilipino",
+  "homeFirstChapterReady": "Handa na an enot mong kapitulo",
+  "homeChapterProgress": "Kapitulo {current} sa {total}",
+  "@homeChapterProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "homeClearedStories": "Mga istoryang natapos",
+  "homeChapterStart": "Magpoon",
+
+  "progressJourneyTitle": "Sakong Pag-agih sa Pag-adal",
+  "progressLearner": "Estudyante: {name}",
+  "@progressLearner": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "progressStoriesInProgress": "Mga Istoryang Binabasa",
+  "progressStartPrompt": "Magpoon magbasa nin mga istorya tanganing masubaybayan an saimong pag-uswag!",
+  "progressChapterCount": "{count, plural, =1{natapos an 1 kapitulo} other{natapos an {count} na kapitulo}}",
+  "@progressChapterCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "progressNoQuizAttemptsRecorded": "Mayong nairekord na pagsubok sa quiz.",
+  "progressScoreAndXp": "Iskor: {score}% • +{xp} XP",
+  "@progressScoreAndXp": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "xp": { "type": "int" }
+    }
+  },
+  "progressPassed": "NAKAPASA",
+  "progressRetry": "ULITON",
+  "progressExplorer": "Parasiyasat",
+  "progressMayonStoryTitle": "An Alamat kan Bulkan Mayon",
+
+  "profileLearner": "Estudyante",
+  "profileEnglishDescription": "Default na mga laog asin quiz",
+  "profileTagalogDescription": "Wikang Pambansa",
+  "profileBikolCentral": "Bikol (Sentral)",
+  "profileBikolDescription": "Hubad sa Bikol Sentral",
+
+  "challengeIncompleteQuestions": "Pakisimbagan an gabos na hapot bago ipadara.",
+  "challengeUnavailable": "Dai pa maabot an laog kan pagsulay sa ngunyan.",
+  "challengeInstructions": "Simbagan nin tama an gabos na {count} hapot tanganing makakuha nin XP asin ma-unlock an sunod na kapitulo.",
+  "@challengeInstructions": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "challengeSubmitFailed": "Dai naipadara: {error}",
+  "@challengeSubmitFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "challengeResultAwesome": "Marhay na marhay!",
+  "challengeResultKeepPracticing": "Padagos na magpraktis!",
+  "challengeResultPassDetail": "Nakakuha ka nin {score}% ({correct} sa {total} an tama)!",
+  "@challengeResultPassDetail": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "correct": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "challengeResultFailDetail": "Nakakuha ka nin {score}%. Kaipuhan nin labing menos {threshold}% tanganing ma-unlock an sunod na kapitulo.",
+  "@challengeResultFailDetail": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "threshold": { "type": "int" }
+    }
+  },
+  "challengeXpEarned": "+{xp} XP an nakua!",
+  "@challengeXpEarned": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "challengeBackToChapters": "Bumalik sa mga Kapitulo",
+  "challengeReadNextChapter": "Basahon an Sunod na Kapitulo",
+
+  "readerTitle": "Parabasa nin Istorya",
+  "readerAdjustTextSize": "Ayuson an sukat kan teksto",
+  "readerSelectLanguage": "Pumili nin Lenggwahe",
+  "readerLanguageEnglish": "Ingles (EN)",
+  "readerLanguageTagalog": "Tagalog (TL)",
+  "readerLanguageBikol": "Bikol (BIK)",
+  "readerUnavailable": "Dai maabot sa piniling lenggwahe an laog kan kapitulo.",
+  "readerReadInEnglish": "Basahon sa Ingles",
+  "readerTranslationReview": "Pig-usisa pa kan mga espesyalista sa lenggwahe an hubad na ini.",
+  "readerFallbackVocabularyDefinition": "Mahalagang tataramon sa istorya.",
+
+  "chapterListDescription": "Basahon an mga kapitulo sunod sa pagkasunod-sunod asin ipasar an pagsuri sa pagbasa tanganing ma-unlock an sunod na kapitulo.",
+  "chapterError": "Error: {error}",
+  "@chapterError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "chapterEmpty": "Mayong nahanap na kapitulo.",
+  "chapterLabel": "Kapitulo {number}",
+  "@chapterLabel": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "chapterStatusUnlocked": "Naka-unlock",
+  "chapterQuizUnlockHint": "Tapuson an quiz kan nakaaging kapitulo tanganing ma-unlock ini.",
+  "chapterFallbackStory": "Istorya",
+
+  "clearedStoriesTitle": "Mga Istoryang Natapos",
+  "clearedStoriesLoadError": "Dai ma-load an mga istoryang natapos mo.",
+  "clearedStoryChapterCount": "{count, plural, =1{natapos an 1 kapitulo} other{natapos an {count} na kapitulo}}",
+  "@clearedStoryChapterCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "clearedStoriesEmptyTitle": "Mayong istoryang natapos pa",
+  "clearedStoriesEmptyDescription": "Tapuson an kada kapitulo asin an pagsuri sa pagbasa kaini tanganing maidugang an istorya sa saimong koleksyon.",
+  "clearedStoriesContinueReading": "Magpadagos sa pagbasa",
+
+  "consentInformation": "Seryoso an BasaLINO sa kaligtasan asin pribasidad kan mga aki. Nagpadara nin email sa rehistradong tagapag-ataman mo na igwa nin mga instruksiyon tanganing aprobahan an access mo bilang estudyante.",
+  "consentApprovalStillPending": "Nasuri na an status kan permiso: naghahalat pa.",
+  "consentCheckApproval": "Suriin an Status kan Permiso",
+
+  "libraryAppBarTitle": "Aklatan nin BasaLINO",
+  "libraryProgressTooltip": "Sakong Pag-asenso",
+  "libraryProfileTooltip": "Profile asin Lenggwahe",
+  "libraryLoadError": "Error sa pag-load nin mga istorya: {error}",
+  "@libraryLoadError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "libraryCompletedChapterCount": "{completed} sa {total} na kapitulo an natapos",
+  "@libraryCompletedChapterCount": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
   }
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../app/bootstrap/providers.dart';
 import '../../../core/models/challenge_model.dart';
 import '../../../core/models/attempt_result_model.dart';
 import '../../../core/services/local_progress_repository.dart';
+import '../../../l10n/app_localizations_context.dart';
 
 class ChallengeScreen extends ConsumerStatefulWidget {
   const ChallengeScreen({
@@ -28,7 +30,7 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
   Future<void> _submitQuiz(ChallengeModel challenge) async {
     if (_selectedAnswers.length < challenge.questions.length) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please answer all questions before submitting.')),
+        SnackBar(content: Text(context.l10n.challengeIncompleteQuestions)),
       );
       return;
     }
@@ -73,7 +75,9 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit: $e')),
+          SnackBar(
+            content: Text(context.l10n.challengeSubmitFailed(e.toString())),
+          ),
         );
       }
     } finally {
@@ -91,9 +95,7 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
     final lang = ref.watch(appLanguageProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Comprehension Check'),
-      ),
+      appBar: AppBar(title: Text(context.l10n.challengeTitle)),
       body: FutureBuilder<ChallengeModel?>(
         future: challengeRepo.getChallenge(
           chapterId: widget.chapterId,
@@ -104,7 +106,7 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError || snapshot.data == null) {
-            return const Center(child: Text('Challenge content currently unavailable.'));
+            return Center(child: Text(context.l10n.challengeUnavailable));
           }
 
           final challenge = snapshot.data!;
@@ -126,11 +128,16 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.help_outline_rounded, color: Color(0xFF075C31)),
+                      const Icon(
+                        Icons.help_outline_rounded,
+                        color: Color(0xFF075C31),
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Answer all ${challenge.questions.length} questions correctly to earn XP and unlock the next chapter.',
+                          context.l10n.challengeInstructions(
+                            challenge.questions.length,
+                          ),
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -149,14 +156,19 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
                 }),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: _isSubmitting ? null : () => _submitQuiz(challenge),
+                  onPressed: _isSubmitting
+                      ? null
+                      : () => _submitQuiz(challenge),
                   child: _isSubmitting
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
-                      : const Text('Submit Answers'),
+                      : Text(context.l10n.challengeSubmit),
                 ),
                 const SizedBox(height: 24),
               ],
@@ -183,7 +195,11 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
                   backgroundColor: const Color(0xFF3E8970),
                   child: Text(
                     '$questionNum',
-                    style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -212,20 +228,31 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
                   },
                   borderRadius: BorderRadius.circular(10),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFD8EAE1) : const Color(0xF9FFFDF7),
+                      color: isSelected
+                          ? const Color(0xFFD8EAE1)
+                          : const Color(0xF9FFFDF7),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF075C31) : const Color(0xFFBFDAD0),
+                        color: isSelected
+                            ? const Color(0xFF075C31)
+                            : const Color(0xFFBFDAD0),
                         width: isSelected ? 2 : 1,
                       ),
                     ),
                     child: Row(
                       children: [
                         Icon(
-                          isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-                          color: isSelected ? const Color(0xFF075C31) : const Color(0xFF78958A),
+                          isSelected
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_off,
+                          color: isSelected
+                              ? const Color(0xFF075C31)
+                              : const Color(0xFF78958A),
                           size: 20,
                         ),
                         const SizedBox(width: 10),
@@ -234,8 +261,12 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
                             choice,
                             style: TextStyle(
                               fontSize: 14,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: isSelected ? const Color(0xFF164D36) : const Color(0xFF263B31),
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isSelected
+                                  ? const Color(0xFF164D36)
+                                  : const Color(0xFF263B31),
                             ),
                           ),
                         ),
@@ -260,25 +291,37 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Icon(
-              res.passed ? Icons.emoji_events_rounded : Icons.replay_circle_filled_rounded,
+              res.passed
+                  ? Icons.emoji_events_rounded
+                  : Icons.replay_circle_filled_rounded,
               size: 80,
-              color: res.passed ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+              color: res.passed
+                  ? const Color(0xFF10B981)
+                  : const Color(0xFFEF4444),
             ),
             const SizedBox(height: 16),
             Text(
-              res.passed ? 'Awesome Job!' : 'Keep Practicing!',
+              res.passed
+                  ? context.l10n.challengeResultAwesome
+                  : context.l10n.challengeResultKeepPracticing,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
-                color: res.passed ? const Color(0xFF065F46) : const Color(0xFF991B1B),
+                color: res.passed
+                    ? const Color(0xFF065F46)
+                    : const Color(0xFF991B1B),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               res.passed
-                  ? 'You scored ${res.score}% (${res.correctAnswers}/${res.totalQuestions} correct)!'
-                  : 'You scored ${res.score}%. Score at least 60% to unlock the next chapter.',
+                  ? context.l10n.challengeResultPassDetail(
+                      res.score,
+                      res.correctAnswers,
+                      res.totalQuestions,
+                    )
+                  : context.l10n.challengeResultFailDetail(res.score, 60),
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 15, color: Color(0xFF4B5563)),
             ),
@@ -297,7 +340,7 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
                     const Icon(Icons.stars_rounded, color: Color(0xFFD97706)),
                     const SizedBox(width: 8),
                     Text(
-                      '+${res.xpAwarded} XP Earned!',
+                      context.l10n.challengeXpEarned(res.xpAwarded),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -313,7 +356,7 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
                 onPressed: () {
                   context.go('/reader/${widget.storyId}/${res.nextChapterId}');
                 },
-                child: const Text('Read Next Chapter'),
+                child: Text(context.l10n.challengeReadNextChapter),
               )
             else if (!res.passed)
               ElevatedButton(
@@ -323,12 +366,12 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
                     _selectedAnswers.clear();
                   });
                 },
-                child: const Text('Try Again'),
+                child: Text(context.l10n.challengeRetry),
               ),
             const SizedBox(height: 12),
             OutlinedButton(
               onPressed: () => context.go('/story/${widget.storyId}'),
-              child: const Text('Back to Chapters'),
+              child: Text(context.l10n.challengeBackToChapters),
             ),
           ],
         ),

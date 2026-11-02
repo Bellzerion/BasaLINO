@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../app/bootstrap/providers.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../l10n/app_localizations_context.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -65,14 +67,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Image.asset(
-                  AppAssets.logo,
-                  height: 132,
-                  fit: BoxFit.contain,
-                ),
+                Image.asset(AppAssets.logo, height: 132, fit: BoxFit.contain),
                 const SizedBox(height: 4),
-                const Text(
-                  'Reading becomes an adventure.',
+                Text(
+                  context.l10n.loginTagline,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 24,
@@ -81,9 +79,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text('Discover Philippine stories, one chapter at a time.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Color(0xFF477261))),
+                Text(
+                  context.l10n.loginIntroduction,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF477261),
+                  ),
+                ),
                 const SizedBox(height: 36),
                 if (_errorMessage != null)
                   Container(
@@ -100,8 +103,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 TextField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email Address',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.authEmailLabel,
                     prefixIcon: Icon(Icons.email_outlined),
                   ),
                   keyboardType: TextInputType.emailAddress,
@@ -109,8 +112,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.authPassword,
                     prefixIcon: Icon(Icons.lock_outline),
                   ),
                   obscureText: true,
@@ -127,12 +130,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Sign In'),
+                      : Text(context.l10n.authSignIn),
                 ),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () => context.go('/register'),
-                  child: const Text("Don't have an account? Sign up"),
+                  child: Text(context.l10n.authNoAccount),
                 ),
               ],
             ),

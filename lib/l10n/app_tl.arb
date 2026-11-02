@@ -121,5 +121,151 @@
       "score": { "type": "int" },
       "chapter": { "type": "String" }
     }
+  },
+
+  "loginTagline": "Nagiging pakikipagsapalaran ang pagbabasa.",
+  "loginIntroduction": "Tuklasin ang mga kuwentong Pilipino, isang kabanata sa bawat pagkakataon.",
+  "authEmailLabel": "Email Address",
+  "authCompleteRequired": "Punan ang lahat ng kinakailangang field.",
+  "registerIntroduction": "Sumali sa BasaLINO at simulan ang iyong pakikipagsapalaran sa pagbabasa.",
+  "authLearnerNicknameLabel": "Palayaw ng Mag-aaral",
+
+  "homeStoriesUnavailable": "Hindi available ang mga kuwento sa ngayon.",
+  "homeExplorer": "Manlalakbay",
+  "homeAdventureMap": "Mapa ng Pakikipagsapalaran",
+  "homeMoreStories": "Iba pang kuwentong matutuklasan",
+  "homeGreeting": "Kumusta, {name}!",
+  "@homeGreeting": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "homeGreetingPrompt": "Handa ka na ba sa susunod mong pakikipagsapalaran?",
+  "homeAdventureFilipino": "Pakikipagsapalaran - Kuwentong Pilipino",
+  "homeFirstChapterReady": "Handa na ang iyong unang kabanata",
+  "homeChapterProgress": "Kabanata {current} sa {total}",
+  "@homeChapterProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "homeClearedStories": "Mga kuwentong natapos",
+  "homeChapterStart": "Simulan",
+
+  "progressJourneyTitle": "Aking Paglalakbay sa Pagkatuto",
+  "progressLearner": "Mag-aaral: {name}",
+  "@progressLearner": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "progressStoriesInProgress": "Mga Kuwentong Binabasa",
+  "progressStartPrompt": "Magsimulang magbasa ng mga kuwento para masubaybayan ang iyong progreso!",
+  "progressChapterCount": "{count, plural, =1{1 kabanata ang natapos} other{{count} na kabanata ang natapos}}",
+  "@progressChapterCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "progressNoQuizAttemptsRecorded": "Wala pang naitalang pagsubok sa quiz.",
+  "progressScoreAndXp": "Iskor: {score}% • +{xp} XP",
+  "@progressScoreAndXp": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "xp": { "type": "int" }
+    }
+  },
+  "progressPassed": "PUMASA",
+  "progressRetry": "ULITIN",
+  "progressExplorer": "Manlalakbay",
+  "progressMayonStoryTitle": "Ang Alamat ng Bulkang Mayon",
+
+  "profileLearner": "Mag-aaral",
+  "profileEnglishDescription": "Default na nilalaman at mga quiz",
+  "profileTagalogDescription": "Wikang Pambansa",
+  "profileBikolCentral": "Bikol (Sentral)",
+  "profileBikolDescription": "Salin sa Bikol Sentral",
+
+  "challengeIncompleteQuestions": "Sagutin ang lahat ng tanong bago isumite.",
+  "challengeUnavailable": "Hindi available sa ngayon ang nilalaman ng pagsusulit.",
+  "challengeInstructions": "Sagutin nang tama ang lahat ng {count} tanong para makakuha ng XP at ma-unlock ang susunod na kabanata.",
+  "@challengeInstructions": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "challengeSubmitFailed": "Hindi naisumite: {error}",
+  "@challengeSubmitFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "challengeResultAwesome": "Napakahusay!",
+  "challengeResultKeepPracticing": "Patuloy na magsanay!",
+  "challengeResultPassDetail": "Nakakuha ka ng {score}% ({correct} sa {total} ang tama)!",
+  "@challengeResultPassDetail": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "correct": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "challengeResultFailDetail": "Nakakuha ka ng {score}%. Kailangan ng hindi bababa sa {threshold}% para ma-unlock ang susunod na kabanata.",
+  "@challengeResultFailDetail": {
+    "placeholders": {
+      "score": { "type": "int" },
+      "threshold": { "type": "int" }
+    }
+  },
+  "challengeXpEarned": "+{xp} XP ang nakuha!",
+  "@challengeXpEarned": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "challengeBackToChapters": "Bumalik sa mga Kabanata",
+  "challengeReadNextChapter": "Basahin ang Susunod na Kabanata",
+
+  "readerTitle": "Mambabasa ng Kuwento",
+  "readerAdjustTextSize": "Ayusin ang laki ng teksto",
+  "readerSelectLanguage": "Pumili ng Wika",
+  "readerLanguageEnglish": "Ingles (EN)",
+  "readerLanguageTagalog": "Tagalog (TL)",
+  "readerLanguageBikol": "Bikol (BIK)",
+  "readerUnavailable": "Hindi available sa piniling wika ang nilalaman ng kabanata.",
+  "readerReadInEnglish": "Basahin sa Ingles",
+  "readerTranslationReview": "Sinusuri pa ng mga espesyalista sa wika ang saling ito.",
+  "readerFallbackVocabularyDefinition": "Mahalagang salita sa kuwento.",
+
+  "chapterListDescription": "Basahin ang mga kabanata ayon sa pagkakasunod-sunod at pumasa sa pagsusuri sa pagbasa para ma-unlock ang susunod na kabanata.",
+  "chapterError": "Error: {error}",
+  "@chapterError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "chapterEmpty": "Walang nahanap na kabanata.",
+  "chapterLabel": "Kabanata {number}",
+  "@chapterLabel": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "chapterStatusUnlocked": "Naka-unlock",
+  "chapterQuizUnlockHint": "Tapusin ang quiz sa naunang kabanata para ma-unlock ito.",
+  "chapterFallbackStory": "Kuwento",
+
+  "clearedStoriesTitle": "Mga Kuwentong Natapos",
+  "clearedStoriesLoadError": "Hindi ma-load ang mga kuwentong natapos mo.",
+  "clearedStoryChapterCount": "{count, plural, =1{1 kabanata ang natapos} other{{count} na kabanata ang natapos}}",
+  "@clearedStoryChapterCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "clearedStoriesEmptyTitle": "Wala ka pang natatapos na kuwento",
+  "clearedStoriesEmptyDescription": "Tapusin ang bawat kabanata at pagsusuri sa pagbasa nito para maidagdag ang kuwento sa iyong koleksiyon.",
+  "clearedStoriesContinueReading": "Magpatuloy sa pagbabasa",
+
+  "consentInformation": "Seryoso ang BasaLINO sa kaligtasan at pagkapribado ng mga bata. Nagpadala kami ng email sa nakarehistrong tagapag-alaga mo na may mga tagubilin para aprubahan ang iyong access bilang mag-aaral.",
+  "consentApprovalStillPending": "Nasuri na ang status ng pahintulot: hinihintay pa rin.",
+  "consentCheckApproval": "Suriin ang Status ng Pahintulot",
+
+  "libraryAppBarTitle": "Aklatan ng BasaLINO",
+  "libraryProgressTooltip": "Aking Pag-unlad",
+  "libraryProfileTooltip": "Profile at Wika",
+  "libraryLoadError": "Error sa pag-load ng mga kuwento: {error}",
+  "@libraryLoadError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "libraryCompletedChapterCount": "{completed} sa {total} na kabanata ang natapos",
+  "@libraryCompletedChapterCount": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
   }
 }

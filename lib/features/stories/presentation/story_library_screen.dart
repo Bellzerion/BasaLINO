@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../app/bootstrap/providers.dart';
 import '../../../core/models/story_model.dart';
 import '../../../core/models/progress_model.dart';
+import '../../../l10n/app_localizations_context.dart';
 
 class StoryLibraryScreen extends ConsumerWidget {
   const StoryLibraryScreen({super.key});
@@ -16,21 +18,21 @@ class StoryLibraryScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.auto_stories, color: Color(0xFFD97706)),
-            SizedBox(width: 8),
-            Text('BasaLINO Library'),
+            const Icon(Icons.auto_stories, color: Color(0xFFD97706)),
+            const SizedBox(width: 8),
+            Text(context.l10n.libraryAppBarTitle),
           ],
         ),
         actions: [
           IconButton(
-            tooltip: 'My Progress',
+            tooltip: context.l10n.libraryProgressTooltip,
             icon: const Icon(Icons.military_tech_outlined),
             onPressed: () => context.push('/progress'),
           ),
           IconButton(
-            tooltip: 'Profile & Language',
+            tooltip: context.l10n.libraryProfileTooltip,
             icon: const Icon(Icons.account_circle_outlined),
             onPressed: () => context.push('/profile'),
           ),
@@ -43,12 +45,16 @@ class StoryLibraryScreen extends ConsumerWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error loading stories: ${snapshot.error}'));
+            return Center(
+              child: Text(
+                context.l10n.libraryLoadError(snapshot.error.toString()),
+              ),
+            );
           }
 
           final stories = snapshot.data ?? [];
           if (stories.isEmpty) {
-            return const Center(child: Text('No stories available.'));
+            return Center(child: Text(context.l10n.libraryEmpty));
           }
 
           return ListView.builder(
@@ -107,7 +113,9 @@ class _StoryCard extends StatelessWidget {
                     right: -20,
                     bottom: -20,
                     child: Icon(
-                      story.id == 'ibalong' ? Icons.shield_rounded : Icons.landscape_rounded,
+                      story.id == 'ibalong'
+                          ? Icons.shield_rounded
+                          : Icons.landscape_rounded,
                       size: 140,
                       color: Colors.white.withValues(alpha: 0.15),
                     ),
@@ -131,7 +139,10 @@ class _StoryCard extends StatelessWidget {
                           children: story.availableLanguages.map((lang) {
                             return Container(
                               margin: const EdgeInsets.only(right: 6),
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.25),
                                 borderRadius: BorderRadius.circular(6),
@@ -168,7 +179,10 @@ class _StoryCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 14),
                   FutureBuilder<StoryProgressModel?>(
-                    future: progressRepo.getStoryProgress(userId: userId, storyId: story.id),
+                    future: progressRepo.getStoryProgress(
+                      userId: userId,
+                      storyId: story.id,
+                    ),
                     builder: (context, snapshot) {
                       final completedCount = snapshot.data?.completedCount ?? 0;
                       final total = story.chapterCount;
@@ -181,7 +195,10 @@ class _StoryCard extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '$completedCount of $total chapters completed',
+                                context.l10n.libraryCompletedChapterCount(
+                                  completedCount,
+                                  total,
+                                ),
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -205,7 +222,9 @@ class _StoryCard extends StatelessWidget {
                               value: percent,
                               minHeight: 6,
                               backgroundColor: const Color(0xFFE5E7EB),
-                              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF075C31)),
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Color(0xFF075C31),
+                              ),
                             ),
                           ),
                         ],

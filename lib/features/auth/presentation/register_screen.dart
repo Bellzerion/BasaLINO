@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../app/bootstrap/providers.dart';
+import '../../../l10n/app_localizations_context.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -23,7 +25,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final password = _passwordController.text;
 
     if (nickname.isEmpty || email.isEmpty || password.isEmpty) {
-      setState(() => _errorMessage = 'Please complete all required fields.');
+      setState(() => _errorMessage = context.l10n.authCompleteRequired);
       return;
     }
 
@@ -77,8 +79,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'Create Account',
+                Text(
+                  context.l10n.authSignUp,
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -86,9 +88,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Join BasaLINO and start your reading quest.',
-                  style: TextStyle(color: Color(0xFF6B7280)),
+                Text(
+                  context.l10n.registerIntroduction,
+                  style: const TextStyle(color: Color(0xFF6B7280)),
                 ),
                 const SizedBox(height: 28),
                 if (_errorMessage != null)
@@ -106,16 +108,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                 TextField(
                   controller: _nicknameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Learner Nickname',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.authLearnerNicknameLabel,
                     prefixIcon: Icon(Icons.person_outline),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email Address',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.authEmailLabel,
                     prefixIcon: Icon(Icons.email_outlined),
                   ),
                   keyboardType: TextInputType.emailAddress,
@@ -123,8 +125,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.authPassword,
                     prefixIcon: Icon(Icons.lock_outline),
                   ),
                   obscureText: true,
@@ -141,7 +143,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Create Account'),
+                      : Text(context.l10n.authSignUp),
                 ),
               ],
             ),

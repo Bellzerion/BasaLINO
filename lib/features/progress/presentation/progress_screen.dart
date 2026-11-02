@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../app/bootstrap/providers.dart';
 import '../../../core/models/progress_model.dart';
+import '../../../l10n/app_localizations_context.dart';
 
 class ProgressScreen extends ConsumerWidget {
   const ProgressScreen({super.key});
@@ -13,9 +15,7 @@ class ProgressScreen extends ConsumerWidget {
     final userId = user?.uid ?? 'guest';
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Learning Journey'),
-      ),
+      appBar: AppBar(title: Text(context.l10n.progressJourneyTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -41,10 +41,14 @@ class ProgressScreen extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  const Icon(Icons.stars_rounded, size: 48, color: Colors.white),
+                  const Icon(
+                    Icons.stars_rounded,
+                    size: 48,
+                    color: Colors.white,
+                  ),
                   const SizedBox(height: 8),
                   Text(
-                    '${user?.totalXp ?? 0} XP',
+                    context.l10n.progressXpTotal(user?.totalXp ?? 0),
                     style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -53,7 +57,9 @@ class ProgressScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Learner: ${user?.nickname ?? 'Explorer'}',
+                    context.l10n.progressLearner(
+                      user?.nickname ?? context.l10n.progressExplorer,
+                    ),
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.white70,
@@ -64,8 +70,8 @@ class ProgressScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Stories in Progress',
+            Text(
+              context.l10n.progressStoriesInProgress,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -81,22 +87,32 @@ class ProgressScreen extends ConsumerWidget {
                 }
                 final progressList = snapshot.data ?? [];
                 if (progressList.isEmpty) {
-                  return const Card(
+                  return Card(
                     child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text('Start reading stories to track your progress!'),
+                      padding: const EdgeInsets.all(16),
+                      child: Text(context.l10n.progressStartPrompt),
                     ),
                   );
                 }
 
                 return Column(
                   children: progressList.map((p) {
-                    final storyTitle = p.storyId == 'ibalong' ? 'Ibalong' : 'The Legend of Mount Mayon';
+                    final storyTitle = p.storyId == 'ibalong'
+                        ? 'Ibalong'
+                        : context.l10n.progressMayonStoryTitle;
                     return Card(
                       child: ListTile(
-                        leading: const Icon(Icons.bookmark_added, color: Color(0xFFD97706)),
-                        title: Text(storyTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text('${p.completedCount} chapters completed'),
+                        leading: const Icon(
+                          Icons.bookmark_added,
+                          color: Color(0xFFD97706),
+                        ),
+                        title: Text(
+                          storyTitle,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          context.l10n.progressChapterCount(p.completedCount),
+                        ),
                       ),
                     );
                   }).toList(),
@@ -104,8 +120,8 @@ class ProgressScreen extends ConsumerWidget {
               },
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Recent Quiz Attempts',
+            Text(
+              context.l10n.progressRecentAttempts,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -121,10 +137,10 @@ class ProgressScreen extends ConsumerWidget {
                 }
                 final attempts = snapshot.data ?? [];
                 if (attempts.isEmpty) {
-                  return const Card(
+                  return Card(
                     child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text('No quiz attempts recorded yet.'),
+                      padding: const EdgeInsets.all(16),
+                      child: Text(context.l10n.progressNoQuizAttemptsRecorded),
                     ),
                   );
                 }
@@ -135,16 +151,30 @@ class ProgressScreen extends ConsumerWidget {
                       child: ListTile(
                         leading: Icon(
                           att.passed ? Icons.check_circle : Icons.cancel,
-                          color: att.passed ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                          color: att.passed
+                              ? const Color(0xFF10B981)
+                              : const Color(0xFFEF4444),
                         ),
-                        title: Text(att.chapterTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text('Score: ${att.score}% • +${att.xpAwarded} XP'),
+                        title: Text(
+                          att.chapterTitle,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          context.l10n.progressScoreAndXp(
+                            att.score,
+                            att.xpAwarded,
+                          ),
+                        ),
                         trailing: Text(
-                          att.passed ? 'PASSED' : 'RETRY',
+                          att.passed
+                              ? context.l10n.progressPassed
+                              : context.l10n.progressRetry,
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: att.passed ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                            color: att.passed
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFFEF4444),
                           ),
                         ),
                       ),

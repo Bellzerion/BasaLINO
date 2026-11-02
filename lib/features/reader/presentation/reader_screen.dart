@@ -4,10 +4,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../app/bootstrap/providers.dart';
 import '../../../core/models/chapter_translation_model.dart';
 import '../../../core/models/vocab_hint_model.dart';
 import '../../../core/services/local_progress_repository.dart';
+import '../../../l10n/app_localizations_context.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({
@@ -51,11 +53,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   }
 
   void _reportReadingStorageError(Object error, StackTrace stackTrace) {
-    FlutterError.reportError(FlutterErrorDetails(
-      exception: error,
-      stack: stackTrace,
-      library: 'reader progress persistence',
-    ));
+    FlutterError.reportError(
+      FlutterErrorDetails(
+        exception: error,
+        stack: stackTrace,
+        library: 'reader progress persistence',
+      ),
+    );
   }
 
   void _restoreReadingPosition(String userId) {
@@ -106,7 +110,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   Future<void> _saveReadingPosition() async {
     final repository = _localProgressRepository;
     final userId = _readingUserId;
-    if (repository == null || userId == null || !_readingController.hasClients) return;
+    if (repository == null || userId == null || !_readingController.hasClients)
+      return;
+  
 
     try {
       await repository.saveReadingPosition(
@@ -136,13 +142,17 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFEF3C7),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      hint.partOfSpeech?.toUpperCase() ?? 'VOCABULARY',
+                      hint.partOfSpeech?.toUpperCase() ??
+                          context.l10n.readerVocabHintTitle.toUpperCase(),
                       style: const TextStyle(
                         color: Color(0xFFB45309),
                         fontSize: 12,
@@ -193,20 +203,25 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
     for (final match in regex.allMatches(content)) {
       if (match.start > lastMatchEnd) {
-        spans.add(TextSpan(
-          text: content.substring(lastMatchEnd, match.start),
-          style: TextStyle(
-            fontSize: _fontSize,
-            color: const Color(0xFF1F2937),
-            height: 1.65,
+        spans.add(
+          TextSpan(
+            text: content.substring(lastMatchEnd, match.start),
+            style: TextStyle(
+              fontSize: _fontSize,
+              color: const Color(0xFF1F2937),
+              height: 1.65,
+            ),
           ),
-        ));
+        );
       }
 
       final bracketedWord = match.group(1)!;
       final matchedHint = hints.firstWhere(
         (h) => h.word.toLowerCase() == bracketedWord.toLowerCase(),
-        orElse: () => VocabHintModel(word: bracketedWord, definition: 'A key story vocabulary term.'),
+        orElse: () => VocabHintModel(
+          word: bracketedWord,
+          definition: context.l10n.readerFallbackVocabularyDefinition,
+        ),
       );
 
       spans.add(
@@ -230,14 +245,16 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     }
 
     if (lastMatchEnd < content.length) {
-      spans.add(TextSpan(
-        text: content.substring(lastMatchEnd),
-        style: TextStyle(
-          fontSize: _fontSize,
-          color: const Color(0xFF1F2937),
-          height: 1.65,
+      spans.add(
+        TextSpan(
+          text: content.substring(lastMatchEnd),
+          style: TextStyle(
+            fontSize: _fontSize,
+            color: const Color(0xFF1F2937),
+            height: 1.65,
+          ),
         ),
-      ));
+      );
     }
 
     return spans;
@@ -251,11 +268,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Story Reader'),
+        title: Text(context.l10n.readerTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.text_fields),
-            tooltip: 'Adjust text size',
+            tooltip: context.l10n.readerAdjustTextSize,
             onPressed: () {
               setState(() {
                 _fontSize = _fontSize >= 22.0 ? 15.0 : _fontSize + 2.0;
@@ -263,17 +280,26 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             },
           ),
           PopupMenuButton<String>(
-            tooltip: 'Select Language',
+            tooltip: context.l10n.readerSelectLanguage,
             icon: const Icon(Icons.language),
             initialValue: currentLang,
             onSelected: (code) {
               ref.read(appLanguageProvider.notifier).state = code;
               ref.read(authRepositoryProvider).updateLanguage(code);
             },
-            itemBuilder: (context) => const [
-              PopupMenuItem(value: 'en', child: Text('English (EN)')),
-              PopupMenuItem(value: 'tl', child: Text('Tagalog (TL)')),
-              PopupMenuItem(value: 'bik', child: Text('Bikol (BIK)')),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'en',
+                child: Text(context.l10n.readerLanguageEnglish),
+              ),
+              PopupMenuItem(
+                value: 'tl',
+                child: Text(context.l10n.readerLanguageTagalog),
+              ),
+              PopupMenuItem(
+                value: 'bik',
+                child: Text(context.l10n.readerLanguageBikol),
+              ),
             ],
           ),
         ],
@@ -294,13 +320,18 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.menu_book_outlined, size: 48, color: Colors.grey),
+                    const Icon(
+                      Icons.menu_book_outlined,
+                      size: 48,
+                      color: Colors.grey,
+                    ),
                     const SizedBox(height: 12),
-                    const Text('Chapter content unavailable in selected language.'),
+                    Text(context.l10n.readerUnavailable),
                     const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: () => ref.read(appLanguageProvider.notifier).state = 'en',
-                      child: const Text('Read in English'),
+                      onPressed: () =>
+                          ref.read(appLanguageProvider.notifier).state = 'en',
+                      child: Text(context.l10n.readerReadInEnglish),
                     ),
                   ],
                 ),
@@ -326,14 +357,21 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: const Color(0xFFFDE68A)),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.info_outline, size: 20, color: Color(0xFF92400E)),
-                        SizedBox(width: 8),
+                        const Icon(
+                          Icons.info_outline,
+                          size: 20,
+                          color: Color(0xFF92400E),
+                        ),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'This translation is in review by language specialists.',
-                            style: TextStyle(fontSize: 12, color: Color(0xFF92400E)),
+                            context.l10n.readerTranslationReview,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF92400E),
+                            ),
                           ),
                         ),
                       ],
@@ -351,16 +389,21 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 const SizedBox(height: 20),
                 RichText(
                   text: TextSpan(
-                    children: _buildInteractiveParagraph(trans.content, trans.vocabularyHints),
+                    children: _buildInteractiveParagraph(
+                      trans.content,
+                      trans.vocabularyHints,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 40),
                 ElevatedButton.icon(
                   onPressed: () {
-                    context.push('/challenge/${widget.storyId}/${widget.chapterId}');
+                    context.push(
+                      '/challenge/${widget.storyId}/${widget.chapterId}',
+                    );
                   },
                   icon: const Icon(Icons.quiz_outlined),
-                  label: const Text('Take Reading Check'),
+                  label: Text(context.l10n.readerStartChallenge),
                 ),
               ],
             ),

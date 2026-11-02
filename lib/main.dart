@@ -1,25 +1,27 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'app/router/app_router.dart';
 import 'app/theme/app_theme.dart';
 import 'core/widgets/brand_background.dart';
+import 'app/bootstrap/providers.dart';
+import 'l10n/generated/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    systemNavigationBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-    systemNavigationBarIconBrightness: Brightness.light,
-  ));
-  runApp(
-    const ProviderScope(
-      child: BasaLinoApp(),
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
+  runApp(const ProviderScope(child: BasaLinoApp()));
 }
 
 class BasaLinoApp extends ConsumerWidget {
@@ -28,25 +30,78 @@ class BasaLinoApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+    final locale = switch (ref.watch(appLanguageProvider)) {
+      'tl' => const Locale('tl'),
+      'bik' => const Locale('bik'),
+      _ => const Locale('en'),
+    };
 
     return MaterialApp.router(
       title: 'BasaLINO',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      builder: (context, child) => BrandBackground(child: child ?? const SizedBox()),
+      builder: (context, child) =>
+          BrandBackground(child: child ?? const SizedBox()),
       routerConfig: router,
-      // The reader's language controls the story content. Flutter does not
-      // bundle Material localizations for Tagalog or Central Bikol, so keep
-      // framework controls in English instead of crashing on those choices.
-      locale: const Locale('en'),
-      supportedLocales: const [
-        Locale('en', ''),
-      ],
+      locale: locale,
+      supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
+        AppLocalizations.delegate,
+        _FallbackMaterialLocalizationsDelegate(),
+        _FallbackWidgetsLocalizationsDelegate(),
+        _FallbackCupertinoLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
     );
   }
+}
+
+class _FallbackMaterialLocalizationsDelegate
+    extends LocalizationsDelegate<MaterialLocalizations> {
+  const _FallbackMaterialLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) =>
+      !GlobalMaterialLocalizations.delegate.isSupported(locale);
+
+  @override
+  Future<MaterialLocalizations> load(Locale locale) =>
+      GlobalMaterialLocalizations.delegate.load(const Locale('en'));
+
+  @override
+  bool shouldReload(_FallbackMaterialLocalizationsDelegate old) => false;
+}
+
+class _FallbackWidgetsLocalizationsDelegate
+    extends LocalizationsDelegate<WidgetsLocalizations> {
+  const _FallbackWidgetsLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) =>
+      !GlobalWidgetsLocalizations.delegate.isSupported(locale);
+
+  @override
+  Future<WidgetsLocalizations> load(Locale locale) =>
+      GlobalWidgetsLocalizations.delegate.load(const Locale('en'));
+
+  @override
+  bool shouldReload(_FallbackWidgetsLocalizationsDelegate old) => false;
+}
+
+class _FallbackCupertinoLocalizationsDelegate
+    extends LocalizationsDelegate<CupertinoLocalizations> {
+  const _FallbackCupertinoLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) =>
+      !GlobalCupertinoLocalizations.delegate.isSupported(locale);
+
+  @override
+  Future<CupertinoLocalizations> load(Locale locale) =>
+      GlobalCupertinoLocalizations.delegate.load(const Locale('en'));
+
+  @override
+  bool shouldReload(_FallbackCupertinoLocalizationsDelegate old) => false;
 }

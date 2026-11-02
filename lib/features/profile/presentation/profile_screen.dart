@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../app/bootstrap/providers.dart';
+import '../../../l10n/app_localizations_context.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -12,9 +14,7 @@ class ProfileScreen extends ConsumerWidget {
     final currentLang = ref.watch(appLanguageProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Profile'),
-      ),
+      appBar: AppBar(title: Text(context.l10n.profileTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -27,7 +27,10 @@ class ProfileScreen extends ConsumerWidget {
                     radius: 44,
                     backgroundColor: const Color(0xFFFEF3C7),
                     child: Text(
-                      (user?.nickname.isNotEmpty == true ? user!.nickname[0] : 'B').toUpperCase(),
+                      (user?.nickname.isNotEmpty == true
+                              ? user!.nickname[0]
+                              : 'B')
+                          .toUpperCase(),
                       style: const TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
@@ -40,7 +43,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              user?.nickname ?? 'Learner',
+              user?.nickname ?? context.l10n.profileLearner,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 22,
@@ -54,8 +57,8 @@ class ProfileScreen extends ConsumerWidget {
               style: const TextStyle(color: Color(0xFF6B7280), fontSize: 13),
             ),
             const SizedBox(height: 32),
-            const Text(
-              'Preferred Reading Language',
+            Text(
+              context.l10n.profileLanguagePreference,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -64,8 +67,8 @@ class ProfileScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             _LanguageTile(
-              label: 'English',
-              sublabel: 'Default content & quizzes',
+              label: context.l10n.profileLanguageEn,
+              sublabel: context.l10n.profileEnglishDescription,
               code: 'en',
               selected: currentLang == 'en',
               onSelect: () {
@@ -74,8 +77,8 @@ class ProfileScreen extends ConsumerWidget {
               },
             ),
             _LanguageTile(
-              label: 'Tagalog',
-              sublabel: 'Wikang Pambansa',
+              label: context.l10n.profileLanguageTl,
+              sublabel: context.l10n.profileTagalogDescription,
               code: 'tl',
               selected: currentLang == 'tl',
               onSelect: () {
@@ -84,8 +87,8 @@ class ProfileScreen extends ConsumerWidget {
               },
             ),
             _LanguageTile(
-              label: 'Bikol (Central)',
-              sublabel: 'Bikol Sentral Translation',
+              label: context.l10n.profileBikolCentral,
+              sublabel: context.l10n.profileBikolDescription,
               code: 'bik',
               selected: currentLang == 'bik',
               onSelect: () {
@@ -102,8 +105,8 @@ class ProfileScreen extends ConsumerWidget {
                 }
               },
               icon: const Icon(Icons.logout, color: Color(0xFFEF4444)),
-              label: const Text(
-                'Sign Out',
+              label: Text(
+                context.l10n.authSignOut,
                 style: TextStyle(color: Color(0xFFEF4444)),
               ),
               style: OutlinedButton.styleFrom(
