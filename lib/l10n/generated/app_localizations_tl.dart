@@ -542,6 +542,157 @@ class AppLocalizationsTl extends AppLocalizations {
   }
 
   @override
+  String get readerCheckKnowledge => 'Suriin ang Kaalaman';
+
+  @override
+  String get knowledgeStoryQuiz => 'Pagsusulit sa Kuwento';
+
+  @override
+  String get knowledgeVocabularyChallenge => 'Hamon sa Bokabularyo';
+
+  @override
+  String get knowledgeStoryQuizDescription =>
+      'Subukan ang nalaman mo sa kabanata.';
+
+  @override
+  String get knowledgeVocabularyChallengeDescription =>
+      'Sanayin ang mahahalagang salita sa kuwento.';
+
+  @override
+  String get quizComplete => 'Tapos na ang Pagsusulit!';
+
+  @override
+  String quizScore(int correct, int total) {
+    return 'Iskor: $correct/$total';
+  }
+
+  @override
+  String get startVocabularyChallenge => 'Simulan ang Hamon sa Bokabularyo';
+
+  @override
+  String get vocabularyChapterPractice =>
+      'Sanayin ang mahahalagang salita mula sa kabanatang ito.';
+
+  @override
+  String get vocabularySkipForNow => 'Laktawan muna';
+
+  @override
+  String get continueAdventure => 'Ipagpatuloy ang Pakikipagsapalaran';
+
+  @override
+  String get chapterComplete => 'Tapos na ang Kabanata!';
+
+  @override
+  String get chapterCleared => 'Nalampasan ang Kabanata!';
+
+  @override
+  String get bonusVocabularyChallenge => 'Bonus na Hamon sa Bokabularyo';
+
+  @override
+  String get vocabularyBonusDescription =>
+      'Sanayin ang mahahalagang salita mula sa kabanatang ito at makakuha ng bonus XP.';
+
+  @override
+  String get greatJob => 'Magaling!';
+
+  @override
+  String get youUnderstoodTheStory => 'Naunawaan mo ang kuwento!';
+
+  @override
+  String get readyForNextAdventure =>
+      'Handa ka na sa susunod na pakikipagsapalaran!';
+
+  @override
+  String bonusXpEarned(int xp) {
+    return 'Bonus XP na Nakuha: +$xp';
+  }
+
+  @override
+  String get vocabularyBonusFailed =>
+      'Hindi namin na-save ang iyong bonus XP. Subukan muli.';
+
+  @override
+  String get vocabularyRetryBonus => 'Subukan muli ang bonus';
+
+  @override
+  String get chapterPracticeComplete => 'Tapos na ang Pagsasanay';
+
+  @override
+  String get storyQuizComplete => 'Tapos na ang Pagsusulit sa Kuwento';
+
+  @override
+  String get vocabularyChallengeComplete => 'Tapos na ang Hamon sa Bokabularyo';
+
+  @override
+  String get vocabularySkipped => 'Nilaktawan ang Hamon sa Bokabularyo';
+
+  @override
+  String get xpEarned => 'XP na Nakuha';
+
+  @override
+  String get wordsPracticedLabel => 'Mga Salitang Napagsanayan';
+
+  @override
+  String wordsPracticed(int count) {
+    return 'Mga Salitang Napagsanayan: $count';
+  }
+
+  @override
+  String get chapterProgress => 'Pag-unlad sa Kabanata';
+
+  @override
+  String chapterProgressCount(int completed, int total) {
+    return '$completed sa $total kabanata ang natapos';
+  }
+
+  @override
+  String get chapterProgressUnavailable => 'Hindi available';
+
+  @override
+  String get chapterJourneyUnavailable =>
+      'Hindi na available ang paglalakbay sa kabanatang ito.';
+
+  @override
+  String get storyCompletionTitle => 'Tapos na ang Kuwento!';
+
+  @override
+  String get storyCompletionMessage =>
+      'Narating mo na ang dulo ng pakikipagsapalaran. Napakagandang paglalakbay!';
+
+  @override
+  String get chapterListReturn => 'Bumalik sa mga kabanata';
+
+  @override
+  String get vocabularyChallengePrompt =>
+      'Piliin ang kahulugang pinakamalapit sa salita.';
+
+  @override
+  String vocabularyWhatDoesWordMean(String word) {
+    return 'Ano ang ibig sabihin ng \"$word\"?';
+  }
+
+  @override
+  String get vocabularySubmitAnswer => 'Isumite ang sagot';
+
+  @override
+  String get vocabularyCorrectFeedback => 'Tama!';
+
+  @override
+  String get vocabularyIncorrectFeedback => 'Hindi pa tama.';
+
+  @override
+  String get vocabularyContinue => 'Magpatuloy';
+
+  @override
+  String get vocabularyComplete => 'Tapos na ang hamon sa bokabularyo!';
+
+  @override
+  String get vocabularyBackToChapter => 'Bumalik sa kabanata';
+
+  @override
+  String get vocabularyUnavailable => 'Hindi pa available ang bokabularyo.';
+
+  @override
   String libraryCompletedChapterCount(int completed, int total) {
     return '$completed sa $total na kabanata ang natapos';
   }

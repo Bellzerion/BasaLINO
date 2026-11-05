@@ -1,5 +1,6 @@
 import 'package:basalino/core/models/chapter_model.dart';
 import 'package:basalino/core/models/chapter_translation_model.dart';
+import 'package:basalino/core/models/progress_model.dart';
 import 'package:basalino/core/models/story_model.dart';
 import 'package:basalino/core/services/local_auth_repository.dart';
 import 'package:basalino/core/services/local_progress_repository.dart';
@@ -87,6 +88,37 @@ void main() {
       ChapterStatus.unlocked,
       ChapterStatus.locked,
     ]);
+  });
+
+  test('quiz snapshots preserve question IDs for repeat avoidance', () async {
+    final repository = LocalProgressRepository(_TestStoryRepository());
+    await repository.startQuizSnapshot(
+      userId: 'learner-1',
+      snapshot: QuizAttemptSnapshot(
+        id: 'attempt-1',
+        bankId: 'bank-1',
+        bankVersion: 1,
+        chapterId: 'chapter-1',
+        languageCode: 'en',
+        questionIds: const ['q1', 'q2', 'q3', 'q4', 'q5'],
+        startedAt: DateTime(2026, 1, 1),
+      ),
+    );
+    await repository.completeQuizSnapshot(
+      userId: 'learner-1',
+      snapshotId: 'attempt-1',
+      answers: const {'q1': 'a'},
+    );
+
+    final restored = LocalProgressRepository(_TestStoryRepository());
+    expect(
+      await restored.getRecentQuestionIds(
+        userId: 'learner-1',
+        chapterId: 'chapter-1',
+        languageCode: 'en',
+      ),
+      const ['q1', 'q2', 'q3', 'q4', 'q5'],
+    );
   });
 }
 

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../app/bootstrap/providers.dart';
+import '../../../core/models/chapter_journey_model.dart';
 import '../../../core/models/challenge_model.dart';
 import '../../../core/models/attempt_result_model.dart';
+import '../../../core/models/progress_model.dart';
 import '../../../core/services/local_progress_repository.dart';
 import '../../../l10n/app_localizations_context.dart';
 
@@ -26,6 +29,47 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
   final Map<String, String> _selectedAnswers = {};
   bool _isSubmitting = false;
   AttemptResultModel? _result;
+  Future<ChallengeModel?>? _challengeFuture;
+  String? _requestKey;
+  String? _snapshotId;
+  final _uuid = const Uuid();
+
+  Future<ChallengeModel?> _prepareChallenge(String languageCode) async {
+    final progressRepo = ref.read(progressRepositoryProvider);
+    final userId = ref.read(currentUserProvider)?.uid ?? 'guest';
+    final excluded = progressRepo is LocalProgressRepository
+        ? await progressRepo.getRecentQuestionIds(
+            userId: userId,
+            chapterId: widget.chapterId,
+            languageCode: languageCode,
+          )
+        : const <String>[];
+    final challenge = await ref
+        .read(challengeRepositoryProvider)
+        .getChallenge(
+          chapterId: widget.chapterId,
+          languageCode: languageCode,
+          excludedQuestionIds: excluded,
+        );
+    if (challenge != null && progressRepo is LocalProgressRepository) {
+      _snapshotId = _uuid.v4();
+      await progressRepo.startQuizSnapshot(
+        userId: userId,
+        snapshot: QuizAttemptSnapshot(
+          id: _snapshotId!,
+          bankId: challenge.id,
+          bankVersion: challenge.version,
+          chapterId: widget.chapterId,
+          languageCode: challenge.languageCode,
+          questionIds: challenge.questions
+              .map((question) => question.id)
+              .toList(),
+          startedAt: DateTime.now(),
+        ),
+      );
+    }
+    return challenge;
+  }
 
   Future<void> _submitQuiz(ChallengeModel challenge) async {
     if (_selectedAnswers.length < challenge.questions.length) {
@@ -44,6 +88,9 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
       final res = await challengeRepo.submitAttempt(
         challengeId: challenge.id,
         chapterId: widget.chapterId,
+        questionIds: challenge.questions
+            .map((question) => question.id)
+            .toList(),
         answers: _selectedAnswers,
       );
 
@@ -52,6 +99,13 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
       final progressRepo = ref.read(progressRepositoryProvider);
 
       if (progressRepo is LocalProgressRepository) {
+        if (_snapshotId != null) {
+          await progressRepo.completeQuizSnapshot(
+            userId: userId,
+            snapshotId: _snapshotId!,
+            answers: _selectedAnswers,
+          );
+        }
         await progressRepo.recordAttemptAndUnlock(
           userId: userId,
           storyId: widget.storyId,
@@ -69,9 +123,22 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
         await ref.read(authRepositoryProvider).addXp(res.xpAwarded);
       }
 
-      setState(() {
-        _result = res;
-      });
+      if (res.passed) {
+        if (mounted) {
+          context.go(
+            '/chapter-cleared',
+            extra: ChapterJourney(
+              storyId: widget.storyId,
+              chapterId: widget.chapterId,
+              quizResult: res,
+            ),
+          );
+        }
+      } else {
+        setState(() {
+          _result = res;
+        });
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -89,18 +156,29 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
     }
   }
 
+  void _startNewAttempt(String languageCode) {
+    setState(() {
+      _selectedAnswers.clear();
+      _result = null;
+      _snapshotId = null;
+      _requestKey = '$languageCode/${widget.chapterId}';
+      _challengeFuture = _prepareChallenge(languageCode);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final challengeRepo = ref.watch(challengeRepositoryProvider);
     final lang = ref.watch(appLanguageProvider);
+    final requestKey = '$lang/${widget.chapterId}';
+    if (_challengeFuture == null || _requestKey != requestKey) {
+      _requestKey = requestKey;
+      _challengeFuture = _prepareChallenge(lang);
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.challengeTitle)),
       body: FutureBuilder<ChallengeModel?>(
-        future: challengeRepo.getChallenge(
-          chapterId: widget.chapterId,
-          languageCode: lang,
-        ),
+        future: _challengeFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -216,14 +294,14 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            ...question.choices.map((choice) {
-              final isSelected = _selectedAnswers[question.id] == choice;
+            ...question.options.map((option) {
+              final isSelected = _selectedAnswers[question.id] == option.id;
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: InkWell(
                   onTap: () {
                     setState(() {
-                      _selectedAnswers[question.id] = choice;
+                      _selectedAnswers[question.id] = option.id;
                     });
                   },
                   borderRadius: BorderRadius.circular(10),
@@ -258,7 +336,7 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            choice,
+                            option.text,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: isSelected
@@ -301,74 +379,62 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              res.passed
-                  ? context.l10n.challengeResultAwesome
-                  : context.l10n.challengeResultKeepPracticing,
+              context.l10n.quizComplete,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
-                color: res.passed
-                    ? const Color(0xFF065F46)
-                    : const Color(0xFF991B1B),
+                color: Color(0xFF065F46),
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              res.passed
-                  ? context.l10n.challengeResultPassDetail(
-                      res.score,
-                      res.correctAnswers,
-                      res.totalQuestions,
-                    )
-                  : context.l10n.challengeResultFailDetail(res.score, 60),
+              context.l10n.quizScore(res.correctAnswers, res.totalQuestions),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 15, color: Color(0xFF4B5563)),
+              style: const TextStyle(fontSize: 20, color: Color(0xFF4B5563)),
             ),
-            const SizedBox(height: 24),
-            if (res.xpAwarded > 0)
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFEF3C7),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFF59E0B)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.stars_rounded, color: Color(0xFFD97706)),
-                    const SizedBox(width: 8),
-                    Text(
-                      context.l10n.challengeXpEarned(res.xpAwarded),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF78350F),
-                      ),
-                    ),
-                  ],
+            if (!res.passed) ...[
+              const SizedBox(height: 8),
+              Text(
+                context.l10n.challengeResultKeepPracticing,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF991B1B),
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            const SizedBox(height: 32),
-            if (res.passed && res.nextChapterId != null)
-              ElevatedButton(
-                onPressed: () {
-                  context.go('/reader/${widget.storyId}/${res.nextChapterId}');
-                },
-                child: Text(context.l10n.challengeReadNextChapter),
-              )
-            else if (!res.passed)
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _result = null;
-                    _selectedAnswers.clear();
-                  });
-                },
+            ],
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF3C7),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFF59E0B)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.stars_rounded, color: Color(0xFFD97706)),
+                  const SizedBox(width: 8),
+                  Text(
+                    context.l10n.challengeXpEarned(res.xpAwarded),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF78350F),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (!res.passed)
+              OutlinedButton(
+                onPressed: () =>
+                    _startNewAttempt(ref.read(appLanguageProvider)),
                 child: Text(context.l10n.challengeRetry),
               ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             OutlinedButton(
               onPressed: () => context.go('/story/${widget.storyId}'),
               child: Text(context.l10n.challengeBackToChapters),

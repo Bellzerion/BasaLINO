@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+
 import '../models/user_model.dart';
 import '../services/auth_repository.dart';
 
@@ -32,6 +34,8 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   String _xpKey(String userId) => 'basalino.user.xp.v1.$userId';
+  String _vocabularyBonusKey(String userId) =>
+      'basalino.vocabularyBonus.v1.$userId';
 
   Future<int?> _readXp(String userId) async {
     final preferences = await SharedPreferences.getInstance();
@@ -47,7 +51,10 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<UserModel> signIn({required String email, required String password}) async {
+  Future<UserModel> signIn({
+    required String email,
+    required String password,
+  }) async {
     await _ready;
     await Future.delayed(const Duration(milliseconds: 300));
     final user = UserModel(
@@ -117,14 +124,41 @@ class LocalAuthRepository implements AuthRepository {
   Future<void> addXp(int xp) async {
     await _ready;
     if (_currentUser != null) {
-      final updatedUser = _currentUser!.copyWith(totalXp: _currentUser!.totalXp + xp);
+      final updatedUser = _currentUser!.copyWith(
+        totalXp: _currentUser!.totalXp + xp,
+      );
       final preferences = await SharedPreferences.getInstance();
-      final saved = await preferences.setInt(_xpKey(updatedUser.uid), updatedUser.totalXp);
+      final saved = await preferences.setInt(
+        _xpKey(updatedUser.uid),
+        updatedUser.totalXp,
+      );
       if (!saved) {
         throw StateError('Could not save learner XP to local storage.');
       }
       _currentUser = updatedUser;
       _controller.add(_currentUser);
     }
+  }
+
+  @override
+  Future<bool> awardVocabularyBonus({required String chapterId}) async {
+    await _ready;
+    final user = _currentUser;
+    if (user == null) return false;
+
+    final preferences = await SharedPreferences.getInstance();
+    final awardedChapters =
+        preferences.getStringList(_vocabularyBonusKey(user.uid)) ?? [];
+    if (awardedChapters.contains(chapterId)) return false;
+
+    await addXp(AuthRepository.vocabularyBonusXp);
+    final saved = await preferences.setStringList(
+      _vocabularyBonusKey(user.uid),
+      [...awardedChapters, chapterId],
+    );
+    if (!saved) {
+      throw StateError('Could not save vocabulary bonus progress.');
+    }
+    return true;
   }
 }

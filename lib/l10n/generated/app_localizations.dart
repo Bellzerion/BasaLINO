@@ -988,6 +988,270 @@ abstract class AppLocalizations {
   /// **'Error loading stories: {error}'**
   String libraryLoadError(String error);
 
+  /// No description provided for @readerCheckKnowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'Check Knowledge'**
+  String get readerCheckKnowledge;
+
+  /// No description provided for @knowledgeStoryQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Story Quiz'**
+  String get knowledgeStoryQuiz;
+
+  /// No description provided for @knowledgeVocabularyChallenge.
+  ///
+  /// In en, this message translates to:
+  /// **'Vocabulary Challenge'**
+  String get knowledgeVocabularyChallenge;
+
+  /// No description provided for @knowledgeStoryQuizDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Test what happened in the chapter.'**
+  String get knowledgeStoryQuizDescription;
+
+  /// No description provided for @knowledgeVocabularyChallengeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice important story words.'**
+  String get knowledgeVocabularyChallengeDescription;
+
+  /// No description provided for @quizComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiz Complete!'**
+  String get quizComplete;
+
+  /// No description provided for @quizScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Score: {correct}/{total}'**
+  String quizScore(int correct, int total);
+
+  /// No description provided for @startVocabularyChallenge.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Vocabulary Challenge'**
+  String get startVocabularyChallenge;
+
+  /// No description provided for @vocabularyChapterPractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice the key words from this chapter.'**
+  String get vocabularyChapterPractice;
+
+  /// No description provided for @vocabularySkipForNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get vocabularySkipForNow;
+
+  /// No description provided for @continueAdventure.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Adventure'**
+  String get continueAdventure;
+
+  /// No description provided for @chapterComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapter Complete!'**
+  String get chapterComplete;
+
+  /// No description provided for @chapterCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapter Cleared!'**
+  String get chapterCleared;
+
+  /// No description provided for @bonusVocabularyChallenge.
+  ///
+  /// In en, this message translates to:
+  /// **'Bonus Vocabulary Challenge'**
+  String get bonusVocabularyChallenge;
+
+  /// No description provided for @vocabularyBonusDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice important words from this chapter and earn bonus XP.'**
+  String get vocabularyBonusDescription;
+
+  /// No description provided for @greatJob.
+  ///
+  /// In en, this message translates to:
+  /// **'Great job!'**
+  String get greatJob;
+
+  /// No description provided for @youUnderstoodTheStory.
+  ///
+  /// In en, this message translates to:
+  /// **'You understood the story!'**
+  String get youUnderstoodTheStory;
+
+  /// No description provided for @readyForNextAdventure.
+  ///
+  /// In en, this message translates to:
+  /// **'You are ready for the next adventure!'**
+  String get readyForNextAdventure;
+
+  /// No description provided for @bonusXpEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'Bonus XP Earned: +{xp}'**
+  String bonusXpEarned(int xp);
+
+  /// No description provided for @vocabularyBonusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save your bonus XP. Please try again.'**
+  String get vocabularyBonusFailed;
+
+  /// No description provided for @vocabularyRetryBonus.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry bonus'**
+  String get vocabularyRetryBonus;
+
+  /// No description provided for @chapterPracticeComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice Complete'**
+  String get chapterPracticeComplete;
+
+  /// No description provided for @storyQuizComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Story Quiz Complete'**
+  String get storyQuizComplete;
+
+  /// No description provided for @vocabularyChallengeComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Vocabulary Challenge Complete'**
+  String get vocabularyChallengeComplete;
+
+  /// No description provided for @vocabularySkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Vocabulary Challenge Skipped'**
+  String get vocabularySkipped;
+
+  /// No description provided for @xpEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'XP Earned'**
+  String get xpEarned;
+
+  /// No description provided for @wordsPracticedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Words Practiced'**
+  String get wordsPracticedLabel;
+
+  /// No description provided for @wordsPracticed.
+  ///
+  /// In en, this message translates to:
+  /// **'Words Practiced: {count}'**
+  String wordsPracticed(int count);
+
+  /// No description provided for @chapterProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapter Progress'**
+  String get chapterProgress;
+
+  /// No description provided for @chapterProgressCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} of {total} chapters complete'**
+  String chapterProgressCount(int completed, int total);
+
+  /// No description provided for @chapterProgressUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable'**
+  String get chapterProgressUnavailable;
+
+  /// No description provided for @chapterJourneyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This chapter journey is no longer available.'**
+  String get chapterJourneyUnavailable;
+
+  /// No description provided for @storyCompletionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Story Complete!'**
+  String get storyCompletionTitle;
+
+  /// No description provided for @storyCompletionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You reached the end of this adventure. What a wonderful journey!'**
+  String get storyCompletionMessage;
+
+  /// No description provided for @chapterListReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to chapters'**
+  String get chapterListReturn;
+
+  /// No description provided for @vocabularyChallengePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the meaning that best matches the word.'**
+  String get vocabularyChallengePrompt;
+
+  /// No description provided for @vocabularyWhatDoesWordMean.
+  ///
+  /// In en, this message translates to:
+  /// **'What does \"{word}\" mean?'**
+  String vocabularyWhatDoesWordMean(String word);
+
+  /// No description provided for @vocabularySubmitAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit answer'**
+  String get vocabularySubmitAnswer;
+
+  /// No description provided for @vocabularyCorrectFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Correct!'**
+  String get vocabularyCorrectFeedback;
+
+  /// No description provided for @vocabularyIncorrectFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Not quite.'**
+  String get vocabularyIncorrectFeedback;
+
+  /// No description provided for @vocabularyContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get vocabularyContinue;
+
+  /// No description provided for @vocabularyComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Vocabulary challenge complete!'**
+  String get vocabularyComplete;
+
+  /// No description provided for @vocabularyBackToChapter.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to chapter'**
+  String get vocabularyBackToChapter;
+
+  /// No description provided for @vocabularyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Vocabulary is not available yet.'**
+  String get vocabularyUnavailable;
+
   /// No description provided for @libraryCompletedChapterCount.
   ///
   /// In en, this message translates to:

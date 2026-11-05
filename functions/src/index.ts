@@ -8,8 +8,13 @@ interface SubmitAttemptData {
   challengeId: string;
   chapterId: string;
   storyId: string;
+  questionIds: string[];
   answers: Record<string, string>;
   attemptId: string; // Client idempotency key
+}
+
+interface AwardVocabularyBonusData {
+  chapterId: string;
 }
 
 /**
@@ -26,9 +31,9 @@ export const submitAttempt = functions.https.onCall(async (data: SubmitAttemptDa
   }
 
   const userId = context.auth.uid;
-  const { challengeId, chapterId, storyId, answers, attemptId } = data;
+  const { challengeId, chapterId, storyId, questionIds, answers, attemptId } = data;
 
-  if (!challengeId || !chapterId || !storyId || !answers || !attemptId) {
+  if (!challengeId || !chapterId || !storyId || !Array.isArray(questionIds) || questionIds.length !== 5 || !answers || !attemptId) {
     throw new functions.https.HttpsError(
       "invalid-argument",
       "Missing required fields for attempt submission."
@@ -78,7 +83,9 @@ export const submitAttempt = functions.https.onCall(async (data: SubmitAttemptDa
   }
 
   const expectedAnswers = keyDoc.data()!.answers as Record<string, string>;
-  const questionIds = Object.keys(expectedAnswers);
+  if (new Set(questionIds).size !== questionIds.length || questionIds.some((id) => !expectedAnswers[id])) {
+    throw new functions.https.HttpsError("invalid-argument", "Attempt contains an invalid question.");
+  }
   const totalQuestions = questionIds.length;
 
   let correctCount = 0;
@@ -118,6 +125,7 @@ export const submitAttempt = functions.https.onCall(async (data: SubmitAttemptDa
       storyId,
       chapterId,
       challengeId,
+      questionIds,
       score,
       totalQuestions,
       correctAnswers: correctCount,
@@ -170,4 +178,58 @@ export const submitAttempt = functions.https.onCall(async (data: SubmitAttemptDa
     passed,
     nextChapterId,
   };
+});
+
+/**
+ * Callable Cloud Function: award a one-time vocabulary bonus for a cleared chapter.
+ */
+export const awardVocabularyBonus = functions.https.onCall(async (data: AwardVocabularyBonusData, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "Only authenticated learners can earn vocabulary bonus XP."
+    );
+  }
+
+  const chapterId = data.chapterId;
+  if (typeof chapterId !== "string" || !/^[a-zA-Z0-9_-]{1,100}$/.test(chapterId)) {
+    throw new functions.https.HttpsError("invalid-argument", "A valid chapter ID is required.");
+  }
+
+  const userId = context.auth.uid;
+  const userRef = db.collection("users").doc(userId);
+  const progressRef = userRef.collection("progress").doc(chapterId.split("_")[0]);
+  const bonusRef = userRef.collection("vocabularyBonuses").doc(chapterId);
+  return db.runTransaction(async (transaction) => {
+    const userSnap = await transaction.get(userRef);
+    const progressSnap = await transaction.get(progressRef);
+    const bonusSnap = await transaction.get(bonusRef);
+    if (!userSnap.exists || userSnap.data()?.approvalStatus !== "approved") {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Account requires guardian approval before earning rewards."
+      );
+    }
+
+    if (!progressSnap.exists ||
+        !(progressSnap.data()?.completedChapterIds as string[] | undefined)?.includes(chapterId)) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The chapter quiz must be passed before claiming vocabulary bonus XP."
+      );
+    }
+
+    if (bonusSnap.exists) return { awarded: false, xpAwarded: 0 };
+
+    const xpAwarded = 5;
+    transaction.update(userRef, {
+      totalXp: admin.firestore.FieldValue.increment(xpAwarded),
+    });
+    transaction.create(bonusRef, {
+      chapterId,
+      xpAwarded,
+      awardedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    return { awarded: true, xpAwarded };
+  });
 });

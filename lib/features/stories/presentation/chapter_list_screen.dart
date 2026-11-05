@@ -20,7 +20,15 @@ class ChapterListScreen extends ConsumerWidget {
     final userId = user?.uid ?? 'guest';
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.chaptersTitle)),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          tooltip: context.l10n.backLabel,
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/library'),
+        ),
+        title: Text(context.l10n.chaptersTitle),
+      ),
       body: FutureBuilder<List<StoryModel>>(
         future: storyRepo.getStories(),
         builder: (context, storySnap) {
@@ -83,15 +91,69 @@ class ChapterListScreen extends ConsumerWidget {
                       return Center(child: Text(context.l10n.chapterEmpty));
                     }
 
-                    return ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: chapters.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final ch = chapters[index];
-                        return _ChapterTile(storyId: storyId, chapter: ch);
-                      },
+                    final nextChapter = chapters
+                        .where((chapter) => chapter.isUnlocked)
+                        .fold<ChapterModel?>(
+                          null,
+                          (next, chapter) =>
+                              next == null ||
+                                  chapter.orderIndex < next.orderIndex
+                              ? chapter
+                              : next,
+                        );
+                    final storyComplete = nextChapter == null;
+
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: ListView.separated(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: chapters.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 12),
+                            itemBuilder: (context, index) {
+                              final ch = chapters[index];
+                              return _ChapterTile(
+                                storyId: storyId,
+                                chapter: ch,
+                              );
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: nextChapter != null
+                                  ? () => context.push(
+                                      '/reader/$storyId/${nextChapter.id}',
+                                    )
+                                  : storyComplete
+                                  ? () =>
+                                        context.go('/story-completion/$storyId')
+                                  : null,
+                              icon: Icon(
+                                storyComplete
+                                    ? Icons.celebration_rounded
+                                    : Icons.explore_rounded,
+                              ),
+                              label: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: Text(
+                                  context.l10n.continueAdventure,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),

@@ -1,37 +1,10 @@
 {
-  "chal_ibalong_ch1_en": {
-    "q1": "Baltog",
-    "q2": "Tandayag the wild boar",
-    "q3": "On a tree"
-  },
-  "chal_ibalong_ch1_tl": {
-    "q1": "Baltog",
-    "q2": "Tandayag na baboy-ramo",
-    "q3": "Sa isang puno"
-  },
-  "chal_ibalong_ch1_bik": {
-    "q1": "Baltog",
-    "q2": "Tandayag na baboy-ihalas",
-    "q3": "Sa sarong kahoy"
-  },
-  "chal_ibalong_ch2_en": {
-    "q1": "Handiong",
-    "q2": "Enchanting voice"
-  },
-  "chal_ibalong_ch3_en": {
-    "q1": "It fell into a deep sleep every afternoon",
-    "q2": "A patient, observant hunter"
-  },
-  "chal_mayon_ch1_en": {
-    "q1": "Beautiful",
-    "q2": "At the clear spring of Yawa"
-  },
-  "chal_mayon_ch2_en": {
-    "q1": "Parotpot",
-    "q2": "He fought and defeated Parotpot's men"
-  },
-  "chal_mayon_ch3_en": {
-    "q1": "Parotpot's arrow struck Panganoron",
-    "q2": "Magayon weeping for her lost beloved"
-  }
+  "chal_ibalong_ch1_en": {"q1": "b", "q2": "a", "q3": "b"},
+  "chal_ibalong_ch1_tl": {"q1": "b", "q2": "a", "q3": "b"},
+  "chal_ibalong_ch1_bik": {"q1": "b", "q2": "a", "q3": "b"},
+  "chal_ibalong_ch2_en": {"q1": "b", "q2": "b"},
+  "chal_ibalong_ch3_en": {"q1": "a", "q2": "b"},
+  "chal_mayon_ch1_en": {"q1": "b", "q2": "b", "q3": "a", "q4": "c", "q5": "b", "q6": "d", "q7": "b", "q8": "a", "q9": "c", "q10": "b", "q11": "d", "q12": "a"},
+  "chal_mayon_ch2_en": {"q1": "c", "q2": "b", "q3": "a", "q4": "d", "q5": "b", "q6": "c", "q7": "a", "q8": "d", "q9": "b", "q10": "c", "q11": "a", "q12": "d"},
+  "chal_mayon_ch3_en": {"q1": "b", "q2": "b", "q3": "a", "q4": "c", "q5": "d", "q6": "b", "q7": "a", "q8": "d", "q9": "c", "q10": "b", "q11": "a", "q12": "d"}
 }

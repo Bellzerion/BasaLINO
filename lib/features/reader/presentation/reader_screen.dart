@@ -112,7 +112,6 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final userId = _readingUserId;
     if (repository == null || userId == null || !_readingController.hasClients)
       return;
-  
 
     try {
       await repository.saveReadingPosition(
@@ -397,13 +396,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 ),
                 const SizedBox(height: 40),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    context.push(
-                      '/challenge/${widget.storyId}/${widget.chapterId}',
-                    );
-                  },
-                  icon: const Icon(Icons.quiz_outlined),
-                  label: Text(context.l10n.readerStartChallenge),
+                  onPressed: () => context.push(
+                    '/challenge/${widget.storyId}/${widget.chapterId}',
+                  ),
+                  icon: const Icon(Icons.fact_check_outlined),
+                  label: Text(context.l10n.readerCheckKnowledge),
                 ),
               ],
             ),

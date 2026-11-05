@@ -261,6 +261,69 @@
   "@libraryLoadError": {
     "placeholders": { "error": { "type": "String" } }
   },
+  "readerCheckKnowledge": "Suriin ang Kaalaman",
+  "knowledgeStoryQuiz": "Pagsusulit sa Kuwento",
+  "knowledgeVocabularyChallenge": "Hamon sa Bokabularyo",
+  "knowledgeStoryQuizDescription": "Subukan ang nalaman mo sa kabanata.",
+  "knowledgeVocabularyChallengeDescription": "Sanayin ang mahahalagang salita sa kuwento.",
+  "quizComplete": "Tapos na ang Pagsusulit!",
+  "quizScore": "Iskor: {correct}/{total}",
+  "@quizScore": {
+    "placeholders": {
+      "correct": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "startVocabularyChallenge": "Simulan ang Hamon sa Bokabularyo",
+  "vocabularyChapterPractice": "Sanayin ang mahahalagang salita mula sa kabanatang ito.",
+  "vocabularySkipForNow": "Laktawan muna",
+  "continueAdventure": "Ipagpatuloy ang Pakikipagsapalaran",
+  "chapterComplete": "Tapos na ang Kabanata!",
+  "chapterCleared": "Nalampasan ang Kabanata!",
+  "bonusVocabularyChallenge": "Bonus na Hamon sa Bokabularyo",
+  "vocabularyBonusDescription": "Sanayin ang mahahalagang salita mula sa kabanatang ito at makakuha ng bonus XP.",
+  "greatJob": "Magaling!",
+  "youUnderstoodTheStory": "Naunawaan mo ang kuwento!",
+  "readyForNextAdventure": "Handa ka na sa susunod na pakikipagsapalaran!",
+  "bonusXpEarned": "Bonus XP na Nakuha: +{xp}",
+  "@bonusXpEarned": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "vocabularyBonusFailed": "Hindi namin na-save ang iyong bonus XP. Subukan muli.",
+  "vocabularyRetryBonus": "Subukan muli ang bonus",
+  "chapterPracticeComplete": "Tapos na ang Pagsasanay",
+  "storyQuizComplete": "Tapos na ang Pagsusulit sa Kuwento",
+  "vocabularyChallengeComplete": "Tapos na ang Hamon sa Bokabularyo",
+  "vocabularySkipped": "Nilaktawan ang Hamon sa Bokabularyo",
+  "xpEarned": "XP na Nakuha",
+  "wordsPracticedLabel": "Mga Salitang Napagsanayan",
+  "wordsPracticed": "Mga Salitang Napagsanayan: {count}",
+  "@wordsPracticed": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "chapterProgress": "Pag-unlad sa Kabanata",
+  "chapterProgressCount": "{completed} sa {total} kabanata ang natapos",
+  "@chapterProgressCount": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "chapterProgressUnavailable": "Hindi available",
+  "chapterJourneyUnavailable": "Hindi na available ang paglalakbay sa kabanatang ito.",
+  "storyCompletionTitle": "Tapos na ang Kuwento!",
+  "storyCompletionMessage": "Narating mo na ang dulo ng pakikipagsapalaran. Napakagandang paglalakbay!",
+  "chapterListReturn": "Bumalik sa mga kabanata",
+  "vocabularyChallengePrompt": "Piliin ang kahulugang pinakamalapit sa salita.",
+  "vocabularyWhatDoesWordMean": "Ano ang ibig sabihin ng \"{word}\"?",
+  "@vocabularyWhatDoesWordMean": { "placeholders": { "word": { "type": "String" } } },
+  "vocabularySubmitAnswer": "Isumite ang sagot",
+  "vocabularyCorrectFeedback": "Tama!",
+  "vocabularyIncorrectFeedback": "Hindi pa tama.",
+  "vocabularyContinue": "Magpatuloy",
+  "vocabularyComplete": "Tapos na ang hamon sa bokabularyo!",
+  "vocabularyBackToChapter": "Bumalik sa kabanata",
+  "vocabularyUnavailable": "Hindi pa available ang bokabularyo.",
   "libraryCompletedChapterCount": "{completed} sa {total} na kabanata ang natapos",
   "@libraryCompletedChapterCount": {
     "placeholders": {

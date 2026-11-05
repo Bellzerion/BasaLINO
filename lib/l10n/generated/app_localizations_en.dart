@@ -537,6 +537,156 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get readerCheckKnowledge => 'Check Knowledge';
+
+  @override
+  String get knowledgeStoryQuiz => 'Story Quiz';
+
+  @override
+  String get knowledgeVocabularyChallenge => 'Vocabulary Challenge';
+
+  @override
+  String get knowledgeStoryQuizDescription =>
+      'Test what happened in the chapter.';
+
+  @override
+  String get knowledgeVocabularyChallengeDescription =>
+      'Practice important story words.';
+
+  @override
+  String get quizComplete => 'Quiz Complete!';
+
+  @override
+  String quizScore(int correct, int total) {
+    return 'Score: $correct/$total';
+  }
+
+  @override
+  String get startVocabularyChallenge => 'Start Vocabulary Challenge';
+
+  @override
+  String get vocabularyChapterPractice =>
+      'Practice the key words from this chapter.';
+
+  @override
+  String get vocabularySkipForNow => 'Skip for now';
+
+  @override
+  String get continueAdventure => 'Continue Adventure';
+
+  @override
+  String get chapterComplete => 'Chapter Complete!';
+
+  @override
+  String get chapterCleared => 'Chapter Cleared!';
+
+  @override
+  String get bonusVocabularyChallenge => 'Bonus Vocabulary Challenge';
+
+  @override
+  String get vocabularyBonusDescription =>
+      'Practice important words from this chapter and earn bonus XP.';
+
+  @override
+  String get greatJob => 'Great job!';
+
+  @override
+  String get youUnderstoodTheStory => 'You understood the story!';
+
+  @override
+  String get readyForNextAdventure => 'You are ready for the next adventure!';
+
+  @override
+  String bonusXpEarned(int xp) {
+    return 'Bonus XP Earned: +$xp';
+  }
+
+  @override
+  String get vocabularyBonusFailed =>
+      'We couldn\'t save your bonus XP. Please try again.';
+
+  @override
+  String get vocabularyRetryBonus => 'Retry bonus';
+
+  @override
+  String get chapterPracticeComplete => 'Practice Complete';
+
+  @override
+  String get storyQuizComplete => 'Story Quiz Complete';
+
+  @override
+  String get vocabularyChallengeComplete => 'Vocabulary Challenge Complete';
+
+  @override
+  String get vocabularySkipped => 'Vocabulary Challenge Skipped';
+
+  @override
+  String get xpEarned => 'XP Earned';
+
+  @override
+  String get wordsPracticedLabel => 'Words Practiced';
+
+  @override
+  String wordsPracticed(int count) {
+    return 'Words Practiced: $count';
+  }
+
+  @override
+  String get chapterProgress => 'Chapter Progress';
+
+  @override
+  String chapterProgressCount(int completed, int total) {
+    return '$completed of $total chapters complete';
+  }
+
+  @override
+  String get chapterProgressUnavailable => 'Unavailable';
+
+  @override
+  String get chapterJourneyUnavailable =>
+      'This chapter journey is no longer available.';
+
+  @override
+  String get storyCompletionTitle => 'Story Complete!';
+
+  @override
+  String get storyCompletionMessage =>
+      'You reached the end of this adventure. What a wonderful journey!';
+
+  @override
+  String get chapterListReturn => 'Return to chapters';
+
+  @override
+  String get vocabularyChallengePrompt =>
+      'Choose the meaning that best matches the word.';
+
+  @override
+  String vocabularyWhatDoesWordMean(String word) {
+    return 'What does \"$word\" mean?';
+  }
+
+  @override
+  String get vocabularySubmitAnswer => 'Submit answer';
+
+  @override
+  String get vocabularyCorrectFeedback => 'Correct!';
+
+  @override
+  String get vocabularyIncorrectFeedback => 'Not quite.';
+
+  @override
+  String get vocabularyContinue => 'Continue';
+
+  @override
+  String get vocabularyComplete => 'Vocabulary challenge complete!';
+
+  @override
+  String get vocabularyBackToChapter => 'Back to chapter';
+
+  @override
+  String get vocabularyUnavailable => 'Vocabulary is not available yet.';
+
+  @override
   String libraryCompletedChapterCount(int completed, int total) {
     return '$completed of $total chapters completed';
   }

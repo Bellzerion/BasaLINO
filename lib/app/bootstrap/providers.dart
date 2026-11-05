@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/services/auth_repository.dart';
 import '../../core/services/story_repository.dart';
 import '../../core/services/challenge_repository.dart';
@@ -31,6 +32,21 @@ final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
 final authStateProvider = StreamProvider<UserModel?>((ref) {
   final repo = ref.watch(authRepositoryProvider);
   return repo.authStateChanges;
+});
+
+typedef AuthRoutingState = ({
+  bool isAuthenticated,
+  ApprovalStatus? approvalStatus,
+});
+
+final authRoutingStateProvider = Provider<AuthRoutingState?>((ref) {
+  return ref.watch(
+    authStateProvider.select((authState) {
+      final user = authState.asData?.value;
+      if (user == null) return null;
+      return (isAuthenticated: true, approvalStatus: user.approvalStatus);
+    }),
+  );
 });
 
 // Current user snapshot provider

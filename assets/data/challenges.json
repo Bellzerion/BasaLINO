@@ -113,9 +113,19 @@
         "id": "q2",
         "questionText": "Where did Panganoron first catch sight of Magayon?",
         "choices": ["At a village harvest festival", "At the clear spring of Yawa", "In the royal palace", "During a mountain storm"]
-      }
-    ]
-  },
+      },
+      {"id":"q3","skill":"literal_recall","difficulty":1,"questionText":"Who was Magayon's father?","choices":["Makusog","Handiong","Parotpot","Baltog"]},
+      {"id":"q4","skill":"literal_recall","difficulty":1,"questionText":"What was Panganoron's role in the story?","choices":["A village elder","A farmer","A young warrior","A merchant"]},
+      {"id":"q5","skill":"cause_effect","difficulty":1,"questionText":"Why did people travel from distant villages to see Magayon?","choices":["She owned a great palace","She was known for her extraordinary beauty and grace","She invited them to a feast","She taught them to fight"]},
+      {"id":"q6","skill":"sequence","difficulty":1,"questionText":"What did Panganoron do after he first saw Magayon?","choices":["He left Bikol forever","He challenged Makusog","He hid at the spring","He asked Makusog for permission to court her"]},
+      {"id":"q7","skill":"vocabulary_in_context","difficulty":2,"questionText":"Panganoron was captivated by Magayon. What does captivated mean here?","choices":["Frightened and ready to run","Attracted and deeply interested","Confused by a map","Ordered to leave"]},
+      {"id":"q8","skill":"vocabulary_in_context","difficulty":2,"questionText":"What does grace describe in the sentence about Magayon?","choices":["Her elegant manner and beauty","Her skill with a weapon","Her family name","Her journey north"]},
+      {"id":"q9","skill":"sequence","difficulty":2,"questionText":"Which event happened first?","choices":["Panganoron visited daily","Makusog gave permission to court Magayon","Panganoron saw Magayon at Yawa spring","Magayon opened her heart to Panganoron"]},
+      {"id":"q10","skill":"inference","difficulty":2,"questionText":"What can readers infer from Panganoron bringing gifts and sharing stories?","choices":["He wanted to leave immediately","He was trying to show care and build a relationship","He was planning to challenge Makusog","He did not like Magayon"]},
+      {"id":"q11","skill":"literal_recall","difficulty":1,"questionText":"What did Magayon often go to the Yawa spring to do?","choices":["Train warriors","Fetch water","Meet Parotpot","Gather crops"]},
+      {"id":"q12","skill":"inference","difficulty":2,"questionText":"Why did Makusog agree to Panganoron's request?","choices":["He accepted Panganoron as a suitable visitor for Magayon","He feared Panganoron","He wanted Panganoron to rule the village","He did not know who Panganoron was"]}
+      ]
+    },
   {
     "id": "chal_mayon_ch2_en",
     "chapterId": "mayon_ch2",
@@ -130,9 +140,19 @@
         "id": "q2",
         "questionText": "How did Panganoron respond to Parotpot's ultimatum?",
         "choices": ["He paid gold ransom", "He fought and defeated Parotpot's men", "He fled to the northern mountains", "He challenged Makusog to a duel"]
-      }
-    ]
-  },
+      },
+      {"id":"q3","skill":"literal_recall","difficulty":1,"questionText":"Who was Magayon's father?","choices":["Makusog","Panganoron","Baltog","Handiong"]},
+      {"id":"q4","skill":"cause_effect","difficulty":1,"questionText":"Why did Makusog agree to Parotpot's demand?","choices":["He wanted a larger village","He admired Parotpot","Magayon asked him to","He wanted to protect his people from harm"]},
+      {"id":"q5","skill":"literal_recall","difficulty":1,"questionText":"What did Parotpot threaten to do to the village?","choices":["Flood it","Burn it","Move it","Hide it"]},
+      {"id":"q6","skill":"literal_recall","difficulty":1,"questionText":"How did Magayon feel after her father was forced to agree?","choices":["Proud","Excited","Heartbroken","Uninterested"]},
+      {"id":"q7","skill":"sequence","difficulty":2,"questionText":"What did Panganoron do when he heard the news?","choices":["He gathered courage and went to Makusog's village","He joined Parotpot","He sailed away","He asked Baltog for help"]},
+      {"id":"q8","skill":"vocabulary_in_context","difficulty":2,"questionText":"Parotpot was arrogant. What does arrogant mean?","choices":["Quiet and shy","Generous to everyone","Careful and observant","Acting as if he is more important than others"]},
+      {"id":"q9","skill":"vocabulary_in_context","difficulty":2,"questionText":"What does disgrace mean in Parotpot fled in disgrace?","choices":["A joyful celebration","Loss of respect after dishonorable defeat","A secret plan","A village rule"]},
+      {"id":"q10","skill":"cause_effect","difficulty":2,"questionText":"Why did Panganoron fight Parotpot's men?","choices":["To take over Makusog's village","To rescue a treasure","To defend his chance to marry Magayon","To find the Yawa spring"]},
+      {"id":"q11","skill":"inference","difficulty":2,"questionText":"Which trait does Panganoron show by refusing to give up?","choices":["Courage and determination","Jealousy","Carelessness","Dishonesty"]},
+      {"id":"q12","skill":"sequence","difficulty":2,"questionText":"What happened after Parotpot's men were defeated?","choices":["Parotpot fled","Magayon left the village","Makusog burned the village","Panganoron returned north"]}
+      ]
+    },
   {
     "id": "chal_mayon_ch3_en",
     "chapterId": "mayon_ch3",
@@ -147,7 +167,17 @@
         "id": "q2",
         "questionText": "According to legend, what does the eruption of Mount Mayon signify?",
         "choices": ["The anger of village elders", "Magayon weeping for her lost beloved", "Celebration of ancient battles", "A warning to distant tribes"]
-      }
-    ]
-  }
+      },
+      {"id":"q3","skill":"literal_recall","difficulty":1,"questionText":"Who secretly planned revenge before the wedding?","choices":["Parotpot","Makusog","Baltog","Handiong"]},
+      {"id":"q4","skill":"literal_recall","difficulty":1,"questionText":"Where was Panganoron struck by Parotpot's arrow?","choices":["At the Yawa spring","On a sea journey","At the wedding before the village elders","In a forest battle"]},
+      {"id":"q5","skill":"sequence","difficulty":1,"questionText":"What did Magayon do after Panganoron was struck?","choices":["She ran away","She called a celebration","She fought Parotpot alone","She rushed to and held Panganoron"]},
+      {"id":"q6","skill":"literal_recall","difficulty":1,"questionText":"What did the people do with Magayon and Panganoron?","choices":["Sent them north","Buried them together on a hill","Built a palace for them","Placed them at the spring"]},
+      {"id":"q7","skill":"vocabulary_in_context","difficulty":2,"questionText":"What does vengeance mean in the story?","choices":["Punishment or revenge for a wrong","A wedding promise","A peaceful journey","A gift from a friend"]},
+      {"id":"q8","skill":"vocabulary_in_context","difficulty":2,"questionText":"What does grief mean as Magayon held Panganoron?","choices":["Great happiness","A wish to travel","Deep sorrow after loss","A clever plan"]},
+      {"id":"q9","skill":"cause_effect","difficulty":2,"questionText":"Why was the mountain named Magayon?","choices":["Makusog ordered it","It was named for the story's beautiful heroine","It was near the Yawa spring","Parotpot chose the name"]},
+      {"id":"q10","skill":"sequence","difficulty":2,"questionText":"What did the hill become over time?","choices":["A river","A village gate","A perfect volcano","A forest"]},
+      {"id":"q11","skill":"inference","difficulty":2,"questionText":"Why is the legend important to Bikolano people?","choices":["It explains the cultural meaning connected to Mount Mayon","It teaches how to build arrows","It proves every mountain is a volcano","It describes a farming method"]},
+      {"id":"q12","skill":"context_meaning","difficulty":2,"questionText":"When Mount Mayon erupts, what happens according to the legend?","choices":["Village elders celebrate","A new wedding begins","Panganoron returns","Magayon is said to be weeping for her lost love"]}
+      ]
+    }
 ]

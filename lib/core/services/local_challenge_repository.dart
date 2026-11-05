@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 import '../models/challenge_model.dart';
@@ -29,6 +30,7 @@ class LocalChallengeRepository implements ChallengeRepository {
   Future<ChallengeModel?> getChallenge({
     required String chapterId,
     required String languageCode,
+    List<String> excludedQuestionIds = const [],
   }) async {
     final list = await _loadChallenges();
     // Look for exact match
@@ -44,13 +46,41 @@ class LocalChallengeRepository implements ChallengeRepository {
       );
     }
     if (match.isEmpty) return null;
-    return ChallengeModel.fromMap(match['id'] as String, match);
+    final bank = ChallengeModel.fromMap(match['id'] as String, match);
+    if (bank.questions.length <= 5) return bank;
+
+    final excluded = excludedQuestionIds.toSet();
+    final eligible = bank.questions.where((q) => !excluded.contains(q.id)).toList();
+    final fallback = bank.questions.where((q) => excluded.contains(q.id)).toList();
+    eligible.shuffle(Random());
+    fallback.shuffle(Random());
+    final selected = <ChallengeQuestionModel>[...eligible.take(5)];
+    if (selected.length < 5) selected.addAll(fallback.take(5 - selected.length));
+
+    final shuffled = selected
+        .map((question) => ChallengeQuestionModel(
+              id: question.id,
+              questionText: question.questionText,
+              options: [...question.options]..shuffle(Random()),
+              skill: question.skill,
+              difficulty: question.difficulty,
+            ))
+        .toList()
+      ..shuffle(Random());
+    return ChallengeModel(
+      id: bank.id,
+      chapterId: bank.chapterId,
+      languageCode: bank.languageCode,
+      version: bank.version,
+      questions: shuffled,
+    );
   }
 
   @override
   Future<AttemptResultModel> submitAttempt({
     required String challengeId,
     required String chapterId,
+    required List<String> questionIds,
     required Map<String, String> answers,
   }) async {
     // In local dev/mock mode, validate against challenge_keys.json (in prod, server-side function does this)
@@ -58,13 +88,14 @@ class LocalChallengeRepository implements ChallengeRepository {
     final challengeKeyMap = keys[challengeId] as Map<String, dynamic>? ?? {};
 
     int correct = 0;
-    challengeKeyMap.forEach((qId, expectedAnswer) {
+    for (final qId in questionIds) {
+      final expectedAnswer = challengeKeyMap[qId];
       if (answers[qId] != null && answers[qId]!.trim() == expectedAnswer.toString().trim()) {
         correct++;
       }
-    });
+    }
 
-    final total = challengeKeyMap.isNotEmpty ? challengeKeyMap.length : answers.length;
+    final total = questionIds.length;
     final score = total > 0 ? ((correct / total) * 100).round() : 0;
     final passed = score >= 60; // 60% threshold
 

@@ -261,6 +261,69 @@
   "@libraryLoadError": {
     "placeholders": { "error": { "type": "String" } }
   },
+  "readerCheckKnowledge": "Suriin an Kaalaman",
+  "knowledgeStoryQuiz": "Pagsuri sa Istorya",
+  "knowledgeVocabularyChallenge": "Hamon sa Bokabularyo",
+  "knowledgeStoryQuizDescription": "Subukan an saimong naamnan sa kapitulo.",
+  "knowledgeVocabularyChallengeDescription": "Praktisahon an mga importanteng tataramon sa istorya.",
+  "quizComplete": "Tapos na an Pagsuri!",
+  "quizScore": "Puntos: {correct}/{total}",
+  "@quizScore": {
+    "placeholders": {
+      "correct": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "startVocabularyChallenge": "Poonan an Hamon sa Bokabularyo",
+  "vocabularyChapterPractice": "Praktisahon an mga importanteng tataramon sa kapitulo na ini.",
+  "vocabularySkipForNow": "Laktawan ngunyan",
+  "continueAdventure": "Padagos sa Pakikipagsapalaran",
+  "chapterComplete": "Tapos na an Kapitulo!",
+  "chapterCleared": "Nalampasan an Kapitulo!",
+  "bonusVocabularyChallenge": "Bonus na Hamon sa Bokabularyo",
+  "vocabularyBonusDescription": "Praktisahon an mga importanteng tataramon sa kapitulo na ini asin makaako nin bonus XP.",
+  "greatJob": "Marhay na trabaho!",
+  "youUnderstoodTheStory": "Nasabutan mo an istorya!",
+  "readyForNextAdventure": "Andam ka na sa sunod na pakikipagsapalaran!",
+  "bonusXpEarned": "Bonus XP na Naako: +{xp}",
+  "@bonusXpEarned": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "vocabularyBonusFailed": "Dai na-save an bonus XP mo. Pakisubukan giraray.",
+  "vocabularyRetryBonus": "Subukan giraray an bonus",
+  "chapterPracticeComplete": "Tapos na an Praktis",
+  "storyQuizComplete": "Tapos na an Pagsuri sa Istorya",
+  "vocabularyChallengeComplete": "Tapos na an Hamon sa Bokabularyo",
+  "vocabularySkipped": "Linalaktawan an Hamon sa Bokabularyo",
+  "xpEarned": "XP na Naako",
+  "wordsPracticedLabel": "Mga Tataramon na Pinraktis",
+  "wordsPracticed": "Mga Tataramon na Pinraktis: {count}",
+  "@wordsPracticed": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "chapterProgress": "Pag-asenso sa Kapitulo",
+  "chapterProgressCount": "{completed} sa {total} na kapitulo an natapos",
+  "@chapterProgressCount": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "chapterProgressUnavailable": "Dai available",
+  "chapterJourneyUnavailable": "Dai na available an paglalakbay sa kapitulo na ini.",
+  "storyCompletionTitle": "Tapos na an Istorya!",
+  "storyCompletionMessage": "Nakaabot ka na sa katapusan kan pakikipagsapalaran. Marhayon na paglalakbay!",
+  "chapterListReturn": "Bumalik sa mga kapitulo",
+  "vocabularyChallengePrompt": "Piliin an kahulugang pinakahahapot sa tataramon.",
+  "vocabularyWhatDoesWordMean": "Ano an boot sabihon kan \"{word}\"?",
+  "@vocabularyWhatDoesWordMean": { "placeholders": { "word": { "type": "String" } } },
+  "vocabularySubmitAnswer": "Ipadara an simbag",
+  "vocabularyCorrectFeedback": "Tama!",
+  "vocabularyIncorrectFeedback": "Dai pa tama.",
+  "vocabularyContinue": "Magpadagos",
+  "vocabularyComplete": "Tapos na an hamon sa bokabularyo!",
+  "vocabularyBackToChapter": "Bumalik sa kapitulo",
+  "vocabularyUnavailable": "Dai pa available an bokabularyo.",
   "libraryCompletedChapterCount": "{completed} sa {total} na kapitulo an natapos",
   "@libraryCompletedChapterCount": {
     "placeholders": {

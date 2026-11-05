@@ -16,6 +16,8 @@ class LocalProgressRepository implements ProgressRepository {
   final Map<String, Map<String, StoryProgressModel>> _progressStore = {};
   final Map<String, List<RecentAttemptModel>> _attemptsStore = {};
   final Map<String, Map<String, Map<String, double>>> _readingPositions = {};
+  final Map<String, List<QuizAttemptSnapshot>> _quizSnapshots = {};
+  final Map<String, List<VocabularyActivityRecord>> _vocabularyRecords = {};
 
   SharedPreferences? _preferences;
   Future<void>? _loadFuture;
@@ -30,7 +32,8 @@ class LocalProgressRepository implements ProgressRepository {
     if (json == null) return;
 
     final decoded = jsonDecode(json);
-    if (decoded is! Map<String, dynamic> || decoded['version'] != 1) {
+    if (decoded is! Map<String, dynamic> ||
+        (decoded['version'] != 1 && decoded['version'] != 2)) {
       throw const FormatException('Unsupported saved progress format.');
     }
 
@@ -77,6 +80,25 @@ class LocalProgressRepository implements ProgressRepository {
               },
         };
       }
+
+      final quizData = userData['quizSnapshots'];
+      if (quizData is List) {
+        _quizSnapshots[userId] = quizData
+            .whereType<Map>()
+            .map((item) => QuizAttemptSnapshot.fromMap(
+                  Map<String, dynamic>.from(item),
+                ))
+            .toList();
+      }
+      final vocabularyData = userData['vocabularyRecords'];
+      if (vocabularyData is List) {
+        _vocabularyRecords[userId] = vocabularyData
+            .whereType<Map>()
+            .map((item) => VocabularyActivityRecord.fromMap(
+                  Map<String, dynamic>.from(item),
+                ))
+            .toList();
+      }
     }
   }
 
@@ -120,12 +142,21 @@ class LocalProgressRepository implements ProgressRepository {
             .map(_attemptToMap)
             .toList(),
         'readingPositions': _readingPositions[userId] ?? const {},
+        'quizSnapshots': (_quizSnapshots[userId] ?? const <QuizAttemptSnapshot>[])
+            .take(20)
+            .map((snapshot) => snapshot.toMap())
+            .toList(),
+        'vocabularyRecords':
+            (_vocabularyRecords[userId] ?? const <VocabularyActivityRecord>[])
+                .take(100)
+                .map((record) => record.toMap())
+                .toList(),
       };
     }
 
     final saved = await _preferences!.setString(
       _storageKey,
-      jsonEncode({'version': 1, 'users': users}),
+      jsonEncode({'version': 2, 'users': users}),
     );
     if (!saved) {
       throw StateError('Could not save learner progress to local storage.');
@@ -243,6 +274,82 @@ class LocalProgressRepository implements ProgressRepository {
         currentUnlockedChapterId: nextChapterId ?? curProgress?.currentUnlockedChapterId,
       );
     }
+    await _save();
+  }
+
+  Future<List<String>> getRecentQuestionIds({
+    required String userId,
+    required String chapterId,
+    required String languageCode,
+    int limit = 5,
+  }) async {
+    await _ensureLoaded();
+    return (_quizSnapshots[userId] ?? const <QuizAttemptSnapshot>[])
+        .where((snapshot) =>
+            snapshot.chapterId == chapterId &&
+            snapshot.languageCode == languageCode)
+        .expand((snapshot) => snapshot.questionIds)
+        .take(limit)
+        .toList();
+  }
+
+  Future<void> startQuizSnapshot({
+    required String userId,
+    required QuizAttemptSnapshot snapshot,
+  }) async {
+    await _ensureLoaded();
+    final snapshots = _quizSnapshots.putIfAbsent(userId, () => []);
+    snapshots.removeWhere((item) => item.id == snapshot.id);
+    snapshots.insert(0, snapshot);
+    await _save();
+  }
+
+  Future<void> completeQuizSnapshot({
+    required String userId,
+    required String snapshotId,
+    required Map<String, String> answers,
+  }) async {
+    await _ensureLoaded();
+    final snapshots = _quizSnapshots[userId];
+    if (snapshots == null) return;
+    final index = snapshots.indexWhere((item) => item.id == snapshotId);
+    if (index < 0) return;
+    final current = snapshots[index];
+    snapshots[index] = QuizAttemptSnapshot(
+      id: current.id,
+      bankId: current.bankId,
+      bankVersion: current.bankVersion,
+      chapterId: current.chapterId,
+      languageCode: current.languageCode,
+      questionIds: current.questionIds,
+      startedAt: current.startedAt,
+      completedAt: DateTime.now(),
+      answers: answers,
+    );
+    await _save();
+  }
+
+  Future<void> recordVocabularyActivity({
+    required String userId,
+    required String chapterId,
+    required String languageCode,
+    required String word,
+    required String activityType,
+    required bool correct,
+  }) async {
+    await _ensureLoaded();
+    _vocabularyRecords.putIfAbsent(userId, () => []).insert(
+          0,
+          VocabularyActivityRecord(
+            id: _uuid.v4(),
+            chapterId: chapterId,
+            languageCode: languageCode,
+            word: word,
+            activityType: activityType,
+            correct: correct,
+            completedAt: DateTime.now(),
+          ),
+        );
     await _save();
   }
 }

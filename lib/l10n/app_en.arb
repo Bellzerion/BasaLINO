@@ -260,6 +260,69 @@
   "@libraryLoadError": {
     "placeholders": { "error": { "type": "String" } }
   },
+  "readerCheckKnowledge": "Check Knowledge",
+  "knowledgeStoryQuiz": "Story Quiz",
+  "knowledgeVocabularyChallenge": "Vocabulary Challenge",
+  "knowledgeStoryQuizDescription": "Test what happened in the chapter.",
+  "knowledgeVocabularyChallengeDescription": "Practice important story words.",
+  "quizComplete": "Quiz Complete!",
+  "quizScore": "Score: {correct}/{total}",
+  "@quizScore": {
+    "placeholders": {
+      "correct": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "startVocabularyChallenge": "Start Vocabulary Challenge",
+  "vocabularyChapterPractice": "Practice the key words from this chapter.",
+  "vocabularySkipForNow": "Skip for now",
+  "continueAdventure": "Continue Adventure",
+  "chapterComplete": "Chapter Complete!",
+  "chapterCleared": "Chapter Cleared!",
+  "bonusVocabularyChallenge": "Bonus Vocabulary Challenge",
+  "vocabularyBonusDescription": "Practice important words from this chapter and earn bonus XP.",
+  "greatJob": "Great job!",
+  "youUnderstoodTheStory": "You understood the story!",
+  "readyForNextAdventure": "You are ready for the next adventure!",
+  "bonusXpEarned": "Bonus XP Earned: +{xp}",
+  "@bonusXpEarned": {
+    "placeholders": { "xp": { "type": "int" } }
+  },
+  "vocabularyBonusFailed": "We couldn't save your bonus XP. Please try again.",
+  "vocabularyRetryBonus": "Retry bonus",
+  "chapterPracticeComplete": "Practice Complete",
+  "storyQuizComplete": "Story Quiz Complete",
+  "vocabularyChallengeComplete": "Vocabulary Challenge Complete",
+  "vocabularySkipped": "Vocabulary Challenge Skipped",
+  "xpEarned": "XP Earned",
+  "wordsPracticedLabel": "Words Practiced",
+  "wordsPracticed": "Words Practiced: {count}",
+  "@wordsPracticed": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "chapterProgress": "Chapter Progress",
+  "chapterProgressCount": "{completed} of {total} chapters complete",
+  "@chapterProgressCount": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "chapterProgressUnavailable": "Unavailable",
+  "chapterJourneyUnavailable": "This chapter journey is no longer available.",
+  "storyCompletionTitle": "Story Complete!",
+  "storyCompletionMessage": "You reached the end of this adventure. What a wonderful journey!",
+  "chapterListReturn": "Return to chapters",
+  "vocabularyChallengePrompt": "Choose the meaning that best matches the word.",
+  "vocabularyWhatDoesWordMean": "What does \"{word}\" mean?",
+  "@vocabularyWhatDoesWordMean": { "placeholders": { "word": { "type": "String" } } },
+  "vocabularySubmitAnswer": "Submit answer",
+  "vocabularyCorrectFeedback": "Correct!",
+  "vocabularyIncorrectFeedback": "Not quite.",
+  "vocabularyContinue": "Continue",
+  "vocabularyComplete": "Vocabulary challenge complete!",
+  "vocabularyBackToChapter": "Back to chapter",
+  "vocabularyUnavailable": "Vocabulary is not available yet.",
   "libraryCompletedChapterCount": "{completed} of {total} chapters completed",
   "@libraryCompletedChapterCount": {
     "placeholders": {
