@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/bootstrap/providers.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/models/chapter_model.dart';
+import '../../../core/models/progress_model.dart';
 import '../../../core/models/story_model.dart';
 import '../../../l10n/app_localizations_context.dart';
 
@@ -23,11 +24,13 @@ class HomeScreen extends ConsumerWidget {
       body: FutureBuilder<List<StoryModel>>(
         future: repo.getStories(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
           final stories = snapshot.data!;
-          if (stories.isEmpty)
+          if (stories.isEmpty) {
             return Center(child: Text(context.l10n.homeStoriesUnavailable));
+          }
           final story = stories.firstWhere(
             (s) => s.id == 'mayon',
             orElse: () => stories.first,
@@ -45,69 +48,111 @@ class HomeScreen extends ConsumerWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               final chapters = chapterSnapshot.data!;
-              return SafeArea(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(24, 12, 24, 18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _Welcome(name: name),
-                            const SizedBox(height: 16),
-                            _AdventureCard(story: story, chapters: chapters),
-                            const SizedBox(height: 16),
-                            Text(
-                              context.l10n.homeAdventureMap,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            _Map(story: story, chapters: chapters),
-                            const SizedBox(height: 14),
-                            Text(
-                              context.l10n.homeMoreStories,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            ...stories
-                                .where((s) => s.id != story.id)
-                                .map(
-                                  (s) => Card(
-                                    child: ListTile(
-                                      onTap: () =>
-                                          context.push('/story/${s.id}'),
-                                      leading: const Icon(
-                                        Icons.menu_book_rounded,
-                                        color: Color(0xFF075C31),
-                                      ),
-                                      title: Text(
-                                        s.titleEn,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                      trailing: const Icon(Icons.chevron_right),
-                                    ),
+              return FutureBuilder<List<StoryProgressModel>>(
+                future: progressRepo.getAllProgress(user?.uid ?? 'guest'),
+                builder: (context, progressSnapshot) {
+                  if (progressSnapshot.hasError) {
+                    return Center(child: Text(context.l10n.errorGeneric));
+                  }
+                  if (!progressSnapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final completedStoryIds = progressSnapshot.data!
+                      .where(
+                        (progress) => stories.any(
+                          (item) =>
+                              item.id == progress.storyId &&
+                              item.chapterCount > 0 &&
+                              progress.completedChapterIds.length >=
+                                  item.chapterCount,
+                        ),
+                      )
+                      .map((progress) => progress.storyId)
+                      .toSet();
+                  return SafeArea(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.fromLTRB(24, 12, 24, 18),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _Welcome(name: name),
+                                const SizedBox(height: 16),
+                                _AdventureCard(
+                                  story: story,
+                                  chapters: chapters,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  context.l10n.homeAdventureMap,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w900,
                                   ),
                                 ),
-                          ],
+                                const SizedBox(height: 8),
+                                _Map(story: story, chapters: chapters),
+                                const SizedBox(height: 14),
+                                Text(
+                                  context.l10n.homeMoreStories,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                ...stories
+                                    .where((s) => s.id != story.id)
+                                    .map(
+                                      (s) => Card(
+                                        child: ListTile(
+                                          onTap: () =>
+                                              context.push('/story/${s.id}'),
+                                          leading: Icon(
+                                            completedStoryIds.contains(s.id)
+                                                ? Icons.emoji_events_rounded
+                                                : Icons.menu_book_rounded,
+                                            color:
+                                                completedStoryIds.contains(s.id)
+                                                ? const Color(0xFFF59E0B)
+                                                : const Color(0xFF075C31),
+                                          ),
+                                          title: Text(
+                                            s.titleEn,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                          subtitle:
+                                              completedStoryIds.contains(s.id)
+                                              ? Text(
+                                                  context
+                                                      .l10n
+                                                      .homeStoryCompleted,
+                                                )
+                                              : null,
+                                          trailing: const Icon(
+                                            Icons.chevron_right,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                        _Nav(
+                          onClearedStories: () =>
+                              context.push('/cleared-stories'),
+                          onProgress: () => context.push('/progress'),
+                          onProfile: () => context.push('/profile'),
+                        ),
+                      ],
                     ),
-                    _Nav(
-                      onClearedStories: () => context.push('/cleared-stories'),
-                      onProgress: () => context.push('/progress'),
-                      onProfile: () => context.push('/profile'),
-                    ),
-                  ],
-                ),
+                  );
+                },
               );
             },
           );
@@ -202,6 +247,7 @@ class _AdventureCard extends StatelessWidget {
             ),
     );
     final completed = chapters.where((chapter) => chapter.isCompleted).length;
+    final isStoryComplete = chapters.isNotEmpty && completed == chapters.length;
     final isNewJourney = completed == 0 && current.orderIndex == 0;
     final progress = chapters.isEmpty ? 0.0 : completed / chapters.length;
     return Container(
@@ -240,7 +286,9 @@ class _AdventureCard extends StatelessWidget {
             ),
           ),
           Text(
-            isNewJourney
+            isStoryComplete
+                ? context.l10n.homeStoryCompleted
+                : isNewJourney
                 ? context.l10n.homeFirstChapterReady
                 : context.l10n.homeChapterProgress(
                     current.orderIndex + 1,
@@ -267,7 +315,9 @@ class _AdventureCard extends StatelessWidget {
             child: FilledButton(
               onPressed: current.id.isEmpty
                   ? null
-                  : () => context.push('/reader/${story.id}/${current.id}'),
+                  : () => isStoryComplete
+                        ? context.push('/story/${story.id}')
+                        : context.push('/reader/${story.id}/${current.id}'),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(110, 30),
                 backgroundColor: const Color(0xFFFF8D28),
@@ -275,7 +325,9 @@ class _AdventureCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
               ),
               child: Text(
-                isNewJourney
+                isStoryComplete
+                    ? context.l10n.storyCompletionReplay
+                    : isNewJourney
                     ? context.l10n.chapterUnlocked
                     : context.l10n.chapterCurrent,
                 style: const TextStyle(fontWeight: FontWeight.w900),

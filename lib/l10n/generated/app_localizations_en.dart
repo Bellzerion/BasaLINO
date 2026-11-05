@@ -324,6 +324,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeChapterStart => 'Start';
 
   @override
+  String get homeStoryCompleted => 'Story Complete';
+
+  @override
   String get progressJourneyTitle => 'My Learning Journey';
 
   @override
@@ -651,7 +654,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storyCompletionMessage =>
-      'You reached the end of this adventure. What a wonderful journey!';
+      'You completed the journey. You are ready for your next adventure!';
+
+  @override
+  String get storyCompletionReturnToMap => 'Return to Adventure Map';
+
+  @override
+  String get storyCompletionReplay => 'Replay Story';
+
+  @override
+  String get storyCompletionChapters => 'Chapters Completed';
+
+  @override
+  String get storyCompletionWordsPracticed => 'Vocabulary Words Practiced';
+
+  @override
+  String get storyCompletionXpEarned => 'Total XP Earned';
+
+  @override
+  String get storyCompletionDate => 'Completion Date';
 
   @override
   String get chapterListReturn => 'Return to chapters';

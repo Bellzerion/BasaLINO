@@ -161,4 +161,12 @@ class LocalAuthRepository implements AuthRepository {
     }
     return true;
   }
+
+  Future<Set<String>> getAwardedVocabularyBonusChapterIds({
+    required String userId,
+  }) async {
+    final preferences = await SharedPreferences.getInstance();
+    return (preferences.getStringList(_vocabularyBonusKey(userId)) ?? [])
+        .toSet();
+  }
 }

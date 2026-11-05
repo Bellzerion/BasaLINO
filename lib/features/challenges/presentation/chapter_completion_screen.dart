@@ -74,6 +74,10 @@ class _ChapterCompletionScreenState
               ?.where((chapter) => chapter.isCompleted)
               .length;
           final total = chapters?.length;
+          final storyIsComplete =
+              chapters != null &&
+              chapters.isNotEmpty &&
+              completed == chapters.length;
           return Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -137,7 +141,9 @@ class _ChapterCompletionScreenState
                   ElevatedButton(
                     onPressed: () {
                       final isFinalChapter =
-                          result.passed && result.nextChapterId == null;
+                          result.passed &&
+                          result.nextChapterId == null &&
+                          storyIsComplete;
                       context.go(
                         isFinalChapter
                             ? '/story-completion/${chapterJourney.storyId}'

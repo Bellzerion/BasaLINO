@@ -652,6 +652,12 @@ abstract class AppLocalizations {
   /// **'Start'**
   String get homeChapterStart;
 
+  /// No description provided for @homeStoryCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Story Complete'**
+  String get homeStoryCompleted;
+
   /// No description provided for @progressJourneyTitle.
   ///
   /// In en, this message translates to:
@@ -1189,8 +1195,44 @@ abstract class AppLocalizations {
   /// No description provided for @storyCompletionMessage.
   ///
   /// In en, this message translates to:
-  /// **'You reached the end of this adventure. What a wonderful journey!'**
+  /// **'You completed the journey. You are ready for your next adventure!'**
   String get storyCompletionMessage;
+
+  /// No description provided for @storyCompletionReturnToMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to Adventure Map'**
+  String get storyCompletionReturnToMap;
+
+  /// No description provided for @storyCompletionReplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Replay Story'**
+  String get storyCompletionReplay;
+
+  /// No description provided for @storyCompletionChapters.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapters Completed'**
+  String get storyCompletionChapters;
+
+  /// No description provided for @storyCompletionWordsPracticed.
+  ///
+  /// In en, this message translates to:
+  /// **'Vocabulary Words Practiced'**
+  String get storyCompletionWordsPracticed;
+
+  /// No description provided for @storyCompletionXpEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'Total XP Earned'**
+  String get storyCompletionXpEarned;
+
+  /// No description provided for @storyCompletionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Completion Date'**
+  String get storyCompletionDate;
 
   /// No description provided for @chapterListReturn.
   ///

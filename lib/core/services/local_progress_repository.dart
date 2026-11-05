@@ -129,6 +129,8 @@ class LocalProgressRepository implements ProgressRepository {
       ..._progressStore.keys,
       ..._attemptsStore.keys,
       ..._readingPositions.keys,
+      ..._quizSnapshots.keys,
+      ..._vocabularyRecords.keys,
     }) {
       users[userId] = {
         'progress': (_progressStore[userId]?.values ?? const <StoryProgressModel>[])
@@ -351,5 +353,17 @@ class LocalProgressRepository implements ProgressRepository {
           ),
         );
     await _save();
+  }
+
+  Future<int> getVocabularyWordsPracticedCount({
+    required String userId,
+    required Set<String> chapterIds,
+  }) async {
+    await _ensureLoaded();
+    return (_vocabularyRecords[userId] ?? const <VocabularyActivityRecord>[])
+        .where((record) => chapterIds.contains(record.chapterId))
+        .map((record) => '${record.languageCode}\u0000${record.word}')
+        .toSet()
+        .length;
   }
 }

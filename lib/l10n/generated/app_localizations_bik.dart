@@ -327,6 +327,9 @@ class AppLocalizationsBik extends AppLocalizations {
   String get homeChapterStart => 'Magpoon';
 
   @override
+  String get homeStoryCompleted => 'Natapos an Istorya';
+
+  @override
   String get progressJourneyTitle => 'Sakong Pag-agih sa Pag-adal';
 
   @override
@@ -657,7 +660,26 @@ class AppLocalizationsBik extends AppLocalizations {
 
   @override
   String get storyCompletionMessage =>
-      'Nakaabot ka na sa katapusan kan pakikipagsapalaran. Marhayon na paglalakbay!';
+      'Natapos mo an pag-agih na ini. Handa ka na sa sunod mong pakikipagsapalaran!';
+
+  @override
+  String get storyCompletionReturnToMap =>
+      'Bumalik sa Mapa kan Pakikipagsapalaran';
+
+  @override
+  String get storyCompletionReplay => 'Liwaton an Istorya';
+
+  @override
+  String get storyCompletionChapters => 'Mga Kapitulo na Natapos';
+
+  @override
+  String get storyCompletionWordsPracticed => 'Mga Tataramon na Pinraktis';
+
+  @override
+  String get storyCompletionXpEarned => 'Gabos na XP na Nakuha';
+
+  @override
+  String get storyCompletionDate => 'Petsa kan Pagtapos';
 
   @override
   String get chapterListReturn => 'Bumalik sa mga kapitulo';

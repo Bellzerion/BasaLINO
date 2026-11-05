@@ -327,6 +327,9 @@ class AppLocalizationsTl extends AppLocalizations {
   String get homeChapterStart => 'Simulan';
 
   @override
+  String get homeStoryCompleted => 'Tapos na ang Kuwento';
+
+  @override
   String get progressJourneyTitle => 'Aking Paglalakbay sa Pagkatuto';
 
   @override
@@ -657,7 +660,26 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get storyCompletionMessage =>
-      'Narating mo na ang dulo ng pakikipagsapalaran. Napakagandang paglalakbay!';
+      'Natapos mo ang paglalakbay na ito. Handa ka na sa susunod mong pakikipagsapalaran!';
+
+  @override
+  String get storyCompletionReturnToMap =>
+      'Bumalik sa Mapa ng Pakikipagsapalaran';
+
+  @override
+  String get storyCompletionReplay => 'Ulitin ang Kuwento';
+
+  @override
+  String get storyCompletionChapters => 'Mga Kabanatang Natapos';
+
+  @override
+  String get storyCompletionWordsPracticed => 'Mga Salitang Pinagsanayan';
+
+  @override
+  String get storyCompletionXpEarned => 'Kabuuang XP na Nakuha';
+
+  @override
+  String get storyCompletionDate => 'Petsa ng Pagtatapos';
 
   @override
   String get chapterListReturn => 'Bumalik sa mga kabanata';
