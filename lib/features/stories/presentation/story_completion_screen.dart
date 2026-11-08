@@ -7,7 +7,6 @@ import '../../../app/bootstrap/providers.dart';
 import '../../../core/models/chapter_model.dart';
 import '../../../core/models/story_model.dart';
 import '../../../core/services/auth_repository.dart';
-import '../../../core/services/local_auth_repository.dart';
 import '../../../core/services/local_progress_repository.dart';
 import '../../../l10n/app_localizations_context.dart';
 
@@ -51,9 +50,8 @@ class _StoryCompletionScreenState extends ConsumerState<StoryCompletionScreen> {
       userId,
       limit: 10000,
     );
-    final vocabularyBonusFuture = authRepository is LocalAuthRepository
-        ? authRepository.getAwardedVocabularyBonusChapterIds(userId: userId)
-        : Future<Set<String>>.value(const {});
+    final vocabularyBonusFuture = authRepository
+        .getAwardedVocabularyBonusChapterIds(userId: userId);
     final vocabularyCountFuture = () async {
       if (progressRepository is! LocalProgressRepository) return 0;
       final chapters = await chaptersFuture;

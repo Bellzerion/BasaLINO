@@ -1,18 +1,33 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/config/auth_mode.dart';
 import '../../core/services/auth_repository.dart';
 import '../../core/services/story_repository.dart';
 import '../../core/services/challenge_repository.dart';
 import '../../core/services/progress_repository.dart';
 import '../../core/services/local_auth_repository.dart';
+import '../../core/services/firebase_auth_repository.dart';
 import '../../core/services/local_story_repository.dart';
 import '../../core/services/local_challenge_repository.dart';
 import '../../core/services/local_progress_repository.dart';
 import '../../core/models/user_model.dart';
 
 // Repositories
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
+final authModeProvider = Provider<AuthMode>((ref) => authMode);
+
+final localAuthRepositoryProvider = Provider<LocalAuthRepository>((ref) {
   return LocalAuthRepository();
+});
+
+final firebaseAuthRepositoryProvider = Provider<FirebaseAuthRepository>((ref) {
+  return FirebaseAuthRepository();
+});
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return switch (ref.watch(authModeProvider)) {
+    AuthMode.local => ref.watch(localAuthRepositoryProvider),
+    AuthMode.firebase => ref.watch(firebaseAuthRepositoryProvider),
+  };
 });
 
 final storyRepositoryProvider = Provider<StoryRepository>((ref) {

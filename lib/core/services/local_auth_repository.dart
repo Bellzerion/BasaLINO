@@ -231,6 +231,7 @@ class LocalAuthRepository implements AuthRepository {
     return true;
   }
 
+  @override
   Future<Set<String>> getAwardedVocabularyBonusChapterIds({
     required String userId,
   }) async {

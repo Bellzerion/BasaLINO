@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "983473623510",
+    "project_id": "basalino-dev",
+    "storage_bucket": "basalino-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983473623510:android:08182479a6755776455477",
+        "android_client_info": {
+          "package_name": "com.example.basalino"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtu1SJ_LhM_wWp_xnYvHCKmtebo7uds3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -19,6 +19,10 @@ abstract class AuthRepository {
 
   Future<UserModel?> getCurrentUser();
 
+  Future<Set<String>> getAwardedVocabularyBonusChapterIds({
+    required String userId,
+  });
+
   void updateLanguage(String lang);
 
   Future<void> addXp(int xp);
