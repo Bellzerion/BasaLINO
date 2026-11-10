@@ -1,7 +1,8 @@
 # BasaLINO Firebase Hybrid Integration Roadmap
 
-Status: assessment and roadmap only. No Firebase integration changes are
-implemented by this document.
+Status: roadmap. Phase 2.6 repository/profile/progress foundations are now
+implemented; sync queues, workers, and cloud progression writes remain
+unimplemented.
 
 ## Executive assessment
 
@@ -12,11 +13,11 @@ authentication or progress persistence to Firebase as-is.
 |---|---|---|
 | Local mode | Local auth, story, challenge, and progress repositories are selected by Riverpod providers. | Working baseline to preserve |
 | Firebase dependencies | Firebase Auth, Firestore, Functions, and Core packages are declared. | Available |
-| Firebase initialization | `main.dart` does not call `Firebase.initializeApp`; no generated FlutterFire options file is present. | Missing |
-| Firebase repository wiring | Firebase repositories exist but are not selected by `providers.dart`. | Partial |
-| Firebase Auth/profile | Auth repository uses Firebase UID and a `users/{uid}` profile; signup writes a pending profile. | Partial |
+| Firebase initialization | Firebase initialization is configured for the current app. | Implemented |
+| Firebase repository wiring | Local repositories remain active; Firebase progress reads are available behind repositories. | Partial |
+| Firebase Auth/profile | Firebase auth uses `users/{uid}` and the canonical profile contract; profile bootstrap writes `approvalStatus: approved`. | Read contract aligned |
 | Secure quiz progression | `submitAttempt` Cloud Function grades answers and writes attempt, XP, and chapter progress. | Strong starting point; hardening needed |
-| Progress repository | Firebase repository reads progress and attempts, but has no write or local-sync API. | Incomplete |
+| Progress repository | A shared mutation contract and ProgressMutationService exist; Firebase story mutations still delegate to local persistence. | Sync not implemented |
 | Offline support | Local progress persists in SharedPreferences. Firestore rules disallow client progress writes. | Local mode only |
 | Reading/vocabulary sync | Reading positions and vocabulary activity are local-repository-specific. | Missing |
 | Security rules and schema | Owner-scoped reads and server-only progression writes are defined. | Useful baseline; test with emulators |
@@ -33,9 +34,8 @@ authentication or progress persistence to Firebase as-is.
   Firebase UID as the profile document ID.
 - The local account index and local progress/XP are separate from Firebase.
   Local learner IDs must not be assumed to equal future Firebase UIDs.
-- `main.dart` does not initialize Firebase. Firebase mode needs explicit
-  configuration and initialization without making local-only mode depend on
-  Firebase credentials or availability.
+- Firebase initialization is available, while local mode remains the active
+  repository configuration and must remain usable without cloud availability.
 - Local mock sign-in is not real credential verification. Its email-to-UID
   record is a local identity convenience, not proof that the email is owned
   by its user.
@@ -52,19 +52,18 @@ authentication or progress persistence to Firebase as-is.
 - Firebase progress currently supports reads from
   `users/{uid}/progress/{storyId}` and root `attempts`, but does not implement
   writes or offline reconciliation.
-- In the quiz screen, local attempt/snapshot persistence runs only when the
-  selected progress repository is `LocalProgressRepository`. The Firebase
-  challenge repository calls `submitAttempt`, whose Cloud Function is the
-  actual server-side writer for attempts, progress, and XP.
-- `FirebaseAuthRepository.addXp` intentionally does nothing; XP is intended to
-  be awarded by trusted backend operations. The active user/profile state is
-  not automatically refreshed by a Firestore document update.
-- Reader position and vocabulary activity are written only through methods
-  available on `LocalProgressRepository`; these operations have no shared
-  repository contract or Firebase sync path.
+- Quiz and vocabulary screens now call `ProgressMutationService`; concrete
+  local repository checks have been removed from UI code.
+- `AuthRepository` is authentication-only. Local XP retains its existing
+  SharedPreferences keys, and cloud XP remains owned by trusted backend logic.
+- Reader position and vocabulary activity are available through the
+  `ProgressRepository` contract; cloud synchronization is not implemented.
 - Firestore rules deny direct client writes to progression and attempts.
   Any sync design must respect this and use trusted Cloud Functions for
   authoritative progression and XP.
+- The source-of-truth contracts are documented in
+  [PHASE3_FOUNDATION.md](./PHASE3_FOUNDATION.md); it supersedes stale
+  pre-Phase-2.6 repository/schema statements in this roadmap.
 
 ### Backend foundations and gaps
 

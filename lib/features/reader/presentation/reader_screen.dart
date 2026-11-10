@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/bootstrap/providers.dart';
 import '../../../core/models/chapter_translation_model.dart';
 import '../../../core/models/vocab_hint_model.dart';
-import '../../../core/services/local_progress_repository.dart';
+import '../../../core/services/progress_repository.dart';
 import '../../../l10n/app_localizations_context.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
@@ -29,7 +29,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   double _fontSize = 17.0;
   final ScrollController _readingController = ScrollController();
   Timer? _readingSaveTimer;
-  LocalProgressRepository? _localProgressRepository;
+  ProgressRepository? _progressRepository;
   String? _readingUserId;
   String? _restoringReadingKey;
   bool _isRestoringReadingPosition = false;
@@ -68,8 +68,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     _restoringReadingKey = key;
     _readingUserId = userId;
     final progressRepository = ref.read(progressRepositoryProvider);
-    if (progressRepository is! LocalProgressRepository) return;
-    _localProgressRepository = progressRepository;
+    _progressRepository = progressRepository;
     _isRestoringReadingPosition = true;
 
     unawaited(() async {
@@ -97,7 +96,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   void _scheduleReadingPositionSave() {
     if (_isRestoringReadingPosition ||
         !_readingController.hasClients ||
-        _localProgressRepository == null ||
+        _progressRepository == null ||
         _readingUserId == null) {
       return;
     }
@@ -108,13 +107,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   }
 
   Future<void> _saveReadingPosition() async {
-    final repository = _localProgressRepository;
+    final repository = _progressRepository;
     final userId = _readingUserId;
     if (repository == null || userId == null || !_readingController.hasClients)
       return;
 
     try {
-      await repository.saveReadingPosition(
+      await ref.read(progressMutationServiceProvider).saveReadingPosition(
         userId: userId,
         storyId: widget.storyId,
         chapterId: widget.chapterId,
@@ -218,6 +217,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       final matchedHint = hints.firstWhere(
         (h) => h.word.toLowerCase() == bracketedWord.toLowerCase(),
         orElse: () => VocabHintModel(
+          vocabularyId: 'legacy:${bracketedWord.toLowerCase()}',
           word: bracketedWord,
           definition: context.l10n.readerFallbackVocabularyDefinition,
         ),
@@ -284,7 +284,6 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             initialValue: currentLang,
             onSelected: (code) {
               ref.read(appLanguageProvider.notifier).state = code;
-              ref.read(authRepositoryProvider).updateLanguage(code);
             },
             itemBuilder: (context) => [
               PopupMenuItem(

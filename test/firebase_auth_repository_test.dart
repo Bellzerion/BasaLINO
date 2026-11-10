@@ -1,5 +1,8 @@
 import 'package:basalino/core/services/auth_repository_exception.dart';
 import 'package:basalino/core/services/firebase_auth_repository.dart';
+import 'package:basalino/core/services/local_progress_repository.dart';
+import 'package:basalino/core/services/local_story_repository.dart';
+import 'package:basalino/core/services/progress_mutation_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -70,27 +73,39 @@ void main() {
     },
   );
 
-  test('Firebase-mode XP and vocabulary bonuses remain local', () async {
+  test('Firebase auth identity is separate from local XP and rewards', () async {
     final repository = FirebaseAuthRepository(auth: MockFirebaseAuth());
     final user = await repository.signUp(
       email: 'progress@example.com',
       password: 'password123',
       nickname: 'Learner',
     );
+    final stories = LocalStoryRepository();
+    final progress = LocalProgressRepository(stories);
+    final mutations = ProgressMutationService(
+      progressRepository: progress,
+      storyRepository: stories,
+    );
 
-    await repository.addXp(25);
-    expect((await repository.getCurrentUser())?.totalXp, 25);
+    await mutations.awardXp(userId: user.uid, amount: 25);
+    expect(await progress.getTotalXp(user.uid), 25);
     expect(
-      await repository.awardVocabularyBonus(chapterId: 'chapter-1'),
+      await mutations.awardVocabularyBonus(
+        userId: user.uid,
+        chapterId: 'chapter-1',
+      ),
       isTrue,
     );
     expect(
-      await repository.awardVocabularyBonus(chapterId: 'chapter-1'),
+      await mutations.awardVocabularyBonus(
+        userId: user.uid,
+        chapterId: 'chapter-1',
+      ),
       isFalse,
     );
-    expect((await repository.getCurrentUser())?.totalXp, 30);
+    expect(await progress.getTotalXp(user.uid), 30);
     expect(
-      await repository.getAwardedVocabularyBonusChapterIds(userId: user.uid),
+      await progress.getAwardedVocabularyBonusChapterIds(userId: user.uid),
       {'chapter-1'},
     );
   });

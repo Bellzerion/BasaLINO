@@ -5,6 +5,7 @@ import 'package:basalino/core/models/story_model.dart';
 import 'package:basalino/core/models/user_model.dart';
 import 'package:basalino/core/services/local_auth_repository.dart';
 import 'package:basalino/core/services/local_progress_repository.dart';
+import 'package:basalino/core/services/progress_mutation_service.dart';
 import 'package:basalino/core/services/story_repository.dart';
 import 'package:basalino/features/stories/presentation/home_screen.dart';
 import 'package:basalino/features/stories/presentation/story_completion_screen.dart';
@@ -30,7 +31,7 @@ void main() {
     final stories = _TestStoryRepository();
     final progress = LocalProgressRepository(stories);
     final auth = LocalAuthRepository();
-    await _completeStory(progress, auth);
+    await _completeStory(progress);
     final router = _testRouter();
 
     await tester.pumpWidget(
@@ -62,7 +63,8 @@ void main() {
   ) async {
     final stories = _TestStoryRepository();
     final progress = LocalProgressRepository(stories);
-    await progress.recordAttemptAndUnlock(
+    await progress.recordAttempt(
+      attemptId: 'incomplete-attempt',
       userId: 'demo_learner_1',
       storyId: 'test-story',
       chapterId: 'test-story_ch1',
@@ -95,7 +97,7 @@ void main() {
     final stories = _TestStoryRepository();
     final progress = LocalProgressRepository(stories);
     final auth = LocalAuthRepository();
-    await _completeStory(progress, auth);
+    await _completeStory(progress);
 
     await tester.pumpWidget(
       _app(
@@ -122,9 +124,13 @@ Future<void> _pumpUntilVisible(WidgetTester tester, Finder finder) async {
 
 Future<void> _completeStory(
   LocalProgressRepository progress,
-  LocalAuthRepository auth,
 ) async {
-  await progress.recordAttemptAndUnlock(
+  final mutations = ProgressMutationService(
+    progressRepository: progress,
+    storyRepository: _TestStoryRepository(),
+  );
+  await mutations.recordAttempt(
+    attemptId: 'test-attempt-1',
     userId: 'demo_learner_1',
     storyId: 'test-story',
     chapterId: 'test-story_ch1',
@@ -134,7 +140,8 @@ Future<void> _completeStory(
     passed: true,
     nextChapterId: 'test-story_ch2',
   );
-  await progress.recordAttemptAndUnlock(
+  await mutations.recordAttempt(
+    attemptId: 'test-attempt-2',
     userId: 'demo_learner_1',
     storyId: 'test-story',
     chapterId: 'test-story_ch2',
@@ -147,6 +154,7 @@ Future<void> _completeStory(
     userId: 'demo_learner_1',
     chapterId: 'test-story_ch1',
     languageCode: 'en',
+    vocabularyId: 'test-story-journey',
     word: 'journey',
     activityType: 'recall_challenge',
     correct: true,
@@ -155,6 +163,7 @@ Future<void> _completeStory(
     userId: 'demo_learner_1',
     chapterId: 'test-story_ch2',
     languageCode: 'en',
+    vocabularyId: 'test-story-journey',
     word: 'journey',
     activityType: 'recall_challenge',
     correct: true,
@@ -163,11 +172,15 @@ Future<void> _completeStory(
     userId: 'demo_learner_1',
     chapterId: 'test-story_ch2',
     languageCode: 'en',
+    vocabularyId: 'test-story-brave',
     word: 'brave',
     activityType: 'recall_challenge',
     correct: true,
   );
-  await auth.awardVocabularyBonus(chapterId: 'test-story_ch1');
+  await mutations.awardVocabularyBonus(
+    userId: 'demo_learner_1',
+    chapterId: 'test-story_ch1',
+  );
 }
 
 Widget _app({
@@ -229,7 +242,6 @@ final _testUser = UserModel(
   nickname: 'Learner',
   preferredLanguage: 'en',
   approvalStatus: ApprovalStatus.approved,
-  totalXp: 0,
   createdAt: DateTime(2026),
 );
 

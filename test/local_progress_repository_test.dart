@@ -2,8 +2,8 @@ import 'package:basalino/core/models/chapter_model.dart';
 import 'package:basalino/core/models/chapter_translation_model.dart';
 import 'package:basalino/core/models/progress_model.dart';
 import 'package:basalino/core/models/story_model.dart';
-import 'package:basalino/core/services/local_auth_repository.dart';
 import 'package:basalino/core/services/local_progress_repository.dart';
+import 'package:basalino/core/services/progress_mutation_service.dart';
 import 'package:basalino/core/services/story_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,7 +18,8 @@ void main() {
   test('chapter progress, attempts, and reading position survive repository restart', () async {
     final repository = LocalProgressRepository(_TestStoryRepository());
 
-    await repository.recordAttemptAndUnlock(
+    await repository.recordAttempt(
+      attemptId: 'attempt-1',
       userId: 'learner-1',
       storyId: 'story-1',
       chapterId: 'chapter-1',
@@ -67,13 +68,39 @@ void main() {
   });
 
   test('local XP survives repository restart', () async {
-    final repository = LocalAuthRepository();
-    expect((await repository.getCurrentUser())?.totalXp, 45);
+    final repository = LocalProgressRepository(_TestStoryRepository());
+    expect(await repository.getTotalXp('demo_learner_1'), 45);
+    await repository.awardXp(userId: 'demo_learner_1', amount: 35);
 
-    await repository.addXp(35);
+    final restored = LocalProgressRepository(_TestStoryRepository());
+    expect(await restored.getTotalXp('demo_learner_1'), 80);
+  });
 
-    final restored = LocalAuthRepository();
-    expect((await restored.getCurrentUser())?.totalXp, 80);
+  test('retrying the same attempt does not award XP twice', () async {
+    final stories = _TestStoryRepository();
+    final repository = LocalProgressRepository(stories);
+    final mutations = ProgressMutationService(
+      progressRepository: repository,
+      storyRepository: stories,
+    );
+
+    Future<void> record() => mutations.recordAttempt(
+      attemptId: 'stable-attempt-id',
+      userId: 'learner-1',
+      storyId: 'story-1',
+      chapterId: 'chapter-1',
+      chapterTitle: 'Chapter 1',
+      score: 100,
+      xpAwarded: 35,
+      passed: true,
+      nextChapterId: 'chapter-2',
+    );
+
+    await record();
+    await record();
+
+    expect(await repository.getTotalXp('learner-1'), 35);
+    expect(await repository.getRecentAttempts('learner-1'), hasLength(1));
   });
 
   test('missing saved progress keeps the initial chapter unlocked', () async {

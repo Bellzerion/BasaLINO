@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user_model.dart';
 import 'auth_repository.dart';
@@ -10,7 +9,6 @@ import 'auth_repository_exception.dart';
 class FirebaseAuthRepository implements AuthRepository {
   final FirebaseAuth _auth;
   UserModel? _latestUser;
-  final Map<String, String> _languageOverrides = {};
   final StreamController<UserModel?> _localChanges =
       StreamController<UserModel?>.broadcast();
 
@@ -49,20 +47,15 @@ class FirebaseAuthRepository implements AuthRepository {
 
   Future<UserModel?> _mapUser(User? user) async {
     if (user == null) return null;
-    final preferences = await SharedPreferences.getInstance();
     return UserModel(
       uid: user.uid,
       email: user.email ?? '',
       nickname: user.displayName ?? user.email?.split('@').first ?? '',
-      preferredLanguage: _languageOverrides[user.uid] ?? 'en',
+      preferredLanguage: 'en',
       approvalStatus: ApprovalStatus.approved,
-      totalXp: preferences.getInt(_xpKey(user.uid)) ?? 0,
       createdAt: user.metadata.creationTime ?? DateTime.now(),
     );
   }
-
-  String _xpKey(String uid) => 'basalino.user.xp.v1.$uid';
-  String _vocabularyBonusKey(String uid) => 'basalino.vocabularyBonus.v1.$uid';
 
   User _requireFirebaseUser(User? user) {
     if (user == null) {
@@ -72,11 +65,6 @@ class FirebaseAuthRepository implements AuthRepository {
       );
     }
     return user;
-  }
-
-  Future<void> _publishLatestUser() async {
-    _latestUser = await _mapUser(_auth.currentUser);
-    _localChanges.add(_latestUser);
   }
 
   @override
@@ -146,54 +134,4 @@ class FirebaseAuthRepository implements AuthRepository {
     return _latestUser;
   }
 
-  @override
-  Future<Set<String>> getAwardedVocabularyBonusChapterIds({
-    required String userId,
-  }) async {
-    final preferences = await SharedPreferences.getInstance();
-    return (preferences.getStringList(_vocabularyBonusKey(userId)) ?? [])
-        .toSet();
-  }
-
-  @override
-  void updateLanguage(String lang) {
-    final user = _latestUser;
-    if (user == null) return;
-    _languageOverrides[user.uid] = lang;
-    _latestUser = user.copyWith(preferredLanguage: lang);
-    _localChanges.add(_latestUser);
-  }
-
-  @override
-  Future<void> addXp(int xp) async {
-    final user = _auth.currentUser;
-    if (user == null) return;
-    final preferences = await SharedPreferences.getInstance();
-    final totalXp = (preferences.getInt(_xpKey(user.uid)) ?? 0) + xp;
-    final saved = await preferences.setInt(_xpKey(user.uid), totalXp);
-    if (!saved) {
-      throw StateError('Could not save learner XP to local storage.');
-    }
-    await _publishLatestUser();
-  }
-
-  @override
-  Future<bool> awardVocabularyBonus({required String chapterId}) async {
-    final user = _auth.currentUser;
-    if (user == null) return false;
-    final preferences = await SharedPreferences.getInstance();
-    final key = _vocabularyBonusKey(user.uid);
-    final awardedChapters = preferences.getStringList(key) ?? [];
-    if (awardedChapters.contains(chapterId)) return false;
-
-    final saved = await preferences.setStringList(key, [
-      ...awardedChapters,
-      chapterId,
-    ]);
-    if (!saved) {
-      throw StateError('Could not save vocabulary bonus progress.');
-    }
-    await addXp(AuthRepository.vocabularyBonusXp);
-    return true;
-  }
 }

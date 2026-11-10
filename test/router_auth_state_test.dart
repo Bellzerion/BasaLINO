@@ -1,6 +1,8 @@
 import 'package:basalino/app/bootstrap/providers.dart';
 import 'package:basalino/app/router/app_router.dart';
 import 'package:basalino/core/services/local_auth_repository.dart';
+import 'package:basalino/core/services/local_progress_repository.dart';
+import 'package:basalino/core/services/local_story_repository.dart';
 import 'package:basalino/core/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -20,9 +22,13 @@ void main() {
     'XP updates preserve router and current route; sign-out still redirects',
     (tester) async {
       final authRepository = LocalAuthRepository();
+      final stories = LocalStoryRepository();
+      final progress = LocalProgressRepository(stories);
       final container = ProviderContainer(
         overrides: [
           authRepositoryProvider.overrideWithValue(authRepository),
+          progressRepositoryProvider.overrideWithValue(progress),
+          storyRepositoryProvider.overrideWithValue(stories),
           currentUserProvider.overrideWith(
             (ref) => UserModel(
               uid: 'test-user',
@@ -30,7 +36,6 @@ void main() {
               nickname: 'Tester',
               preferredLanguage: 'en',
               approvalStatus: ApprovalStatus.approved,
-              totalXp: 0,
               createdAt: DateTime(2026),
             ),
           ),
@@ -59,7 +64,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(router.routeInformationProvider.value.uri.path, '/profile');
 
-      await authRepository.addXp(5);
+      await container.read(progressMutationServiceProvider).awardXp(
+        userId: 'test-user',
+        amount: 5,
+      );
       await tester.pumpAndSettle();
 
       expect(identical(container.read(routerProvider), router), isTrue);

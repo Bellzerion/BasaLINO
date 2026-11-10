@@ -6,8 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/bootstrap/providers.dart';
 import '../../../core/models/chapter_model.dart';
 import '../../../core/models/story_model.dart';
-import '../../../core/services/auth_repository.dart';
-import '../../../core/services/local_progress_repository.dart';
+import '../../../core/services/progress_mutation_service.dart';
 import '../../../l10n/app_localizations_context.dart';
 
 class StoryCompletionScreen extends ConsumerStatefulWidget {
@@ -41,7 +40,6 @@ class _StoryCompletionScreenState extends ConsumerState<StoryCompletionScreen> {
   Future<_StoryCompletionSummary?> _loadSummary(String userId) async {
     final storiesFuture = ref.read(storyRepositoryProvider).getStories();
     final progressRepository = ref.read(progressRepositoryProvider);
-    final authRepository = ref.read(authRepositoryProvider);
     final chaptersFuture = progressRepository.getChaptersWithStatus(
       storyId: widget.storyId,
       userId: userId,
@@ -50,16 +48,14 @@ class _StoryCompletionScreenState extends ConsumerState<StoryCompletionScreen> {
       userId,
       limit: 10000,
     );
-    final vocabularyBonusFuture = authRepository
+    final vocabularyBonusFuture = progressRepository
         .getAwardedVocabularyBonusChapterIds(userId: userId);
-    final vocabularyCountFuture = () async {
-      if (progressRepository is! LocalProgressRepository) return 0;
-      final chapters = await chaptersFuture;
-      return progressRepository.getVocabularyWordsPracticedCount(
+    final vocabularyCountFuture = chaptersFuture.then(
+      (chapters) => progressRepository.getVocabularyWordsPracticedCount(
         userId: userId,
         chapterIds: chapters.map((chapter) => chapter.id).toSet(),
-      );
-    }();
+      ),
+    );
 
     final stories = await storiesFuture;
     final chapters = await chaptersFuture;
@@ -102,7 +98,7 @@ class _StoryCompletionScreenState extends ConsumerState<StoryCompletionScreen> {
       xpEarned:
           storyAttempts.fold(0, (total, attempt) => total + attempt.xpAwarded) +
           vocabularyBonusChapterIds.intersection(chapterIds).length *
-              AuthRepository.vocabularyBonusXp,
+              ProgressMutationService.vocabularyBonusXp,
       completionDate: completionDate,
     );
   }

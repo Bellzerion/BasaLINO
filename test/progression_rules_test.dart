@@ -84,7 +84,6 @@ void main() {
         nickname: 'Nino',
         preferredLanguage: 'en',
         approvalStatus: ApprovalStatus.approved,
-        totalXp: 100,
         createdAt: DateTime.now(),
       );
 

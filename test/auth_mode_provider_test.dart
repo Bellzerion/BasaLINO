@@ -15,11 +15,20 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  test('local authentication remains the default mode', () {
+  test('cloud reads are disabled by default', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
 
-    expect(container.read(authModeProvider), AuthMode.local);
+    expect(container.read(dataModeProvider), DataMode.local);
+  });
+
+  test('local authentication repository remains selectable', () {
+    final container = ProviderContainer(
+      overrides: [authModeProvider.overrideWithValue(AuthMode.local)],
+    );
+    addTearDown(container.dispose);
+
+    expect(container.read(dataModeProvider), DataMode.local);
     expect(container.read(authRepositoryProvider), isA<LocalAuthRepository>());
   });
 

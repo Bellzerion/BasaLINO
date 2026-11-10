@@ -138,6 +138,7 @@ class LocalProgressRepository implements ProgressRepository {
                   'storyId': progress.storyId,
                   'completedChapterIds': progress.completedChapterIds,
                   'currentUnlockedChapterId': progress.currentUnlockedChapterId,
+                  'isStoryCompleted': progress.isStoryCompleted,
                 })
             .toList(),
         'attempts': (_attemptsStore[userId] ?? const <RecentAttemptModel>[])
@@ -163,6 +164,63 @@ class LocalProgressRepository implements ProgressRepository {
     if (!saved) {
       throw StateError('Could not save learner progress to local storage.');
     }
+  }
+
+  String _xpKey(String userId) => 'basalino.user.xp.v1.$userId';
+
+  String _vocabularyBonusKey(String userId) =>
+      'basalino.vocabularyBonus.v1.$userId';
+
+  int _readXp(String userId) =>
+      _preferences!.getInt(_xpKey(userId)) ??
+      (userId == 'demo_learner_1' ? 45 : 0);
+
+  @override
+  Future<int> getTotalXp(String userId) async {
+    await _ensureLoaded();
+    return _readXp(userId);
+  }
+
+  @override
+  Future<void> awardXp({required String userId, required int amount}) async {
+    if (amount < 0) throw ArgumentError.value(amount, 'amount');
+    await _ensureLoaded();
+    final saved = await _preferences!.setInt(
+      _xpKey(userId),
+      _readXp(userId) + amount,
+    );
+    if (!saved) throw StateError('Could not save learner XP to local storage.');
+  }
+
+  @override
+  Future<bool> awardVocabularyBonus({
+    required String userId,
+    required String chapterId,
+    required int xpAwarded,
+  }) async {
+    if (xpAwarded < 0) throw ArgumentError.value(xpAwarded, 'xpAwarded');
+    await _ensureLoaded();
+    final key = _vocabularyBonusKey(userId);
+    final chapters = _preferences!.getStringList(key) ?? [];
+    if (chapters.contains(chapterId)) return false;
+    await awardXp(userId: userId, amount: xpAwarded);
+    final saved = await _preferences!.setStringList(key, [
+      ...chapters,
+      chapterId,
+    ]);
+    if (!saved) {
+      throw StateError('Could not save vocabulary bonus progress.');
+    }
+    return true;
+  }
+
+  @override
+  Future<Set<String>> getAwardedVocabularyBonusChapterIds({
+    required String userId,
+  }) async {
+    await _ensureLoaded();
+    return (_preferences!.getStringList(_vocabularyBonusKey(userId)) ?? [])
+        .toSet();
   }
 
   @override
@@ -218,6 +276,7 @@ class LocalProgressRepository implements ProgressRepository {
     }).toList();
   }
 
+  @override
   Future<double?> getReadingPosition({
     required String userId,
     required String storyId,
@@ -227,6 +286,7 @@ class LocalProgressRepository implements ProgressRepository {
     return _readingPositions[userId]?[storyId]?[chapterId];
   }
 
+  @override
   Future<void> saveReadingPosition({
     required String userId,
     required String storyId,
@@ -240,7 +300,9 @@ class LocalProgressRepository implements ProgressRepository {
     await _save();
   }
 
-  Future<void> recordAttemptAndUnlock({
+  @override
+  Future<bool> recordAttempt({
+    required String attemptId,
     required String userId,
     required String storyId,
     required String chapterId,
@@ -250,9 +312,15 @@ class LocalProgressRepository implements ProgressRepository {
     required bool passed,
     String? nextChapterId,
   }) async {
+    if (attemptId.trim().isEmpty) {
+      throw ArgumentError.value(attemptId, 'attemptId');
+    }
+    if (xpAwarded < 0) throw ArgumentError.value(xpAwarded, 'xpAwarded');
     await _ensureLoaded();
+    final attempts = _attemptsStore.putIfAbsent(userId, () => []);
+    if (attempts.any((attempt) => attempt.attemptId == attemptId)) return false;
     final attempt = RecentAttemptModel(
-      attemptId: _uuid.v4(),
+      attemptId: attemptId,
       chapterId: chapterId,
       chapterTitle: chapterTitle,
       score: score,
@@ -260,25 +328,82 @@ class LocalProgressRepository implements ProgressRepository {
       passed: passed,
       attemptedAt: DateTime.now(),
     );
-
-    _attemptsStore.putIfAbsent(userId, () => []).insert(0, attempt);
+    attempts.insert(0, attempt);
 
     if (passed) {
-      final curProgress = await getStoryProgress(userId: userId, storyId: storyId);
-      final currentCompleted = List<String>.from(curProgress?.completedChapterIds ?? []);
-      if (!currentCompleted.contains(chapterId)) {
-        currentCompleted.add(chapterId);
-      }
-
-      _progressStore.putIfAbsent(userId, () => {})[storyId] = StoryProgressModel(
+      _recordChapterCompletionLocally(
+        userId: userId,
         storyId: storyId,
-        completedChapterIds: currentCompleted,
-        currentUnlockedChapterId: nextChapterId ?? curProgress?.currentUnlockedChapterId,
+        chapterId: chapterId,
+        nextChapterId: nextChapterId,
       );
     }
     await _save();
+    return true;
   }
 
+  void _recordChapterCompletionLocally({
+    required String userId,
+    required String storyId,
+    required String chapterId,
+    String? nextChapterId,
+  }) {
+    final progress = _progressStore[userId]?[storyId] ??
+        StoryProgressModel(
+          storyId: storyId,
+          completedChapterIds: const [],
+          currentUnlockedChapterId: '${storyId}_ch1',
+        );
+    final completed = List<String>.from(progress.completedChapterIds);
+    if (!completed.contains(chapterId)) completed.add(chapterId);
+    _progressStore.putIfAbsent(userId, () => {})[storyId] = StoryProgressModel(
+      storyId: storyId,
+      completedChapterIds: completed,
+      currentUnlockedChapterId:
+          nextChapterId ?? progress.currentUnlockedChapterId,
+      isStoryCompleted: progress.isStoryCompleted,
+    );
+  }
+
+  @override
+  Future<void> recordChapterCompletion({
+    required String userId,
+    required String storyId,
+    required String chapterId,
+    String? nextChapterId,
+  }) async {
+    await _ensureLoaded();
+    _recordChapterCompletionLocally(
+      userId: userId,
+      storyId: storyId,
+      chapterId: chapterId,
+      nextChapterId: nextChapterId,
+    );
+    await _save();
+  }
+
+  @override
+  Future<void> recordStoryCompletion({
+    required String userId,
+    required String storyId,
+  }) async {
+    await _ensureLoaded();
+    final progress = _progressStore[userId]?[storyId] ??
+        StoryProgressModel(
+          storyId: storyId,
+          completedChapterIds: const [],
+          currentUnlockedChapterId: '${storyId}_ch1',
+        );
+    _progressStore.putIfAbsent(userId, () => {})[storyId] = StoryProgressModel(
+      storyId: progress.storyId,
+      completedChapterIds: progress.completedChapterIds,
+      currentUnlockedChapterId: progress.currentUnlockedChapterId,
+      isStoryCompleted: true,
+    );
+    await _save();
+  }
+
+  @override
   Future<List<String>> getRecentQuestionIds({
     required String userId,
     required String chapterId,
@@ -295,6 +420,7 @@ class LocalProgressRepository implements ProgressRepository {
         .toList();
   }
 
+  @override
   Future<void> startQuizSnapshot({
     required String userId,
     required QuizAttemptSnapshot snapshot,
@@ -306,6 +432,7 @@ class LocalProgressRepository implements ProgressRepository {
     await _save();
   }
 
+  @override
   Future<void> completeQuizSnapshot({
     required String userId,
     required String snapshotId,
@@ -331,10 +458,12 @@ class LocalProgressRepository implements ProgressRepository {
     await _save();
   }
 
+  @override
   Future<void> recordVocabularyActivity({
     required String userId,
     required String chapterId,
     required String languageCode,
+    required String vocabularyId,
     required String word,
     required String activityType,
     required bool correct,
@@ -344,6 +473,7 @@ class LocalProgressRepository implements ProgressRepository {
           0,
           VocabularyActivityRecord(
             id: _uuid.v4(),
+            vocabularyId: vocabularyId,
             chapterId: chapterId,
             languageCode: languageCode,
             word: word,
@@ -355,6 +485,7 @@ class LocalProgressRepository implements ProgressRepository {
     await _save();
   }
 
+  @override
   Future<int> getVocabularyWordsPracticedCount({
     required String userId,
     required Set<String> chapterIds,
@@ -362,7 +493,7 @@ class LocalProgressRepository implements ProgressRepository {
     await _ensureLoaded();
     return (_vocabularyRecords[userId] ?? const <VocabularyActivityRecord>[])
         .where((record) => chapterIds.contains(record.chapterId))
-        .map((record) => '${record.languageCode}\u0000${record.word}')
+        .map((record) => record.vocabularyId)
         .toSet()
         .length;
   }

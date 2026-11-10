@@ -8,8 +8,7 @@ import '../../../app/bootstrap/providers.dart';
 import '../../../core/models/chapter_journey_model.dart';
 import '../../../core/models/chapter_translation_model.dart';
 import '../../../core/models/vocab_hint_model.dart';
-import '../../../core/services/auth_repository.dart';
-import '../../../core/services/local_progress_repository.dart';
+import '../../../core/services/progress_mutation_service.dart';
 import '../../../l10n/app_localizations_context.dart';
 
 /// A recall bonus that never changes quiz results or chapter progression.
@@ -55,17 +54,15 @@ class _VocabularyPracticeScreenState
   Future<void> _submit(VocabHintModel item) async {
     if (_selectedWord == null || _wasCorrect != null) return;
     final correct = _selectedWord == item.word;
-    final repository = ref.read(progressRepositoryProvider);
-    if (repository is LocalProgressRepository) {
-      await repository.recordVocabularyActivity(
-        userId: ref.read(currentUserProvider)?.uid ?? 'guest',
-        chapterId: widget.chapterId,
-        languageCode: ref.read(appLanguageProvider),
-        word: item.word,
-        activityType: 'recall_challenge',
-        correct: correct,
-      );
-    }
+    await ref.read(progressMutationServiceProvider).recordVocabularyActivity(
+      userId: ref.read(currentUserProvider)?.uid ?? 'guest',
+      chapterId: widget.chapterId,
+      languageCode: ref.read(appLanguageProvider),
+      vocabularyId: item.vocabularyId,
+      word: item.word,
+      activityType: 'recall_challenge',
+      correct: correct,
+    );
     if (mounted) setState(() => _wasCorrect = correct);
   }
 
@@ -211,10 +208,14 @@ class _VocabularyPracticeScreenState
   Future<int> _claimVocabularyBonus() async {
     final journey = widget.journey;
     if (journey == null || !journey.quizResult.passed) return 0;
-    final awarded = await ref
-        .read(authRepositoryProvider)
-        .awardVocabularyBonus(chapterId: widget.chapterId);
-    return awarded ? AuthRepository.vocabularyBonusXp : 0;
+    final awarded = await ref.read(progressMutationServiceProvider)
+        .awardVocabularyBonus(
+          userId: ref.read(currentUserProvider)?.uid ?? 'guest',
+          chapterId: widget.chapterId,
+        );
+    return awarded
+        ? ProgressMutationService.vocabularyBonusXp
+        : 0;
   }
 
   Widget _completeView(BuildContext context) {

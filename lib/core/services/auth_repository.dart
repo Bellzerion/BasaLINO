@@ -1,8 +1,6 @@
 import '../models/user_model.dart';
 
 abstract class AuthRepository {
-  static const vocabularyBonusXp = 5;
-
   Stream<UserModel?> get authStateChanges;
 
   Future<UserModel> signIn({required String email, required String password});
@@ -19,13 +17,4 @@ abstract class AuthRepository {
 
   Future<UserModel?> getCurrentUser();
 
-  Future<Set<String>> getAwardedVocabularyBonusChapterIds({
-    required String userId,
-  });
-
-  void updateLanguage(String lang);
-
-  Future<void> addXp(int xp);
-
-  Future<bool> awardVocabularyBonus({required String chapterId});
 }

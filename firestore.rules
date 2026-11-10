@@ -2,37 +2,46 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
     function isAuthenticated() {
       return request.auth != null;
     }
 
     function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+      return request.auth != null && request.auth.uid == userId;
     }
 
-    function isApproved(userId) {
-      return get(/databases/$(database)/documents/users/$(userId)).data.approvalStatus == 'approved';
-    }
-
-    // Default: Deny all reads and writes
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // Users collection:
-    // Learners can read their own profile; cannot alter their approvalStatus or totalXp.
     match /users/{userId} {
       allow read: if isOwner(userId);
       allow create: if isOwner(userId)
-                    && request.resource.data.approvalStatus == 'pending'
-                    && request.resource.data.totalXp == 0;
-      allow update: if isOwner(userId)
-                    && request.resource.data.approvalStatus == resource.data.approvalStatus
-                    && request.resource.data.totalXp == resource.data.totalXp;
+                    && request.resource.data.keys().hasAll([
+                      'uid', 'email', 'nickname', 'preferredLanguage',
+                      'approvalStatus', 'totalXp', 'createdAt'
+                    ])
+                    && request.resource.data.keys().hasOnly([
+                      'uid', 'email', 'nickname', 'preferredLanguage',
+                      'approvalStatus', 'totalXp', 'createdAt'
+                    ])
+                    && request.resource.data.uid == userId
+                    && request.resource.data.email is string
+                    && request.resource.data.email == request.auth.token.email
+                    && request.resource.data.nickname is string
+                    && request.resource.data.preferredLanguage in ['en', 'tl', 'bik']
+                    && request.resource.data.approvalStatus == 'approved'
+                    && request.resource.data.totalXp is int
+                    && request.resource.data.totalXp == 0
+                    && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
     }
 
-    // Stories and Chapters: Authenticated users can read story metadata and chapters
+    match /users/{userId}/progress/{storyId} {
+      allow read: if isOwner(userId);
+      allow write: if false;
+    }
+
     match /stories/{storyId} {
       allow read: if isAuthenticated();
     }
@@ -50,18 +59,10 @@ service cloud.firestore {
       allow read: if isAuthenticated();
     }
 
-    // ChallengeKeys: Strictly server-only. CLIENTS CAN NEVER READ OR WRITE.
     match /challengeKeys/{challengeId} {
       allow read, write: if false;
     }
 
-    // Progress: Learner can read their own progress; writes must go through trusted Cloud Functions.
-    match /users/{userId}/progress/{storyId} {
-      allow read: if isOwner(userId);
-      allow write: if false;
-    }
-
-    // Attempts: Learners can read their own attempts; writes occur via trusted submitAttempt function.
     match /attempts/{attemptId} {
       allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
       allow write: if false;

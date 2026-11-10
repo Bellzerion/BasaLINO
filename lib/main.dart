@@ -10,6 +10,7 @@ import 'app/router/app_router.dart';
 import 'app/theme/app_theme.dart';
 import 'core/widgets/brand_background.dart';
 import 'app/bootstrap/providers.dart';
+import 'app/bootstrap/cloud_data_provider.dart';
 import 'l10n/generated/app_localizations.dart';
 
 void main() async {
@@ -41,6 +42,7 @@ class BasaLinoApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(cloudDataProvider);
     final router = ref.watch(routerProvider);
     final locale = switch (ref.watch(appLanguageProvider)) {
       'tl' => const Locale('tl'),

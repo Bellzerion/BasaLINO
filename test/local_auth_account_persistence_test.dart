@@ -5,6 +5,7 @@ import 'package:basalino/core/models/chapter_translation_model.dart';
 import 'package:basalino/core/models/story_model.dart';
 import 'package:basalino/core/services/local_auth_repository.dart';
 import 'package:basalino/core/services/local_progress_repository.dart';
+import 'package:basalino/core/services/progress_mutation_service.dart';
 import 'package:basalino/core/services/story_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,10 +26,16 @@ void main() {
         password: 'password',
         nickname: 'bel',
       );
-      final progress = LocalProgressRepository(_TestStoryRepository());
+      final stories = _TestStoryRepository();
+      final progress = LocalProgressRepository(stories);
+      final mutations = ProgressMutationService(
+        progressRepository: progress,
+        storyRepository: stories,
+      );
 
-      await auth.addXp(75);
-      await progress.recordAttemptAndUnlock(
+      await progress.awardXp(userId: registered.uid, amount: 75);
+      await mutations.recordAttempt(
+        attemptId: 'attempt-mayon-1',
         userId: registered.uid,
         storyId: 'mayon',
         chapterId: 'mayon_ch1',
@@ -38,7 +45,8 @@ void main() {
         passed: true,
         nextChapterId: 'mayon_ch2',
       );
-      await progress.recordAttemptAndUnlock(
+      await mutations.recordAttempt(
+        attemptId: 'attempt-mayon-2',
         userId: registered.uid,
         storyId: 'mayon',
         chapterId: 'mayon_ch2',
@@ -51,6 +59,7 @@ void main() {
         userId: registered.uid,
         chapterId: 'mayon_ch2',
         languageCode: 'en',
+        vocabularyId: 'mayon-ch2-magayon',
         word: 'magayon',
         activityType: 'recall_challenge',
         correct: true,
@@ -71,7 +80,7 @@ void main() {
       final restoredProgress = LocalProgressRepository(_TestStoryRepository());
 
       expect(signedIn.uid, registered.uid);
-      expect(signedIn.totalXp, 75);
+      expect(await restoredProgress.getTotalXp(signedIn.uid), 145);
       final chapters = await restoredProgress.getChaptersWithStatus(
         storyId: 'mayon',
         userId: signedIn.uid,
@@ -113,7 +122,8 @@ void main() {
       nickname: 'A',
     );
     final progress = LocalProgressRepository(_TestStoryRepository());
-    await progress.recordAttemptAndUnlock(
+    await progress.recordAttempt(
+      attemptId: 'attempt-user-a',
       userId: userA.uid,
       storyId: 'mayon',
       chapterId: 'mayon_ch1',
@@ -159,20 +169,22 @@ void main() {
         password: 'password',
         nickname: 'XP Learner',
       );
-      await auth.addXp(40);
+      final progress = LocalProgressRepository(_TestStoryRepository());
+      await progress.awardXp(userId: user.uid, amount: 40);
       await auth.signOut();
 
       final restored = await LocalAuthRepository().signIn(
         email: 'xp@test.com',
         password: 'password',
       );
+      final restoredProgress = LocalProgressRepository(_TestStoryRepository());
       final preferences = await SharedPreferences.getInstance();
       final accountData = jsonDecode(
         preferences.getString('basalino.localAccounts.v1')!,
       ) as Map<String, dynamic>;
 
       expect(restored.uid, user.uid);
-      expect(restored.totalXp, 40);
+      expect(await restoredProgress.getTotalXp(user.uid), 40);
       expect(accountData['xp@test.com']['uid'], user.uid);
       expect(preferences.getInt('basalino.user.xp.v1.${user.uid}'), 40);
     },
@@ -212,7 +224,8 @@ void main() {
     );
     final progress = LocalProgressRepository(_TestStoryRepository());
     for (final chapterId in ['mayon_ch1', 'mayon_ch2']) {
-      await progress.recordAttemptAndUnlock(
+      await progress.recordAttempt(
+        attemptId: 'attempt-story-$chapterId',
         userId: user.uid,
         storyId: 'mayon',
         chapterId: chapterId,

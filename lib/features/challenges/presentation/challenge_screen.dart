@@ -8,7 +8,6 @@ import '../../../core/models/chapter_journey_model.dart';
 import '../../../core/models/challenge_model.dart';
 import '../../../core/models/attempt_result_model.dart';
 import '../../../core/models/progress_model.dart';
-import '../../../core/services/local_progress_repository.dart';
 import '../../../l10n/app_localizations_context.dart';
 
 class ChallengeScreen extends ConsumerStatefulWidget {
@@ -37,13 +36,11 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
   Future<ChallengeModel?> _prepareChallenge(String languageCode) async {
     final progressRepo = ref.read(progressRepositoryProvider);
     final userId = ref.read(currentUserProvider)?.uid ?? 'guest';
-    final excluded = progressRepo is LocalProgressRepository
-        ? await progressRepo.getRecentQuestionIds(
-            userId: userId,
-            chapterId: widget.chapterId,
-            languageCode: languageCode,
-          )
-        : const <String>[];
+    final excluded = await progressRepo.getRecentQuestionIds(
+      userId: userId,
+      chapterId: widget.chapterId,
+      languageCode: languageCode,
+    );
     final challenge = await ref
         .read(challengeRepositoryProvider)
         .getChallenge(
@@ -51,9 +48,9 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
           languageCode: languageCode,
           excludedQuestionIds: excluded,
         );
-    if (challenge != null && progressRepo is LocalProgressRepository) {
+    if (challenge != null) {
       _snapshotId = _uuid.v4();
-      await progressRepo.startQuizSnapshot(
+      await ref.read(progressMutationServiceProvider).startQuizSnapshot(
         userId: userId,
         snapshot: QuizAttemptSnapshot(
           id: _snapshotId!,
@@ -96,32 +93,26 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> {
 
       final user = ref.read(currentUserProvider);
       final userId = user?.uid ?? 'guest';
-      final progressRepo = ref.read(progressRepositoryProvider);
+      final progressMutations = ref.read(progressMutationServiceProvider);
 
-      if (progressRepo is LocalProgressRepository) {
-        if (_snapshotId != null) {
-          await progressRepo.completeQuizSnapshot(
-            userId: userId,
-            snapshotId: _snapshotId!,
-            answers: _selectedAnswers,
-          );
-        }
-        await progressRepo.recordAttemptAndUnlock(
+      if (_snapshotId != null) {
+        await progressMutations.completeQuizSnapshot(
           userId: userId,
-          storyId: widget.storyId,
-          chapterId: widget.chapterId,
-          chapterTitle: 'Chapter ${widget.chapterId}',
-          score: res.score,
-          xpAwarded: res.xpAwarded,
-          passed: res.passed,
-          nextChapterId: res.nextChapterId,
+          snapshotId: _snapshotId!,
+          answers: _selectedAnswers,
         );
       }
-
-      // Add XP to user profile
-      if (res.xpAwarded > 0) {
-        await ref.read(authRepositoryProvider).addXp(res.xpAwarded);
-      }
+      await progressMutations.recordAttempt(
+        attemptId: _snapshotId ?? _uuid.v4(),
+        userId: userId,
+        storyId: widget.storyId,
+        chapterId: widget.chapterId,
+        chapterTitle: 'Chapter ${widget.chapterId}',
+        score: res.score,
+        xpAwarded: res.xpAwarded,
+        passed: res.passed,
+        nextChapterId: res.nextChapterId,
+      );
 
       if (res.passed) {
         if (mounted) {

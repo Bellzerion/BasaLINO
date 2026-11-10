@@ -10,7 +10,6 @@ class UserModel extends Equatable {
     required this.nickname,
     required this.preferredLanguage,
     required this.approvalStatus,
-    required this.totalXp,
     required this.createdAt,
   });
 
@@ -19,7 +18,6 @@ class UserModel extends Equatable {
   final String nickname;
   final String preferredLanguage;
   final ApprovalStatus approvalStatus;
-  final int totalXp;
   final DateTime createdAt;
 
   bool get isApproved => approvalStatus == ApprovalStatus.approved;
@@ -42,7 +40,6 @@ class UserModel extends Equatable {
       nickname: map['nickname'] as String? ?? '',
       preferredLanguage: map['preferredLanguage'] as String? ?? 'en',
       approvalStatus: status,
-      totalXp: map['totalXp'] as int? ?? 0,
       createdAt: map['createdAt'] != null
           ? (map['createdAt'] as dynamic).toDate() as DateTime
           : DateTime.now(),
@@ -54,14 +51,12 @@ class UserModel extends Equatable {
         'nickname': nickname,
         'preferredLanguage': preferredLanguage,
         'approvalStatus': approvalStatus.name,
-        'totalXp': totalXp,
       };
 
   UserModel copyWith({
     String? nickname,
     String? preferredLanguage,
     ApprovalStatus? approvalStatus,
-    int? totalXp,
   }) {
     return UserModel(
       uid: uid,
@@ -69,11 +64,10 @@ class UserModel extends Equatable {
       nickname: nickname ?? this.nickname,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       approvalStatus: approvalStatus ?? this.approvalStatus,
-      totalXp: totalXp ?? this.totalXp,
       createdAt: createdAt,
     );
   }
 
   @override
-  List<Object?> get props => [uid, nickname, preferredLanguage, approvalStatus, totalXp];
+  List<Object?> get props => [uid, nickname, preferredLanguage, approvalStatus];
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/bootstrap/cloud_data_provider.dart';
 import '../../../app/bootstrap/providers.dart';
+import '../../../core/config/auth_mode.dart';
 import '../../../core/models/progress_model.dart';
 import '../../../l10n/app_localizations_context.dart';
 
@@ -12,6 +14,10 @@ class ProgressScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
     final progressRepo = ref.watch(progressRepositoryProvider);
+    final cloudDataAsync = ref.watch(cloudDataProvider);
+    final cloudReadsEnabled = ref.watch(dataModeProvider) == DataMode.cloud;
+    final cloudData = cloudDataAsync.asData?.value;
+    final cloudProgress = cloudData?.progress;
     final userId = user?.uid ?? 'guest';
 
     return Scaffold(
@@ -47,12 +53,15 @@ class ProgressScreen extends ConsumerWidget {
                     color: Colors.white,
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    context.l10n.progressXpTotal(user?.totalXp ?? 0),
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  FutureBuilder<int>(
+                    future: progressRepo.getTotalXp(userId),
+                    builder: (context, snapshot) => Text(
+                      context.l10n.progressXpTotal(snapshot.data ?? 0),
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -69,6 +78,41 @@ class ProgressScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            if (cloudReadsEnabled && cloudDataAsync.isLoading)
+              const _CloudProgressNotice(
+                message:
+                    'Loading cloud progress. Local progress remains available.',
+              )
+            else if (cloudReadsEnabled && cloudData?.message != null)
+              _CloudProgressNotice(message: cloudData!.message!),
+            if (cloudProgress != null) ...[
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Cloud progress',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text('XP: ${cloudProgress.xp}'),
+                      Text(
+                        'Stories completed: ${cloudProgress.storiesCompleted}',
+                      ),
+                      Text(
+                        'Chapters completed: ${cloudProgress.chaptersCompleted}',
+                      ),
+                      Text(
+                        'Vocabulary practiced: ${cloudProgress.vocabularyPracticed}',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 24),
             Text(
               context.l10n.progressStoriesInProgress,
@@ -186,6 +230,25 @@ class ProgressScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _CloudProgressNotice extends StatelessWidget {
+  const _CloudProgressNotice({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(top: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7ED),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(message, style: const TextStyle(color: Color(0xFF9A3412))),
     );
   }
 }

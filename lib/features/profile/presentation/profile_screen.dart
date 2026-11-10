@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/bootstrap/cloud_data_provider.dart';
 import '../../../app/bootstrap/providers.dart';
+import '../../../core/config/auth_mode.dart';
 import '../../../l10n/app_localizations_context.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -12,6 +14,16 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
     final currentLang = ref.watch(appLanguageProvider);
+    final cloudDataAsync = ref.watch(cloudDataProvider);
+    final cloudReadsEnabled = ref.watch(dataModeProvider) == DataMode.cloud;
+    final cloudData = cloudDataAsync.asData?.value;
+    final cloudProfile = cloudData?.profile;
+    final displayName = cloudProfile?.nickname.isNotEmpty == true
+        ? cloudProfile!.nickname
+        : user?.nickname ?? context.l10n.profileLearner;
+    final email = cloudProfile?.email.isNotEmpty == true
+        ? cloudProfile!.email
+        : user?.email ?? '';
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.profileTitle)),
@@ -20,6 +32,13 @@ class ProfileScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (cloudReadsEnabled && cloudDataAsync.isLoading)
+              const _CloudStatusBanner(
+                message:
+                    'Loading your cloud profile. Local data remains available.',
+              )
+            else if (cloudReadsEnabled && cloudData?.message != null)
+              _CloudStatusBanner(message: cloudData!.message!),
             Center(
               child: Stack(
                 children: [
@@ -43,7 +62,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              user?.nickname ?? context.l10n.profileLearner,
+              displayName,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 22,
@@ -52,7 +71,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             Text(
-              user?.email ?? '',
+              email,
               textAlign: TextAlign.center,
               style: const TextStyle(color: Color(0xFF6B7280), fontSize: 13),
             ),
@@ -73,7 +92,6 @@ class ProfileScreen extends ConsumerWidget {
               selected: currentLang == 'en',
               onSelect: () {
                 ref.read(appLanguageProvider.notifier).state = 'en';
-                ref.read(authRepositoryProvider).updateLanguage('en');
               },
             ),
             _LanguageTile(
@@ -83,7 +101,6 @@ class ProfileScreen extends ConsumerWidget {
               selected: currentLang == 'tl',
               onSelect: () {
                 ref.read(appLanguageProvider.notifier).state = 'tl';
-                ref.read(authRepositoryProvider).updateLanguage('tl');
               },
             ),
             _LanguageTile(
@@ -93,7 +110,6 @@ class ProfileScreen extends ConsumerWidget {
               selected: currentLang == 'bik',
               onSelect: () {
                 ref.read(appLanguageProvider.notifier).state = 'bik';
-                ref.read(authRepositoryProvider).updateLanguage('bik');
               },
             ),
             const SizedBox(height: 36),
@@ -116,6 +132,25 @@ class ProfileScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _CloudStatusBanner extends StatelessWidget {
+  const _CloudStatusBanner({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7ED),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(message, style: const TextStyle(color: Color(0xFF9A3412))),
     );
   }
 }

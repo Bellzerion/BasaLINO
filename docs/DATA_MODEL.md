@@ -12,8 +12,8 @@ Stores learner profile, role, approval state, and total accumulated XP.
   - `email` (string): Registered email address.
   - `nickname` (string): In-app display name.
   - `preferredLanguage` (string): `'en' | 'tl' | 'bik'`.
-  - `approvalStatus` (string): `'pending' | 'approved' | 'rejected'` (Default: `pending` or `approved` based on guardian flow).
-  - `totalXp` (number): Authoritative total XP awarded exclusively by backend logic.
+  - `approvalStatus` (string): `'pending' | 'approved' | 'rejected'`. Current profile bootstrap sets `approved`; this is not a guardian-approval flow.
+  - `totalXp` (integer): Cloud XP total updated by trusted Cloud Functions.
   - `createdAt` (timestamp): Account creation timestamp.
 
 ---
@@ -51,6 +51,7 @@ Holds localized narrative text, paragraphs, and vocabulary hints.
   - `title` (string): Localized chapter title.
   - `content` (string): Story paragraphs with bracketed `[vocabulary]` keywords.
   - `vocabularyHints` (array of objects):
+    - `vocabularyId` (string): Stable content identity shared across translations of the same concept.
     - `word` (string)
     - `definition` (string)
     - `partOfSpeech` (string)
@@ -81,14 +82,19 @@ Protected answer keys. **Clients have zero read/write access.**
 
 ---
 
-### 7. `progress` Collection
-Subcollection under user or root: `/users/{userId}/progress/{storyId}`
+### 7. `progress` Subcollection
+Canonical path: `/users/{uid}/progress/{storyId}`. There is no root progress collection.
 
 - **Fields**:
   - `storyId` (string)
   - `completedChapterIds` (array of strings)
   - `currentUnlockedChapterId` (string)
+  - `isStoryCompleted` (boolean, optional until maintained by trusted backend logic)
   - `updatedAt` (timestamp)
+
+The current Cloud Function writes the first four fields except
+`isStoryCompleted`; clients must not treat a locally derived completion flag
+as authoritative cloud state.
 
 ---
 
@@ -98,6 +104,7 @@ Audit log of submitted quizzes and scoring results.
 - **Document ID**: `attemptId` (UUID)
 - **Fields**:
   - `userId` (string)
+  - `storyId` (string)
   - `chapterId` (string)
   - `score` (number): 0 - 100
   - `correctAnswers` (number)
@@ -105,3 +112,7 @@ Audit log of submitted quizzes and scoring results.
   - `xpAwarded` (number)
   - `passed` (boolean)
   - `attemptedAt` (timestamp)
+
+See [PHASE3_FOUNDATION.md](./PHASE3_FOUNDATION.md) for the canonical
+profile/progress contracts, repository ownership, event envelope, and
+vocabulary identity rules.

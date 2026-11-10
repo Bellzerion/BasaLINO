@@ -11,9 +11,11 @@ import '../../core/services/local_story_repository.dart';
 import '../../core/services/local_challenge_repository.dart';
 import '../../core/services/local_progress_repository.dart';
 import '../../core/models/user_model.dart';
+import '../../core/services/progress_mutation_service.dart';
 
 // Repositories
 final authModeProvider = Provider<AuthMode>((ref) => authMode);
+final dataModeProvider = Provider<DataMode>((ref) => dataMode);
 
 final localAuthRepositoryProvider = Provider<LocalAuthRepository>((ref) {
   return LocalAuthRepository();
@@ -41,6 +43,13 @@ final challengeRepositoryProvider = Provider<ChallengeRepository>((ref) {
 final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
   final storyRepo = ref.watch(storyRepositoryProvider);
   return LocalProgressRepository(storyRepo);
+});
+
+final progressMutationServiceProvider = Provider<ProgressMutationService>((ref) {
+  return ProgressMutationService(
+    progressRepository: ref.watch(progressRepositoryProvider),
+    storyRepository: ref.watch(storyRepositoryProvider),
+  );
 });
 
 // Auth state stream

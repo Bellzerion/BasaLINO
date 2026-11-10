@@ -6,11 +6,13 @@ class StoryProgressModel extends Equatable {
     required this.storyId,
     required this.completedChapterIds,
     required this.currentUnlockedChapterId,
+    this.isStoryCompleted = false,
   });
 
   final String storyId;
   final List<String> completedChapterIds;
   final String? currentUnlockedChapterId;
+  final bool isStoryCompleted;
 
   int get completedCount => completedChapterIds.length;
 
@@ -20,11 +22,17 @@ class StoryProgressModel extends Equatable {
       completedChapterIds:
           List<String>.from(map['completedChapterIds'] as List? ?? []),
       currentUnlockedChapterId: map['currentUnlockedChapterId'] as String?,
+      isStoryCompleted: map['isStoryCompleted'] as bool? ?? false,
     );
   }
 
   @override
-  List<Object?> get props => [storyId, completedChapterIds, currentUnlockedChapterId];
+  List<Object?> get props => [
+    storyId,
+    completedChapterIds,
+    currentUnlockedChapterId,
+    isStoryCompleted,
+  ];
 }
 
 class RecentAttemptModel extends Equatable {
@@ -123,6 +131,7 @@ class QuizAttemptSnapshot extends Equatable {
 class VocabularyActivityRecord extends Equatable {
   const VocabularyActivityRecord({
     required this.id,
+    required this.vocabularyId,
     required this.chapterId,
     required this.languageCode,
     required this.word,
@@ -132,6 +141,7 @@ class VocabularyActivityRecord extends Equatable {
   });
 
   final String id;
+  final String vocabularyId;
   final String chapterId;
   final String languageCode;
   final String word;
@@ -141,6 +151,7 @@ class VocabularyActivityRecord extends Equatable {
 
   Map<String, dynamic> toMap() => {
         'id': id,
+        'vocabularyId': vocabularyId,
         'chapterId': chapterId,
         'languageCode': languageCode,
         'word': word,
@@ -149,17 +160,24 @@ class VocabularyActivityRecord extends Equatable {
         'completedAt': completedAt.toIso8601String(),
       };
 
-  factory VocabularyActivityRecord.fromMap(Map<String, dynamic> map) =>
-      VocabularyActivityRecord(
+  factory VocabularyActivityRecord.fromMap(Map<String, dynamic> map) {
+    final chapterId = map['chapterId'] as String? ?? '';
+    final languageCode = map['languageCode'] as String? ?? 'en';
+    final word = map['word'] as String? ?? '';
+    return VocabularyActivityRecord(
         id: map['id'] as String? ?? '',
-        chapterId: map['chapterId'] as String? ?? '',
-        languageCode: map['languageCode'] as String? ?? 'en',
-        word: map['word'] as String? ?? '',
+        vocabularyId:
+            map['vocabularyId'] as String? ??
+            'legacy:$chapterId:$languageCode:${word.toLowerCase()}',
+        chapterId: chapterId,
+        languageCode: languageCode,
+        word: word,
         activityType: map['activityType'] as String? ?? '',
         correct: map['correct'] as bool? ?? false,
         completedAt: DateTime.parse(map['completedAt'] as String),
       );
+  }
 
   @override
-  List<Object?> get props => [id, word, activityType, correct];
+  List<Object?> get props => [id, vocabularyId, word, activityType, correct];
 }
