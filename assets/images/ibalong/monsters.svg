@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+  <defs><linearGradient id="forest" x2="0" y2="1"><stop stop-color="#253b3c"/><stop offset="1" stop-color="#152a2c"/></linearGradient></defs>
+  <rect width="640" height="360" fill="url(#forest)"/>
+  <circle cx="490" cy="70" r="27" fill="#e2bb72" opacity=".6"/>
+  <path d="M0 65 84 175h-54l105 110H0Zm640 0-84 110h54L505 285h135Z" fill="#315344"/>
+  <path d="M98 360V95m-44 27q38-55 82-2m-81 67q39-59 83-6m332 179V70m-39 49q35-62 77-5m-78 85q39-62 80-7" stroke="#56704a" stroke-width="18" fill="none"/>
+  <path d="M243 244q9-79 71-80 54 8 69 80l-14 68H254Z" fill="#765842"/>
+  <path d="m273 183-18-42 46 20m55 23 23-45-49 19" fill="#906c4f"/>
+  <ellipse cx="284" cy="225" rx="8" ry="13" fill="#f4c56f"/>
+  <ellipse cx="344" cy="225" rx="8" ry="13" fill="#f4c56f"/>
+  <path d="M289 271q28 21 54 0" fill="none" stroke="#d4ad75" stroke-width="6" stroke-linecap="round"/>
+  <path d="M0 314q118-53 240 0t236 0 164 0v46H0Z" fill="#203d32"/>
+</svg>

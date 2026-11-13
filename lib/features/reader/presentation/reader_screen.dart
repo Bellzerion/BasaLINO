@@ -7,9 +7,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/bootstrap/providers.dart';
 import '../../../core/models/chapter_translation_model.dart';
+import '../../../core/models/scene_annotation_model.dart';
 import '../../../core/models/vocab_hint_model.dart';
 import '../../../core/services/progress_repository.dart';
 import '../../../l10n/app_localizations_context.dart';
+import '../widgets/chapter_scene_widget.dart';
+import '../widgets/vocabulary_card.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({
@@ -33,6 +36,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   String? _readingUserId;
   String? _restoringReadingKey;
   bool _isRestoringReadingPosition = false;
+  bool _hasShownSceneDiscoveryPrompt = false;
+  Future<ChapterTranslationModel?>? _chapterTranslationFuture;
+  Object? _chapterTranslationRepository;
+  String? _chapterTranslationKey;
+  VocabHintModel? _activeVocabularyHint;
+  String? _activeVocabularyExample;
+  String _activeVocabularyLanguage = 'en';
 
   @override
   void initState() {
@@ -109,91 +119,55 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   Future<void> _saveReadingPosition() async {
     final repository = _progressRepository;
     final userId = _readingUserId;
-    if (repository == null || userId == null || !_readingController.hasClients)
+    if (repository == null ||
+        userId == null ||
+        !_readingController.hasClients) {
       return;
+    }
 
     try {
-      await ref.read(progressMutationServiceProvider).saveReadingPosition(
-        userId: userId,
-        storyId: widget.storyId,
-        chapterId: widget.chapterId,
-        position: _readingController.offset,
-      );
+      await ref
+          .read(progressMutationServiceProvider)
+          .saveReadingPosition(
+            userId: userId,
+            storyId: widget.storyId,
+            chapterId: widget.chapterId,
+            position: _readingController.offset,
+          );
     } catch (error, stackTrace) {
       _reportReadingStorageError(error, stackTrace);
     }
   }
 
-  void _showVocabSheet(VocabHintModel hint) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFEF3C7),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      hint.partOfSpeech?.toUpperCase() ??
-                          context.l10n.readerVocabHintTitle.toUpperCase(),
-                      style: const TextStyle(
-                        color: Color(0xFFB45309),
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                hint.word,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F2937),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                hint.definition,
-                style: const TextStyle(
-                  fontSize: 16,
-                  height: 1.4,
-                  color: Color(0xFF4B5563),
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        );
-      },
+  void _showVocabularyCard(
+    VocabHintModel hint, {
+    required String languageCode,
+    required String exampleSentence,
+  }) {
+    setState(() {
+      _activeVocabularyHint = hint;
+      _activeVocabularyLanguage = languageCode;
+      _activeVocabularyExample = hint.exampleSentence ?? exampleSentence;
+    });
+  }
+
+  String _exampleSentence(String paragraph, RegExpMatch match) {
+    final start = paragraph.lastIndexOf(
+      RegExp(r'[.!?]'),
+      match.start > 0 ? match.start - 1 : 0,
     );
+    final punctuation = paragraph.indexOf(RegExp(r'[.!?]'), match.end);
+    final end = punctuation == -1 ? paragraph.length : punctuation + 1;
+    return paragraph
+        .substring(start == -1 ? 0 : start + 1, end)
+        .replaceAll(RegExp(r'\[([^\]]+)\]'), r'$1')
+        .trim();
   }
 
   List<TextSpan> _buildInteractiveParagraph(
     String content,
     List<VocabHintModel> hints,
+    String languageCode,
   ) {
     final spans = <TextSpan>[];
     final regex = RegExp(r'\[([^\]]+)\]');
@@ -236,7 +210,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             height: 1.65,
           ),
           recognizer: TapGestureRecognizer()
-            ..onTap = () => _showVocabSheet(matchedHint),
+            ..onTap = () => _showVocabularyCard(
+              matchedHint,
+              languageCode: languageCode,
+              exampleSentence: _exampleSentence(content, match),
+            ),
         ),
       );
 
@@ -259,11 +237,109 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     return spans;
   }
 
+  /// Splits [trans.content] on double-newlines into individual paragraphs,
+  /// then interleaves [ChapterSceneWidget]s wherever a [SceneAnnotationModel]
+  /// specifies a [paragraphIndex].
+  List<Widget> _buildReaderContent(ChapterTranslationModel trans) {
+    final paragraphs = trans.content
+        .split('\n\n')
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .toList();
+
+    // Keep multiple story moments at the same paragraph boundary.
+    final sceneMap = <int, List<SceneAnnotationModel>>{};
+    for (final scene in trans.scenes) {
+      sceneMap.putIfAbsent(scene.paragraphIndex, () => []).add(scene);
+    }
+
+    final widgets = <Widget>[];
+    var hasSceneInThisBuild = false;
+
+    for (int i = 0; i < paragraphs.length; i++) {
+      // Add the paragraph text.
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: RichText(
+            text: TextSpan(
+              children: _buildInteractiveParagraph(
+                paragraphs[i],
+                trans.vocabularyHints,
+                trans.languageCode,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // After this paragraph, inject a scene card if one is configured.
+      for (final scene in sceneMap[i] ?? const <SceneAnnotationModel>[]) {
+        final sceneKey = 'scene_${trans.chapterId}_$i-${widgets.length}';
+        widgets.add(
+          ChapterSceneWidget(
+            key: ValueKey(sceneKey),
+            scene: scene,
+            storyTitle: trans.title,
+            heroTag: sceneKey,
+            showExplorePrompt:
+                !_hasShownSceneDiscoveryPrompt && !hasSceneInThisBuild,
+            onExplorePromptShown: _markSceneDiscoveryPromptShown,
+          ),
+        );
+        hasSceneInThisBuild = true;
+      }
+    }
+
+    final trailingScenes =
+        sceneMap.entries
+            .where((entry) => entry.key >= paragraphs.length)
+            .toList()
+          ..sort((a, b) => a.key.compareTo(b.key));
+    for (final entry in trailingScenes) {
+      for (final scene in entry.value) {
+        final sceneKey =
+            'scene_${trans.chapterId}_${entry.key}-${widgets.length}';
+        widgets.add(
+          ChapterSceneWidget(
+            key: ValueKey(sceneKey),
+            scene: scene,
+            storyTitle: trans.title,
+            heroTag: sceneKey,
+            showExplorePrompt:
+                !_hasShownSceneDiscoveryPrompt && !hasSceneInThisBuild,
+            onExplorePromptShown: _markSceneDiscoveryPromptShown,
+          ),
+        );
+        hasSceneInThisBuild = true;
+      }
+    }
+
+    return widgets;
+  }
+
+  void _markSceneDiscoveryPromptShown() {
+    if (!mounted || _hasShownSceneDiscoveryPrompt) return;
+    _hasShownSceneDiscoveryPrompt = true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final storyRepo = ref.watch(storyRepositoryProvider);
     final currentLang = ref.watch(appLanguageProvider);
     final userId = ref.watch(currentUserProvider)?.uid ?? 'guest';
+    final translationKey = '${widget.storyId}/${widget.chapterId}/$currentLang';
+    if (_chapterTranslationFuture == null ||
+        _chapterTranslationKey != translationKey ||
+        !identical(_chapterTranslationRepository, storyRepo)) {
+      _chapterTranslationKey = translationKey;
+      _chapterTranslationRepository = storyRepo;
+      _chapterTranslationFuture = storyRepo.getChapterTranslation(
+        chapterId: widget.chapterId,
+        languageCode: currentLang,
+      );
+    }
+    final chapterTranslationFuture = _chapterTranslationFuture!;
 
     return Scaffold(
       appBar: AppBar(
@@ -283,6 +359,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             icon: const Icon(Icons.language),
             initialValue: currentLang,
             onSelected: (code) {
+              setState(() {
+                _activeVocabularyHint = null;
+                _activeVocabularyExample = null;
+              });
               ref.read(appLanguageProvider.notifier).state = code;
             },
             itemBuilder: (context) => [
@@ -302,109 +382,121 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           ),
         ],
       ),
-      body: FutureBuilder<ChapterTranslationModel?>(
-        future: storyRepo.getChapterTranslation(
-          chapterId: widget.chapterId,
-          languageCode: currentLang,
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError || snapshot.data == null) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.menu_book_outlined,
-                      size: 48,
-                      color: Colors.grey,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: FutureBuilder<ChapterTranslationModel?>(
+              future: chapterTranslationFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError || snapshot.data == null) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.menu_book_outlined,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(context.l10n.readerUnavailable),
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed: () =>
+                                ref.read(appLanguageProvider.notifier).state =
+                                    'en',
+                            child: Text(context.l10n.readerReadInEnglish),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    Text(context.l10n.readerUnavailable),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () =>
-                          ref.read(appLanguageProvider.notifier).state = 'en',
-                      child: Text(context.l10n.readerReadInEnglish),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
+                  );
+                }
 
-          final trans = snapshot.data!;
-          _restoreReadingPosition(userId);
+                final trans = snapshot.data!;
+                _restoreReadingPosition(userId);
 
-          return SingleChildScrollView(
-            controller: _readingController,
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (trans.needsReview)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFEF3C7),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFFDE68A)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.info_outline,
-                          size: 20,
-                          color: Color(0xFF92400E),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            context.l10n.readerTranslationReview,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF92400E),
-                            ),
+                return SingleChildScrollView(
+                  controller: _readingController,
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (trans.needsReview)
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFEF3C7),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFFFDE68A)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.info_outline,
+                                size: 20,
+                                color: Color(0xFF92400E),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  context.l10n.readerTranslationReview,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF92400E),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      Text(
+                        trans.title,
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1F2937),
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // ── Story content: paragraphs interleaved with scene cards ──
+                      ...(_buildReaderContent(trans)),
+                      const SizedBox(height: 40),
+                      ElevatedButton.icon(
+                        onPressed: () => context.push(
+                          '/challenge/${widget.storyId}/${widget.chapterId}',
+                        ),
+                        icon: const Icon(Icons.fact_check_outlined),
+                        label: Text(context.l10n.readerCheckKnowledge),
+                      ),
+                    ],
                   ),
-                Text(
-                  trans.title,
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                RichText(
-                  text: TextSpan(
-                    children: _buildInteractiveParagraph(
-                      trans.content,
-                      trans.vocabularyHints,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                ElevatedButton.icon(
-                  onPressed: () => context.push(
-                    '/challenge/${widget.storyId}/${widget.chapterId}',
-                  ),
-                  icon: const Icon(Icons.fact_check_outlined),
-                  label: Text(context.l10n.readerCheckKnowledge),
-                ),
-              ],
+                );
+              },
             ),
-          );
-        },
+          ),
+          if (_activeVocabularyHint != null)
+            VocabularyCardOverlay(
+              key: ValueKey(_activeVocabularyHint!.vocabularyId),
+              hint: _activeVocabularyHint!,
+              languageCode: _activeVocabularyLanguage,
+              exampleSentence: _activeVocabularyExample ?? '',
+              onClose: () {
+                if (!mounted) return;
+                setState(() {
+                  _activeVocabularyHint = null;
+                  _activeVocabularyExample = null;
+                });
+              },
+            ),
+        ],
       ),
     );
   }

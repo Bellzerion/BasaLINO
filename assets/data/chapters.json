@@ -3,14 +3,19 @@
     "id": "ibalong_ch1",
     "storyId": "ibalong",
     "orderIndex": 0,
+    "scenes": [
+      { "paragraphIndex": 0, "assetKey": "assets/scenes/forest_monsters.json", "label": "The monsters of Ibalong", "title": "The Wilds of Ibalong", "description": "In the shadowed forests, Tandayag and Oryol make the people fear the wild.", "sceneType": "monster_encounter", "importanceLevel": "high", "imageAssetKey": "assets/images/ibalong/monsters.svg", "educationalNote": "Ibalong is an ancient Bikol epic whose heroes face legendary creatures." },
+      { "paragraphIndex": 1, "assetKey": "assets/scenes/hero_triumph.json", "label": "Baltog's victory", "title": "Baltog Faces Tandayag", "description": "Baltog meets the mighty boar in a contest of courage and strength.", "sceneType": "hero", "importanceLevel": "high", "imageAssetKey": "assets/images/ibalong/baltog.svg" },
+      { "paragraphIndex": 2, "assetKey": "assets/scenes/peace_celebration.json", "label": "The people celebrate", "title": "A Hero Celebrated", "description": "Songs of Baltog's victory bring a moment of peace to Ibalong.", "sceneType": "celebration", "importanceLevel": "medium", "imageAssetKey": "assets/images/ibalong/victory_celebration.svg" }
+    ],
     "translations": {
       "en": {
         "title": "The Heroes of Ibalong",
         "content": "Long ago, in the fertile land called Ibalong, the people lived in fear. Great monsters roamed the forests and rivers, making life unbearable. The wild [boar] Tandayag destroyed crops with its mighty tusks. The giant [serpent] Oryol, who could take the form of a beautiful woman, led warriors astray.\n\nThen came Baltog, a mighty hero from Baltavara. He was the first to bring hope to Ibalong. In a fierce battle, Baltog wrestled the great boar Tandayag and defeated it with his bare hands. He hung the creature's tusks on a tree as a sign of his [triumph].\n\nWord of Baltog's victory spread across the land. The people celebrated and sang songs of praise for their hero. For a time, there was peace in Ibalong.",
         "vocabularyHints": [
-          { "vocabularyId": "ibalong-ch1-boar", "word": "boar", "definition": "A wild pig, usually a male, known for its tusks and aggressive nature.", "partOfSpeech": "noun" },
-          { "vocabularyId": "ibalong-ch1-serpent", "word": "serpent", "definition": "A large snake, often used in myths to represent danger or evil.", "partOfSpeech": "noun" },
-          { "vocabularyId": "ibalong-ch1-triumph", "word": "triumph", "definition": "A great victory or achievement.", "partOfSpeech": "noun" }
+          {"vocabularyId": "ibalong-ch1-boar", "word": "boar", "definition": "A wild pig, usually a male, known for its tusks and aggressive nature.", "partOfSpeech": "noun", "englishTranslation": "boar", "tagalogTranslation": "baboy-ramo", "illustrationAsset": "assets/images/ibalong/baltog.svg"},
+          {"vocabularyId": "ibalong-ch1-serpent", "word": "serpent", "definition": "A large snake, often used in myths to represent danger or evil.", "partOfSpeech": "noun", "englishTranslation": "serpent", "tagalogTranslation": "ahas"},
+          {"vocabularyId": "ibalong-ch1-triumph", "word": "triumph", "definition": "A great victory or achievement.", "partOfSpeech": "noun", "englishTranslation": "triumph", "tagalogTranslation": "tagumpay"}
         ],
         "needsReview": false
       },
@@ -18,9 +23,9 @@
         "title": "Ang mga Bayani ng Ibalong",
         "content": "Noong unang panahon, sa mayamanang lupain na tinatawag na Ibalong, ang mga tao ay namumuhay sa takot. Malalaking [halimaw] ang naglalakad sa mga kagubatan at ilog, ginagawang hindi mapayapang pamumuhay.\n\nAng mabangis na [baboy-ramo] na si Tandayag ay sinisira ang mga pananim gamit ang kanyang makapangyarihang pangil. Ang malaking [ahas] na si Oryol, na maaaring magbihis ng anyo ng isang magandang babae, ay inililigaw ang mga mandirigma.\n\nSaka dumating si Baltog, isang makapangyarihang bayani. Sa isang marahas na labanan, sinugaban ni Baltog ang malaking baboy-ramo at tinalo ito ng kanyang sariling mga kamay. Ibinit niya ang mga pangil ng nilalang sa isang puno bilang tanda ng kanyang tagumpay.",
         "vocabularyHints": [
-          { "vocabularyId": "ibalong-ch1-monster", "word": "halimaw", "definition": "Isang malaking at nakakatakot na nilalang; monster.", "partOfSpeech": "pangngalan" },
-          { "vocabularyId": "ibalong-ch1-boar", "word": "baboy-ramo", "definition": "Isang ligaw na baboy na may malalaking pangil.", "partOfSpeech": "pangngalan" },
-          { "vocabularyId": "ibalong-ch1-serpent", "word": "ahas", "definition": "Isang mahabang reptilya na walang paa, kadalasang ginagamit sa mga alamat para kumatawan ng panganib.", "partOfSpeech": "pangngalan" }
+          {"vocabularyId": "ibalong-ch1-monster", "word": "halimaw", "definition": "Isang malaking at nakakatakot na nilalang; monster.", "partOfSpeech": "pangngalan", "englishTranslation": "monster", "tagalogTranslation": "halimaw", "illustrationAsset": "assets/images/ibalong/monsters.svg"},
+          {"vocabularyId": "ibalong-ch1-boar", "word": "baboy-ramo", "definition": "Isang ligaw na baboy na may malalaking pangil.", "partOfSpeech": "pangngalan", "englishTranslation": "boar", "tagalogTranslation": "baboy-ramo", "illustrationAsset": "assets/images/ibalong/baltog.svg"},
+          {"vocabularyId": "ibalong-ch1-serpent", "word": "ahas", "definition": "Isang mahabang reptilya na walang paa, kadalasang ginagamit sa mga alamat para kumatawan ng panganib.", "partOfSpeech": "pangngalan", "englishTranslation": "serpent", "tagalogTranslation": "ahas"}
         ],
         "needsReview": true
       },
@@ -28,9 +33,9 @@
         "title": "An mga Bayani kan Ibalong",
         "content": "Kaidto pa, sa mayamang lugar na inaapod na Ibalong, an mga tao naghihingowa nin takot. Mga dakulang [halimaw] an naglalakaw sa mga kagubatan asin ilog, na ginigibo pang mahirap an buhay.\n\nAn mapanglaw na [baboy-ror] na si Tandayag nagwawasak kan mga tanom gamit an saiyang makapangyarihang ngipon. An dakulang [halas] na si Oryol, na kayang magbago nin anyo bilang sarong magandang babae, naglalagalag sa mga mandirigma.\n\nDuman nagdumanan si Baltog, sarong makapangyarihang bayani. Sa isang mahigugmaon na labanan, sinakmak ni Baltog an dakulang baboy-ror asin tinalo niya ini gamit an saiyang mga kamot. Ibitay niya an mga ngipon kan hayop sa sarong puno bilang tanda kan saiyang tagumpay.",
         "vocabularyHints": [
-          { "vocabularyId": "ibalong-ch1-monster", "word": "halimaw", "definition": "Sarong dakulang asin makatatakot na nilalang; monster.", "partOfSpeech": "ngaran" },
-          { "vocabularyId": "ibalong-ch1-boar", "word": "baboy-ror", "definition": "Sarong ligaw na baboy na igwa nin malalaking ngipon.", "partOfSpeech": "ngaran" },
-          { "vocabularyId": "ibalong-ch1-serpent", "word": "halas", "definition": "Sarong mahabang reptilya na mayong bitis, kadalasang ginagamit sa mga mito para kumatawan kan peligro.", "partOfSpeech": "ngaran" }
+          {"vocabularyId": "ibalong-ch1-monster", "word": "halimaw", "definition": "Sarong dakulang asin makatatakot na nilalang; monster.", "partOfSpeech": "ngaran", "englishTranslation": "monster", "tagalogTranslation": "halimaw", "illustrationAsset": "assets/images/ibalong/monsters.svg"},
+          {"vocabularyId": "ibalong-ch1-boar", "word": "baboy-ror", "definition": "Sarong ligaw na baboy na igwa nin malalaking ngipon.", "partOfSpeech": "ngaran", "englishTranslation": "boar", "tagalogTranslation": "baboy-ramo", "illustrationAsset": "assets/images/ibalong/baltog.svg"},
+          {"vocabularyId": "ibalong-ch1-serpent", "word": "halas", "definition": "Sarong mahabang reptilya na mayong bitis, kadalasang ginagamit sa mga mito para kumatawan kan peligro.", "partOfSpeech": "ngaran", "englishTranslation": "serpent", "tagalogTranslation": "ahas"}
         ],
         "needsReview": true
       }
@@ -40,14 +45,19 @@
     "id": "ibalong_ch2",
     "storyId": "ibalong",
     "orderIndex": 1,
+    "scenes": [
+      { "paragraphIndex": 0, "assetKey": "assets/scenes/battle_scene.json", "label": "Handiong battles the monsters", "title": "Handiong, the Wise Warrior", "description": "Handiong gathers his courage as danger stirs across the land.", "sceneType": "hero", "importanceLevel": "high", "imageAssetKey": "assets/images/ibalong/handiong.svg" },
+      { "paragraphIndex": 1, "assetKey": "assets/scenes/forest_monsters.json", "label": "Handiong's encounters", "title": "Monsters of Ibalong", "description": "Winged Tiburones and the one-eyed Sarimao challenge Handiong's strategy.", "sceneType": "monster_encounter", "importanceLevel": "high", "imageAssetKey": "assets/images/ibalong/monsters.svg" },
+      { "paragraphIndex": 2, "assetKey": "assets/scenes/peace_celebration.json", "label": "Peace returns to Ibalong", "title": "Peace Returns", "description": "Handiong's steadfastness helps restore peace to part of Ibalong.", "sceneType": "celebration", "importanceLevel": "medium", "imageAssetKey": "assets/images/ibalong/victory_celebration.svg" }
+    ],
     "translations": {
       "en": {
         "title": "Handiong and the Monsters",
         "content": "After Baltog, another great hero arrived in Ibalong — Handiong. He was a warrior of great skill and wisdom. But Ibalong still suffered under the terror of many [creatures]: the winged Tiburones, the one-eyed giants called Sarimao, and the cunning Oryol.\n\nHandiong gathered brave warriors around him. For many years, he fought and defeated the monsters one by one. He chased the Tiburones across the seas. He tricked the one-eyed Sarimao with his clever [strategy].\n\nBut Oryol was different. She was beautiful and dangerous. Whenever warriors came near her, she would use her enchanting voice to mesmerize them. Handiong, however, was [steadfast]. He refused to be tricked. After countless encounters, he finally subdued Oryol, and together they brought lasting peace to part of Ibalong.",
         "vocabularyHints": [
-          { "vocabularyId": "ibalong-ch2-creatures", "word": "creatures", "definition": "Living beings, especially animals or mythical beings.", "partOfSpeech": "noun" },
-          { "vocabularyId": "ibalong-ch2-strategy", "word": "strategy", "definition": "A plan or method for achieving a goal, especially in a battle.", "partOfSpeech": "noun" },
-          { "vocabularyId": "ibalong-ch2-steadfast", "word": "steadfast", "definition": "Firmly determined and unwavering; not easily changed or moved.", "partOfSpeech": "adjective" }
+          {"vocabularyId": "ibalong-ch2-creatures", "word": "creatures", "definition": "Living beings, especially animals or mythical beings.", "partOfSpeech": "noun", "englishTranslation": "creatures", "tagalogTranslation": "nilalang", "illustrationAsset": "assets/images/ibalong/monsters.svg"},
+          {"vocabularyId": "ibalong-ch2-strategy", "word": "strategy", "definition": "A plan or method for achieving a goal, especially in a battle.", "partOfSpeech": "noun", "englishTranslation": "strategy", "tagalogTranslation": "diskarte"},
+          {"vocabularyId": "ibalong-ch2-steadfast", "word": "steadfast", "definition": "Firmly determined and unwavering; not easily changed or moved.", "partOfSpeech": "adjective", "englishTranslation": "steadfast", "tagalogTranslation": "matatag"}
         ],
         "needsReview": false
       },
@@ -55,8 +65,8 @@
         "title": "Si Handiong at ang mga Halimaw",
         "content": "Pagkatapos ni Baltog, dumating ang isa pang dakilang bayani sa Ibalong — si Handiong. Siya ay isang mandirigma na may dakilang husay at karunungan. Ngunit ang Ibalong ay nagdurusa pa rin sa ilalim ng teror ng maraming [nilalang]: ang mga may pakpak na Tiburones, ang mga isang-matang higante na tinatawag na Sarimao, at ang tuso na Oryol.\n\nTinipon ni Handiong ang mga matapang na mandirigma. Sa loob ng maraming taon, lumaban siya at tinalo ang mga halimaw isa-isa. Inusig niya ang mga Tiburones sa mga dagat. Niloko niya ang isang-matang Sarimao gamit ang kanyang matalinong [diskarte].\n\nNgunit si Oryol ay naiiba. Siya ay maganda at mapanganib. Sa wakas, pinalaya ni Handiong ang Ibalong mula sa karamihan ng mga halimaw.",
         "vocabularyHints": [
-          { "vocabularyId": "ibalong-ch2-creatures", "word": "nilalang", "definition": "Isang buhay na bagay, lalo na ang mga hayop o mitolohikal na nilalang.", "partOfSpeech": "pangngalan" },
-          { "vocabularyId": "ibalong-ch2-strategy", "word": "diskarte", "definition": "Isang plano o paraan para makamit ang isang layunin, lalo na sa labanan.", "partOfSpeech": "pangngalan" }
+          {"vocabularyId": "ibalong-ch2-creatures", "word": "nilalang", "definition": "Isang buhay na bagay, lalo na ang mga hayop o mitolohikal na nilalang.", "partOfSpeech": "pangngalan", "englishTranslation": "creatures", "tagalogTranslation": "nilalang", "illustrationAsset": "assets/images/ibalong/monsters.svg"},
+          {"vocabularyId": "ibalong-ch2-strategy", "word": "diskarte", "definition": "Isang plano o paraan para makamit ang isang layunin, lalo na sa labanan.", "partOfSpeech": "pangngalan", "englishTranslation": "strategy", "tagalogTranslation": "diskarte"}
         ],
         "needsReview": true
       },
@@ -64,7 +74,7 @@
         "title": "Si Handiong asin an mga Halimaw",
         "content": "Pagkatapos ni Baltog, sarong iba pang dakulang bayani nag-abot sa Ibalong — si Handiong. Siya sarong mandirigma na igwa nin dakulang kahusayan asin karunungan. Pero an Ibalong naghihingowa pa sa ilalim kan takot kan dakul na [nilalang]: an mga pakpak na Tiburones, an mga isang-matang higante na inaapod Sarimao, asin an tuso na Oryol.\n\nNag-ipon si Handiong nin mga matapang na mandirigma. Sa loob nin dakul na taon, nakilaban siya asin tinalo an mga halimaw isa-isa. Sa katapusan, linigtas ni Handiong an Ibalong mula sa kadaklan kan mga halimaw.",
         "vocabularyHints": [
-          { "vocabularyId": "ibalong-ch2-creatures", "word": "nilalang", "definition": "Sarong buhay na bagay, lalong-lalo na an mga hayop o mitolohikal na nilalang.", "partOfSpeech": "ngaran" }
+          {"vocabularyId": "ibalong-ch2-creatures", "word": "nilalang", "definition": "Sarong buhay na bagay, lalong-lalo na an mga hayop o mitolohikal na nilalang.", "partOfSpeech": "ngaran", "englishTranslation": "creatures", "tagalogTranslation": "nilalang", "illustrationAsset": "assets/images/ibalong/monsters.svg"}
         ],
         "needsReview": true
       }
@@ -74,14 +84,19 @@
     "id": "ibalong_ch3",
     "storyId": "ibalong",
     "orderIndex": 2,
+    "scenes": [
+      { "paragraphIndex": 0, "assetKey": "assets/scenes/disaster_flood.json", "label": "Bantong arrives", "title": "Bantong, the Patient Hunter", "description": "As disaster threatens Ibalong, a watchful hunter brings new hope.", "sceneType": "hero", "importanceLevel": "high", "imageAssetKey": "assets/images/ibalong/bantong.svg" },
+      { "paragraphIndex": 2, "assetKey": "assets/scenes/battle_scene.json", "label": "Bantong confronts Rabot", "title": "The Rabot Encounter", "description": "Bantong studies the sleeping monster and discovers the opening he needs.", "sceneType": "monster_encounter", "importanceLevel": "high", "imageAssetKey": "assets/images/ibalong/rabot_encounter.svg" },
+      { "paragraphIndex": 3, "assetKey": "assets/scenes/peace_celebration.json", "label": "Ibalong is free!", "title": "Victory for Ibalong", "description": "The people celebrate as the stories of Baltog, Handiong, and Bantong live on.", "sceneType": "celebration", "importanceLevel": "high", "imageAssetKey": "assets/images/ibalong/victory_celebration.svg" }
+    ],
     "translations": {
       "en": {
         "title": "Bantong and the Final Victory",
         "content": "When a great [catastrophe] struck Ibalong — floods, volcanic eruptions, and a plague of locusts — the people feared all was lost. But hope came in the form of Bantong, the third and final great hero of the epic.\n\nBantong was different from the others. He was a hunter by nature, patient and [observant]. He studied his enemies before attacking. His greatest challenge was the invincible monster Rabot, a half-man, half-beast that could not be killed by weapons.\n\nBantong discovered Rabot's weakness: the monster fell into a deep sleep every afternoon. One afternoon, Bantong crept near the sleeping monster, and with a single, powerful blow, he split Rabot in two. Ibalong was finally free.\n\nThe people rejoiced. Songs and stories of the three heroes — Baltog, Handiong, and Bantong — were passed down through generations, keeping the [legacy] of Ibalong alive forever.",
         "vocabularyHints": [
-          { "vocabularyId": "ibalong-ch3-catastrophe", "word": "catastrophe", "definition": "A sudden large-scale disaster or terrible event.", "partOfSpeech": "noun" },
-          { "vocabularyId": "ibalong-ch3-observant", "word": "observant", "definition": "Quick to notice things; paying close attention to what is happening around you.", "partOfSpeech": "adjective" },
-          { "vocabularyId": "ibalong-ch3-legacy", "word": "legacy", "definition": "Something, like a tradition or story, that is handed down from the past.", "partOfSpeech": "noun" }
+          {"vocabularyId": "ibalong-ch3-catastrophe", "word": "catastrophe", "definition": "A sudden large-scale disaster or terrible event.", "partOfSpeech": "noun", "englishTranslation": "catastrophe", "tagalogTranslation": "kalamidad"},
+          {"vocabularyId": "ibalong-ch3-observant", "word": "observant", "definition": "Quick to notice things; paying close attention to what is happening around you.", "partOfSpeech": "adjective", "englishTranslation": "observant", "tagalogTranslation": "mapanuri", "illustrationAsset": "assets/images/ibalong/bantong.svg"},
+          {"vocabularyId": "ibalong-ch3-legacy", "word": "legacy", "definition": "Something, like a tradition or story, that is handed down from the past.", "partOfSpeech": "noun", "englishTranslation": "legacy", "tagalogTranslation": "pamana"}
         ],
         "needsReview": false
       },
@@ -89,8 +104,8 @@
         "title": "Si Bantong at ang Huling Tagumpay",
         "content": "Nang isang malaking [kalamidad] ang tumama sa Ibalong — baha, pagputok ng bulkan, at salot ng mga balang — natakot ang mga tao na lahat ay nawala na. Ngunit dumating ang pag-asa sa anyo ni Bantong, ang ikatlo at huling dakilang bayani ng epiko.\n\nSi Bantong ay iba sa mga iba. Siya ay isang mangangaso sa likas, matiyaga at [mapanuri]. Pinag-aralan niya ang kanyang mga kaaway bago siya umatake. Ang kanyang pinakamahirap na hamon ay ang walang kapantay na halimaw na Rabot.\n\nNatuklasan ni Bantong ang kahinaan ni Rabot: ang halimaw ay nahuhulog sa malalim na pagtulog tuwing hapon. Isang hapon, palihim na lumapit si Bantong sa natutulog na halimaw, at sa isang malakas na suntok, hinati niya si Rabot. Ang Ibalong ay kalayaan na sa wakas.",
         "vocabularyHints": [
-          { "vocabularyId": "ibalong-ch3-catastrophe", "word": "kalamidad", "definition": "Isang biglaang malaking sakuna o kakila-kilabot na pangyayari.", "partOfSpeech": "pangngalan" },
-          { "vocabularyId": "ibalong-ch3-observant", "word": "mapanuri", "definition": "Mabilis na mapansin ang mga bagay; nagbibigay ng malapit na pansin.", "partOfSpeech": "pang-uri" }
+          {"vocabularyId": "ibalong-ch3-catastrophe", "word": "kalamidad", "definition": "Isang biglaang malaking sakuna o kakila-kilabot na pangyayari.", "partOfSpeech": "pangngalan", "englishTranslation": "catastrophe", "tagalogTranslation": "kalamidad"},
+          {"vocabularyId": "ibalong-ch3-observant", "word": "mapanuri", "definition": "Mabilis na mapansin ang mga bagay; nagbibigay ng malapit na pansin.", "partOfSpeech": "pang-uri", "englishTranslation": "observant", "tagalogTranslation": "mapanuri", "illustrationAsset": "assets/images/ibalong/bantong.svg"}
         ],
         "needsReview": true
       },
@@ -98,8 +113,8 @@
         "title": "Si Bantong asin an Huring Tagumpay",
         "content": "Kan sarong dakulang [kalamidad] an nag-abot sa Ibalong — baha, pagputok kan bulkan, asin plahe kan mga balang — natakot an mga tao na nawara na an gabos. Pero nag-abot an pag-asa sa anyo ni Bantong, an ikatlo asin huring dakulang bayani kan epiko.\n\nSi Bantong naiiba sa iba. Siya sarong mangungubra sa kinaiyahan, maiyong-mahuwat asin [mapanobela]. Pinag-aral niya an saiyang mga kaaway bago siya mag-atake. An saiyang pinakamarahas na hamon iyo an di-malabanan na halimaw na Rabot.\n\nNatuklasan ni Bantong an kahinaan ni Rabot. Isang hapon, tahimik na nagrani si Bantong sa natuturog na halimaw, asin sa sarong makapangyarihang hampak, hinati niya si Rabot. An Ibalong malaya na sa huring huring.",
         "vocabularyHints": [
-          { "vocabularyId": "ibalong-ch3-catastrophe", "word": "kalamidad", "definition": "Sarong biglang dakulang sakuna o makatatakot na pangyayari.", "partOfSpeech": "ngaran" },
-          { "vocabularyId": "ibalong-ch3-observant", "word": "mapanobela", "definition": "Maibilang na makamataman; nagbibigay nin malapit na atensiyon.", "partOfSpeech": "pang-uri" }
+          {"vocabularyId": "ibalong-ch3-catastrophe", "word": "kalamidad", "definition": "Sarong biglang dakulang sakuna o makatatakot na pangyayari.", "partOfSpeech": "ngaran", "englishTranslation": "catastrophe", "tagalogTranslation": "kalamidad"},
+          {"vocabularyId": "ibalong-ch3-observant", "word": "mapanobela", "definition": "Maibilang na makamataman; nagbibigay nin malapit na atensiyon.", "partOfSpeech": "pang-uri", "englishTranslation": "observant", "tagalogTranslation": "mapanuri", "illustrationAsset": "assets/images/ibalong/bantong.svg"}
         ],
         "needsReview": true
       }
@@ -109,13 +124,17 @@
     "id": "mayon_ch1",
     "storyId": "mayon",
     "orderIndex": 0,
+    "scenes": [
+      { "paragraphIndex": 0, "assetKey": "assets/scenes/village_nature.json", "label": "The land of Bikol", "title": "Meet Magayon", "description": "In the green hills of Bikol, Makusog's daughter Magayon is known for her gentle grace.", "sceneType": "character", "importanceLevel": "high", "imageAssetKey": "assets/images/mayon/magayon_introduction.svg" },
+      { "paragraphIndex": 1, "assetKey": "assets/scenes/spring_encounter.json", "label": "Panganoron sees Magayon", "title": "Panganoron at the Spring", "description": "At the clear waters of Yawa, Panganoron meets Magayon and is captivated by her kindness.", "sceneType": "character_meeting", "importanceLevel": "high", "imageAssetKey": "assets/images/mayon/panganoron_at_spring.svg", "educationalNote": "Yawa is remembered in the legend as the spring where Magayon and Panganoron first met." }
+    ],
     "translations": {
       "en": {
         "title": "The Beautiful Magayon",
         "content": "In the ancient land of Bikol, there lived a chieftain named Makusog who had a daughter of extraordinary beauty. She was called Magayon, which means 'beautiful' in the Bikol tongue. Her [grace] and gentle nature made people travel from distant villages just to see her.\n\nAt a spring called Yawa, where the water was crystal clear, Magayon would often go to fetch water. It was at this spring that a young warrior named Panganoron first saw her. He was immediately [captivated] by her beauty and kindness.\n\nPanganoron approached Makusog and asked permission to court Magayon. The chieftain agreed, and Panganoron began to visit daily, bringing gifts and sharing stories. Magayon, too, found her heart opening to the gentle warrior from the north.",
         "vocabularyHints": [
-          { "vocabularyId": "mayon-ch1-grace", "word": "grace", "definition": "Elegant and refined movement or manner; beauty of form or style.", "partOfSpeech": "noun" },
-          { "vocabularyId": "mayon-ch1-captivated", "word": "captivated", "definition": "Attracted and held the interest and attention of someone; charmed.", "partOfSpeech": "verb" }
+          {"vocabularyId": "mayon-ch1-grace", "word": "grace", "definition": "Elegant and refined movement or manner; beauty of form or style.", "partOfSpeech": "noun", "englishTranslation": "grace", "tagalogTranslation": "grasya", "illustrationAsset": "assets/images/mayon/magayon_introduction.svg"},
+          {"vocabularyId": "mayon-ch1-captivated", "word": "captivated", "definition": "Attracted and held the interest and attention of someone; charmed.", "partOfSpeech": "verb", "englishTranslation": "captivated", "tagalogTranslation": "nabighani", "illustrationAsset": "assets/images/mayon/panganoron_at_spring.svg"}
         ],
         "needsReview": false
       },
@@ -123,8 +142,8 @@
         "title": "Ang Magandang si Magayon",
         "content": "Sa sinaunang lupain ng Bikol, may isang pinuno na nagngangalang Makusog na may anak na may pambihirang kagandahan. Siya ay tinatawag na Magayon, na nangangahulugang 'maganda' sa wikang Bikol. Ang kanyang [grasya] at malambot na kalikasan ay nagpapabiyahe sa mga tao mula sa malalayong nayon para lamang makita siya.\n\nSa isang bukal na tinatawag na Yawa, kung saan ang tubig ay malinaw na parang kristal, madalas pumunta si Magayon para kumuha ng tubig. Doon sa bukal na iyon, isang batang mandirigma na nagngangalang Panganoron ang unang nakakita sa kanya. Agad siyang [nabighani] ng kagandahan at kabaitan ni Magayon.",
         "vocabularyHints": [
-          { "vocabularyId": "mayon-ch1-grace", "word": "grasya", "definition": "Elegante at pino na kilos o asal; kagandahan ng anyo.", "partOfSpeech": "pangngalan" },
-          { "vocabularyId": "mayon-ch1-captivated", "word": "nabighani", "definition": "Nakaakit at nakahawak ng interes at atensiyon ng isang tao; nahumaling.", "partOfSpeech": "pandiwa" }
+          {"vocabularyId": "mayon-ch1-grace", "word": "grasya", "definition": "Elegante at pino na kilos o asal; kagandahan ng anyo.", "partOfSpeech": "pangngalan", "englishTranslation": "grace", "tagalogTranslation": "grasya", "illustrationAsset": "assets/images/mayon/magayon_introduction.svg"},
+          {"vocabularyId": "mayon-ch1-captivated", "word": "nabighani", "definition": "Nakaakit at nakahawak ng interes at atensiyon ng isang tao; nahumaling.", "partOfSpeech": "pandiwa", "englishTranslation": "captivated", "tagalogTranslation": "nabighani", "illustrationAsset": "assets/images/mayon/panganoron_at_spring.svg"}
         ],
         "needsReview": true
       },
@@ -132,8 +151,8 @@
         "title": "An Magayunon na si Magayon",
         "content": "Sa daan nang daan na lugar nin Bikol, igwa nin sarong poon na ngaran Makusog na igwa nin aking babae na may espesyal na kagayunan. Siya inaapod na Magayon, na boot sabihon 'magayunon' sa Bikolnon. An saiyang [grasya] asin malambot na ugali nagpapalawig sa mga tawo gikan sa mararayo na baryo tanganing mahiling siya lamang.\n\nSa sarong bukal na inaapod na Yawa, kun sain an tubig malinaw na siring sa kristal, madalas pumindugan si Magayon para magkuha nin tubig. Duman sa bukal na idto, sarong hoben na mandirigma na ngaran Panganoron an enot na nahiling sa siya. Agad siyang [nabighani] kan kagayunan asin kabutihan ni Magayon.",
         "vocabularyHints": [
-          { "vocabularyId": "mayon-ch1-grace", "word": "grasya", "definition": "Elegante asin pino na paglalakaw o asal; kagayunan kan anyo.", "partOfSpeech": "ngaran" },
-          { "vocabularyId": "mayon-ch1-captivated", "word": "nabighani", "definition": "Naakit asin nahawakan an interes kan sarong tao; nahumaling.", "partOfSpeech": "pandiwang" }
+          {"vocabularyId": "mayon-ch1-grace", "word": "grasya", "definition": "Elegante asin pino na paglalakaw o asal; kagayunan kan anyo.", "partOfSpeech": "ngaran", "englishTranslation": "grace", "tagalogTranslation": "grasya", "illustrationAsset": "assets/images/mayon/magayon_introduction.svg"},
+          {"vocabularyId": "mayon-ch1-captivated", "word": "nabighani", "definition": "Naakit asin nahawakan an interes kan sarong tao; nahumaling.", "partOfSpeech": "pandiwang", "englishTranslation": "captivated", "tagalogTranslation": "nabighani", "illustrationAsset": "assets/images/mayon/panganoron_at_spring.svg"}
         ],
         "needsReview": true
       }
@@ -143,14 +162,18 @@
     "id": "mayon_ch2",
     "storyId": "mayon",
     "orderIndex": 1,
+    "scenes": [
+      { "paragraphIndex": 0, "assetKey": "assets/scenes/mayon_battle.json", "label": "Parotpot threatens the village", "title": "Parotpot's Challenge", "description": "Parotpot's jealousy becomes a threat to Makusog's village and Magayon.", "sceneType": "conflict", "importanceLevel": "high", "imageAssetKey": "assets/images/mayon/parotpot_conflict.svg" },
+      { "paragraphIndex": 2, "assetKey": "assets/scenes/mayon_victory.json", "label": "Panganoron wins!", "title": "Panganoron Defends the Village", "description": "Panganoron and his warriors stand together to protect the people they love.", "sceneType": "victory", "importanceLevel": "high", "imageAssetKey": "assets/images/mayon/panganoron_victory.svg" }
+    ],
     "translations": {
       "en": {
         "title": "The Rival's Threat",
         "content": "Not everyone was happy about Panganoron's courtship. A powerful and [arrogant] chieftain named Parotpot also desired Magayon. When he learned of Panganoron, his jealousy turned to rage.\n\nParotpot came with his warriors to challenge Makusog. He threatened to burn the village if Magayon was not given to him. To protect his people, Makusog was forced to agree. Magayon was heartbroken but [obedient] to her father.\n\nPanganoron heard the news and was devastated. He refused to give up on Magayon. Gathering his courage, he came to Makusog's village. In a fierce battle, Panganoron and his warriors defeated Parotpot's men. Parotpot fled in [disgrace], and Panganoron had won the right to marry Magayon.",
         "vocabularyHints": [
-          { "vocabularyId": "mayon-ch2-arrogant", "word": "arrogant", "definition": "Having an exaggerated sense of one's own importance; behaving in a superior way.", "partOfSpeech": "adjective" },
-          { "vocabularyId": "mayon-ch2-obedient", "word": "obedient", "definition": "Doing what one is told to do; complying with rules or instructions.", "partOfSpeech": "adjective" },
-          { "vocabularyId": "mayon-ch2-disgrace", "word": "disgrace", "definition": "The loss of reputation or respect as a result of a dishonorable action.", "partOfSpeech": "noun" }
+          {"vocabularyId": "mayon-ch2-arrogant", "word": "arrogant", "definition": "Having an exaggerated sense of one's own importance; behaving in a superior way.", "partOfSpeech": "adjective", "englishTranslation": "arrogant", "tagalogTranslation": "palalo"},
+          {"vocabularyId": "mayon-ch2-obedient", "word": "obedient", "definition": "Doing what one is told to do; complying with rules or instructions.", "partOfSpeech": "adjective", "englishTranslation": "obedient", "tagalogTranslation": "masunurin"},
+          {"vocabularyId": "mayon-ch2-disgrace", "word": "disgrace", "definition": "The loss of reputation or respect as a result of a dishonorable action.", "partOfSpeech": "noun", "englishTranslation": "disgrace", "tagalogTranslation": "kahihiyan"}
         ],
         "needsReview": false
       },
@@ -158,8 +181,8 @@
         "title": "Ang Banta ng Karibal",
         "content": "Hindi lahat ay masaya sa pagliligawan ni Panganoron. Isang makapangyarihan at [palalo] na pinuno na nagngangalang Parotpot ay nagnanasa rin kay Magayon. Nang malaman niya si Panganoron, ang kanyang inggit ay naging galit.\n\nDumating si Parotpot kasama ang kanyang mga mandirigma para hamunin si Makusog. Nagbanta siyang susunugin ang nayon kung hindi ibibigay si Magayon sa kanya. Para protektahan ang kanyang mga tao, napilitang sumang-ayon si Makusog.\n\nNarinig ni Panganoron ang balita at nasira ang loob niya. Tumanggi siyang sumuko kay Magayon. Sa isang marahas na labanan, tinalo ni Panganoron at ng kanyang mga mandirigma ang mga lalaki ni Parotpot. Tumakas si Parotpot nang may [kahihiyan], at nanalo si Panganoron ng karapatang pakasalan si Magayon.",
         "vocabularyHints": [
-          { "vocabularyId": "mayon-ch2-arrogant", "word": "palalo", "definition": "May pinalaking pakiramdam ng sariling kahalagahan; kumikilos sa isang mahusay na paraan.", "partOfSpeech": "pang-uri" },
-          { "vocabularyId": "mayon-ch2-disgrace", "word": "kahihiyan", "definition": "Ang pagkawala ng reputasyon o paggalang bilang resulta ng isang hindi karangal-daratig na kilos.", "partOfSpeech": "pangngalan" }
+          {"vocabularyId": "mayon-ch2-arrogant", "word": "palalo", "definition": "May pinalaking pakiramdam ng sariling kahalagahan; kumikilos sa isang mahusay na paraan.", "partOfSpeech": "pang-uri", "englishTranslation": "arrogant", "tagalogTranslation": "palalo"},
+          {"vocabularyId": "mayon-ch2-disgrace", "word": "kahihiyan", "definition": "Ang pagkawala ng reputasyon o paggalang bilang resulta ng isang hindi karangal-daratig na kilos.", "partOfSpeech": "pangngalan", "englishTranslation": "disgrace", "tagalogTranslation": "kahihiyan"}
         ],
         "needsReview": true
       },
@@ -167,8 +190,8 @@
         "title": "An Banta kan Karibal",
         "content": "Dai gabos masaya sa pagliligaw ni Panganoron. Sarong makapangyarihan asin [hambog] na poon na ngaran Parotpot gusto man si Magayon. Kan maaraman niya si Panganoron, an saiyang inggit nagin galit.\n\nNag-abot si Parotpot kaiba an saiyang mga mandirigma para hamunon si Makusog. Nagbabala siyang susunugon an baryo kun dai ibibigay si Magayon sa saiya. Para protektaran an saiyang mga tawo, napilitan si Makusog na umayon.\n\nNarinig ni Panganoron an balita asin nasakitan an saiyang puso. Tumanggi siyang sumuko ki Magayon. Sa sarong marahas na labanan, tinalo ni Panganoron asin kan saiyang mga mandirigma an mga lalaki ni Parotpot. Nagdulag si Parotpot na igwa nin [kastigaran], asin nanalo si Panganoron kan karapatan na pakasalan si Magayon.",
         "vocabularyHints": [
-          { "vocabularyId": "mayon-ch2-arrogant", "word": "hambog", "definition": "Igwa nin pinalaking pakiramdam kan saiyang sadiring kahalaga; naggigibo nin nakaataas na paraan.", "partOfSpeech": "pang-uri" },
-          { "vocabularyId": "mayon-ch2-disgrace", "word": "kastigaran", "definition": "An pagkawara kan reputasyon o paggalang bilang resulta kan sarong di-marangal na gibo.", "partOfSpeech": "ngaran" }
+          {"vocabularyId": "mayon-ch2-arrogant", "word": "hambog", "definition": "Igwa nin pinalaking pakiramdam kan saiyang sadiring kahalaga; naggigibo nin nakaataas na paraan.", "partOfSpeech": "pang-uri", "englishTranslation": "arrogant", "tagalogTranslation": "palalo"},
+          {"vocabularyId": "mayon-ch2-disgrace", "word": "kastigaran", "definition": "An pagkawara kan reputasyon o paggalang bilang resulta kan sarong di-marangal na gibo.", "partOfSpeech": "ngaran", "englishTranslation": "disgrace", "tagalogTranslation": "kahihiyan"}
         ],
         "needsReview": true
       }
@@ -178,14 +201,20 @@
     "id": "mayon_ch3",
     "storyId": "mayon",
     "orderIndex": 2,
+    "scenes": [
+      { "paragraphIndex": 1, "assetKey": "assets/scenes/tragedy_scene.json", "label": "The tragedy of Magayon", "title": "A Love Remembered", "description": "Magayon grieves for Panganoron, and the people lay them to rest side by side.", "sceneType": "tragedy", "importanceLevel": "high", "imageAssetKey": "assets/images/mayon/magayon_tragedy.svg" },
+      { "paragraphIndex": 2, "assetKey": "assets/scenes/mayon_formation.json", "label": "The rise of the mountain", "title": "The Rise of Mount Mayon", "description": "The hill where Magayon and Panganoron were buried grows into a great mountain.", "sceneType": "landmark", "importanceLevel": "high", "imageAssetKey": "assets/images/mayon/mountain_formation.svg", "educationalNote": "The name Mayon is associated with the Bikol word magayon, meaning beautiful." },
+      { "paragraphIndex": 3, "assetKey": "assets/scenes/volcano_eruption.json", "label": "Mount Mayon erupts", "title": "The Volcano Erupts", "description": "The legend says each eruption is Magayon weeping for her lost love.", "sceneType": "volcano", "importanceLevel": "high", "imageAssetKey": "assets/images/mayon/eruption.svg", "educationalNote": "Mayon is an active volcano in Albay, in the Bicol Region of the Philippines." },
+      { "paragraphIndex": 4, "assetKey": "assets/scenes/mayon_ending.json", "label": "A story passed through generations", "title": "A Story That Endures", "description": "The story of Magayon and Panganoron continues to shape how people remember the mountain.", "sceneType": "story_ending", "importanceLevel": "high", "imageAssetKey": "assets/images/mayon/story_ending.svg" }
+    ],
     "translations": {
       "en": {
         "title": "The Tragedy and the Mountain",
         "content": "Preparations for the wedding of Magayon and Panganoron were joyful. But Parotpot, burning with [vengeance], secretly plotted his revenge. On the day of the wedding, as the couple knelt before the village elders, Parotpot's arrow struck Panganoron from behind.\n\nMagayon screamed and rushed to her fallen beloved. She held Panganoron in her arms as the light faded from his eyes. In her [grief], she took his dagger and ended her own life, so she could be with him forever.\n\nThe people buried them together on a hill. Over time, the hill grew into a great and perfect volcano. In the Bikol language, the mountain was named Magayon — beautiful — because it was said that the spirit of Magayon lived within it, making it the most perfectly shaped mountain in the world.\n\nTo this day, when Mount Mayon [erupts], the Bikolano people say it is Magayon weeping for her lost love, Panganoron.",
         "vocabularyHints": [
-          { "vocabularyId": "mayon-ch3-vengeance", "word": "vengeance", "definition": "Punishment inflicted as revenge for a wrong or injury; retaliation.", "partOfSpeech": "noun" },
-          { "vocabularyId": "mayon-ch3-grief", "word": "grief", "definition": "Intense sorrow, especially caused by someone's death.", "partOfSpeech": "noun" },
-          { "vocabularyId": "mayon-ch3-erupts", "word": "erupts", "definition": "When a volcano erupts, it suddenly throws out lava, ash, and gas.", "partOfSpeech": "verb" }
+          {"vocabularyId": "mayon-ch3-vengeance", "word": "vengeance", "definition": "Punishment inflicted as revenge for a wrong or injury; retaliation.", "partOfSpeech": "noun", "englishTranslation": "vengeance", "tagalogTranslation": "paghihiganti"},
+          {"vocabularyId": "mayon-ch3-grief", "word": "grief", "definition": "Intense sorrow, especially caused by someone's death.", "partOfSpeech": "noun", "englishTranslation": "grief", "tagalogTranslation": "kalungkutan", "illustrationAsset": "assets/images/mayon/magayon_tragedy.svg"},
+          {"vocabularyId": "mayon-ch3-erupts", "word": "erupts", "definition": "When a volcano erupts, it suddenly throws out lava, ash, and gas.", "partOfSpeech": "verb", "englishTranslation": "erupts", "tagalogTranslation": "sumabog", "illustrationAsset": "assets/images/mayon/eruption.svg"}
         ],
         "needsReview": false
       },
@@ -193,9 +222,9 @@
         "title": "Ang Trahedya at ang Bundok",
         "content": "Ang mga paghahanda para sa kasal ni Magayon at Panganoron ay masaya. Ngunit si Parotpot, nag-aapoy ng [paghihiganti], lihim na nagbalak ng kanyang ganti. Sa araw ng kasal, habang lumuhod ang mag-asawa sa harapan ng mga pinuno ng nayon, ang palaso ni Parotpot ay tumama kay Panganoron sa likod.\n\nSumigaw si Magayon at nagmadali sa kanyang nahulog na minamahal. Hawak niya si Panganoron sa kanyang mga bisig habang lumalabo ang ilaw sa kanyang mga mata. Sa kanyang [kalungkutan], kinuha niya ang kanyang patalim at winakasan ang kanyang sariling buhay.\n\nLinubugan sila ng mga tao nang magkasama sa isang burol. Sa paglipas ng panahon, ang burol ay lumago at naging isang dakilang bulkan. Sa wikang Bikol, ang bundok ay pinangalanang Magayon. Hanggang ngayon, kapag ang Mayon ay [sumabog], sinasabi ng mga Bikolano na si Magayon ay umiiyak para sa kanyang nawawalang pag-ibig.",
         "vocabularyHints": [
-          { "vocabularyId": "mayon-ch3-vengeance", "word": "paghihiganti", "definition": "Parusa na ipinataw bilang ganti sa isang mali o pinsala.", "partOfSpeech": "pangngalan" },
-          { "vocabularyId": "mayon-ch3-grief", "word": "kalungkutan", "definition": "Matinding hapis, lalo na dulot ng pagkamatay ng isang tao.", "partOfSpeech": "pangngalan" },
-          { "vocabularyId": "mayon-ch3-erupts", "word": "sumabog", "definition": "Kapag ang bulkan ay sumabog, biglang inilalabas nito ang lava, abo, at gas.", "partOfSpeech": "pandiwa" }
+          {"vocabularyId": "mayon-ch3-vengeance", "word": "paghihiganti", "definition": "Parusa na ipinataw bilang ganti sa isang mali o pinsala.", "partOfSpeech": "pangngalan", "englishTranslation": "vengeance", "tagalogTranslation": "paghihiganti"},
+          {"vocabularyId": "mayon-ch3-grief", "word": "kalungkutan", "definition": "Matinding hapis, lalo na dulot ng pagkamatay ng isang tao.", "partOfSpeech": "pangngalan", "englishTranslation": "grief", "tagalogTranslation": "kalungkutan", "illustrationAsset": "assets/images/mayon/magayon_tragedy.svg"},
+          {"vocabularyId": "mayon-ch3-erupts", "word": "sumabog", "definition": "Kapag ang bulkan ay sumabog, biglang inilalabas nito ang lava, abo, at gas.", "partOfSpeech": "pandiwa", "englishTranslation": "erupts", "tagalogTranslation": "sumabog", "illustrationAsset": "assets/images/mayon/eruption.svg"}
         ],
         "needsReview": true
       },
@@ -203,9 +232,9 @@
         "title": "An Trahedya asin an Bukid",
         "content": "An mga paghahanda para sa kasal ni Magayon asin Panganoron masaya. Pero si Parotpot, naglalatob sa [paghihigante], lihim na nagbalak kan saiyang ganti. Sa aldaw kan kasal, habang nagluhod an mag-asawa sa atubangan kan mga magurang kan baryo, an palaso ni Parotpot nagtama ki Panganoron sa likod.\n\nNaghuwad si Magayon asin nagdurulan sa saiyang nahulog na namumutan. Kinuyog niya si Panganoron sa saiyang mga kamot habang kumukurad an liwanag sa saiyang mga mata. Sa saiyang [pagmakulog], kinua niya an saiyang kutsilyo asin winakasan an saiyang sadiring buhay.\n\nLinubong sinda kan mga tawo na magkasabay sa sarong bungtod. Sa paglipas kan panahon, an bungtod lumaki asin nagin sarong dakulang bulkan. Sa Bikolnon, an bukid pinangaran nin Magayon. Sagkod ngonyan, kan an Mayon [sumabog], sinasabi kan mga Bikolano na si Magayon nagtatangis para sa saiyang nawawarang pagmakulog.",
         "vocabularyHints": [
-          { "vocabularyId": "mayon-ch3-vengeance", "word": "paghihigante", "definition": "Parusa na ipataw bilang ganti sa sarong mali o pinsala.", "partOfSpeech": "ngaran" },
-          { "vocabularyId": "mayon-ch3-grief", "word": "pagmakulog", "definition": "Makosog na paghatol, lalong-lalo na dahil sa pagkamatay kan sarong tao.", "partOfSpeech": "ngaran" },
-          { "vocabularyId": "mayon-ch3-erupts", "word": "sumabog", "definition": "Kan an bulkan nagpupuok, biglang sinusuwa nito an lava, abo, asin gas.", "partOfSpeech": "pandiwang" }
+          {"vocabularyId": "mayon-ch3-vengeance", "word": "paghihigante", "definition": "Parusa na ipataw bilang ganti sa sarong mali o pinsala.", "partOfSpeech": "ngaran", "englishTranslation": "vengeance", "tagalogTranslation": "paghihiganti"},
+          {"vocabularyId": "mayon-ch3-grief", "word": "pagmakulog", "definition": "Makosog na paghatol, lalong-lalo na dahil sa pagkamatay kan sarong tao.", "partOfSpeech": "ngaran", "englishTranslation": "grief", "tagalogTranslation": "kalungkutan", "illustrationAsset": "assets/images/mayon/magayon_tragedy.svg"},
+          {"vocabularyId": "mayon-ch3-erupts", "word": "sumabog", "definition": "Kan an bulkan nagpupuok, biglang sinusuwa nito an lava, abo, asin gas.", "partOfSpeech": "pandiwang", "englishTranslation": "erupts", "tagalogTranslation": "sumabog", "illustrationAsset": "assets/images/mayon/eruption.svg"}
         ],
         "needsReview": true
       }

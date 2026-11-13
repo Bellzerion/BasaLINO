@@ -65,9 +65,13 @@ class LocalStoryRepository implements StoryRepository {
     transData ??= translations['en'] as Map<String, dynamic>?;
     if (transData == null) return null;
 
+    // 'scenes' is defined at the chapter level (language-independent),
+    // not inside each translation block, so we merge it in here.
+    final chapterScenes = chapter['scenes'] as List? ?? [];
     return ChapterTranslationModel.fromMap({
       'chapterId': chapterId,
       'languageCode': languageCode,
+      'scenes': chapterScenes,
       ...transData,
     });
   }

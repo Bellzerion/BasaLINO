@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+  <defs><linearGradient id="twilight" x2="0" y2="1"><stop stop-color="#4f5269"/><stop offset="1" stop-color="#c88177"/></linearGradient></defs>
+  <rect width="640" height="360" fill="url(#twilight)"/>
+  <circle cx="504" cy="80" r="29" fill="#f3d9b2" opacity=".8"/>
+  <path d="M0 271 127 180l96 68 122-143 134 165 82-90 79 87v93H0Z" fill="#3c544d"/>
+  <path d="M0 314q150-47 320 0t320 0v46H0Z" fill="#253e37"/>
+  <path d="M274 210q24-18 48 0l17 61h-82Z" fill="#bd826e"/>
+  <circle cx="297" cy="191" r="17" fill="#473a3a"/>
+  <path d="M324 222q23-19 46 0l16 54h-78Z" fill="#657f9a"/>
+  <circle cx="346" cy="202" r="17" fill="#423838"/>
+  <path d="M315 268q18 16 42 0" fill="none" stroke="#eac9a7" stroke-width="4" opacity=".8"/>
+  <path d="M135 172q35-40 70 0" fill="none" stroke="#f1d8b8" stroke-width="4" opacity=".7"/>
+</svg>

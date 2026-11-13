@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#d28e76"/><stop offset="1" stop-color="#f0d1a2"/></linearGradient></defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <path d="M0 253 170 120l132 139 115-158 223 160v99H0Z" fill="#625b58"/>
+  <path d="M0 288q151-53 320 1t320 0v71H0Z" fill="#405544"/>
+  <path d="M292 172v-52m-30 52h60m-30-52-19 24m19-24 19 24" stroke="#513e39" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="292" cy="161" r="17" fill="#563d35"/>
+  <path d="M270 185q22-20 44 0l20 73h-85Z" fill="#9a4f49"/>
+  <path d="M136 207v-49m-22 49h44" stroke="#583e32" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="136" cy="195" r="15" fill="#503c35"/>
+  <path d="M117 216q19-16 38 0l13 53h-64Z" fill="#d6b06e"/>
+  <path d="M496 205v-47m-25 47h50" stroke="#583e32" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="496" cy="194" r="15" fill="#503c35"/>
+  <path d="M477 214q19-16 38 0l13 53h-64Z" fill="#d6b06e"/>
+  <path d="M185 252h268" stroke="#e9c39a" stroke-width="3" stroke-dasharray="10 12"/>
+</svg>

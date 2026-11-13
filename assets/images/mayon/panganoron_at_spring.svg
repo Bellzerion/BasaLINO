@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#8ec9d1"/><stop offset="1" stop-color="#edf0d5"/></linearGradient>
+    <linearGradient id="water" x2="0" y2="1"><stop stop-color="#69b7b1"/><stop offset="1" stop-color="#287d83"/></linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <circle cx="488" cy="71" r="34" fill="#fff4cc"/>
+  <path d="M0 219 120 137l79 70 116-127 140 133 93-72 92 69v141H0Z" fill="#799978"/>
+  <path d="M0 244q130-54 260 3t260-5 120 9v109H0Z" fill="#476e53"/>
+  <ellipse cx="315" cy="299" rx="230" ry="64" fill="url(#water)"/>
+  <path d="M113 293q70-25 139 0m76 17q58-18 126 0" fill="none" stroke="#c1e9d8" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+  <circle cx="260" cy="193" r="18" fill="#4a3938"/>
+  <path d="M239 215q21-19 42 0l17 65h-76Z" fill="#d1846e"/>
+  <path d="m249 271-8 43m27-43 14 43" stroke="#413e3a" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="375" cy="199" r="17" fill="#443735"/>
+  <path d="M355 218q20-18 40 0l15 62h-70Z" fill="#45668a"/>
+  <path d="m365 270-8 43m25-43 12 43" stroke="#413e3a" stroke-width="9" stroke-linecap="round"/>
+</svg>
