@@ -22,6 +22,8 @@ class VocabHintModel extends Equatable {
   final String? tagalogTranslation;
   final String? exampleSentence;
   final String? illustrationAsset;
+
+  /// Optional recorded pronunciation asset; TTS is used when playback fails.
   final String? audioAsset;
 
   factory VocabHintModel.fromMap(Map<String, dynamic> map) {

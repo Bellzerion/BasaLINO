@@ -30,6 +30,7 @@ class ReaderScreen extends ConsumerStatefulWidget {
 
 class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   double _fontSize = 17.0;
+  bool _storybookMode = false;
   final ScrollController _readingController = ScrollController();
   Timer? _readingSaveTimer;
   ProgressRepository? _progressRepository;
@@ -43,6 +44,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   VocabHintModel? _activeVocabularyHint;
   String? _activeVocabularyExample;
   String _activeVocabularyLanguage = 'en';
+
+  double get _readingFontSize => _fontSize + (_storybookMode ? 2 : 0);
 
   @override
   void initState() {
@@ -179,7 +182,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           TextSpan(
             text: content.substring(lastMatchEnd, match.start),
             style: TextStyle(
-              fontSize: _fontSize,
+              fontSize: _readingFontSize,
               color: const Color(0xFF1F2937),
               height: 1.65,
             ),
@@ -201,7 +204,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
         TextSpan(
           text: bracketedWord,
           style: TextStyle(
-            fontSize: _fontSize,
+            fontSize: _readingFontSize,
             fontWeight: FontWeight.bold,
             color: const Color(0xFFD97706),
             decoration: TextDecoration.underline,
@@ -226,7 +229,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
         TextSpan(
           text: content.substring(lastMatchEnd),
           style: TextStyle(
-            fontSize: _fontSize,
+            fontSize: _readingFontSize,
             color: const Color(0xFF1F2937),
             height: 1.65,
           ),
@@ -260,7 +263,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       // Add the paragraph text.
       widgets.add(
         Padding(
-          padding: const EdgeInsets.only(bottom: 4),
+          padding: EdgeInsets.only(bottom: _storybookMode ? 16 : 4),
           child: RichText(
             text: TextSpan(
               children: _buildInteractiveParagraph(
@@ -285,6 +288,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             showExplorePrompt:
                 !_hasShownSceneDiscoveryPrompt && !hasSceneInThisBuild,
             onExplorePromptShown: _markSceneDiscoveryPromptShown,
+            storybookMode: _storybookMode,
           ),
         );
         hasSceneInThisBuild = true;
@@ -309,6 +313,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             showExplorePrompt:
                 !_hasShownSceneDiscoveryPrompt && !hasSceneInThisBuild,
             onExplorePromptShown: _markSceneDiscoveryPromptShown,
+            storybookMode: _storybookMode,
           ),
         );
         hasSceneInThisBuild = true;
@@ -342,9 +347,16 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final chapterTranslationFuture = _chapterTranslationFuture!;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: _storybookMode
+          ? null
+          : AppBar(
         title: Text(context.l10n.readerTitle),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_stories_rounded),
+            tooltip: 'Enter storybook mode',
+            onPressed: () => setState(() => _storybookMode = true),
+          ),
           IconButton(
             icon: const Icon(Icons.text_fields),
             tooltip: context.l10n.readerAdjustTextSize,
@@ -423,11 +435,16 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
                 return SingleChildScrollView(
                   controller: _readingController,
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    _storybookMode ? 76 : 16,
+                    20,
+                    32,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (trans.needsReview)
+                      if (trans.needsReview && !_storybookMode)
                         Container(
                           margin: const EdgeInsets.only(bottom: 16),
                           padding: const EdgeInsets.all(12),
@@ -458,14 +475,14 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                         ),
                       Text(
                         trans.title,
-                        style: const TextStyle(
-                          fontSize: 26,
+                        style: TextStyle(
+                          fontSize: _storybookMode ? 30 : 26,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF1F2937),
                           letterSpacing: -0.5,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: _storybookMode ? 28 : 20),
                       // ── Story content: paragraphs interleaved with scene cards ──
                       ...(_buildReaderContent(trans)),
                       const SizedBox(height: 40),
@@ -495,6 +512,18 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   _activeVocabularyExample = null;
                 });
               },
+            ),
+          if (_storybookMode)
+            Positioned(
+              top: 8,
+              right: 12,
+              child: SafeArea(
+                child: IconButton.filledTonal(
+                  tooltip: 'Exit storybook mode',
+                  onPressed: () => setState(() => _storybookMode = false),
+                  icon: const Icon(Icons.close_fullscreen_rounded),
+                ),
+              ),
             ),
         ],
       ),

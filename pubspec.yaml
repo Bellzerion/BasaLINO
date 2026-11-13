@@ -38,6 +38,8 @@ dependencies:
   lottie: ^3.1.0
   flutter_animate: ^4.5.2
   flutter_svg: ^2.4.0
+  flutter_tts: ^4.2.5
+  audioplayers: ^6.8.1
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +56,17 @@ flutter:
   generate: true
 
   assets:
+    - assets/audio/
+    - assets/audio/bikol/
+    - assets/audio/english/
+    - assets/audio/sfx/
+    - assets/audio/tagalog/
     - assets/images/
+    - assets/images/avatar/
+    - assets/images/ibalong/
+    - assets/images/mayon/
+    - assets/gifs/
+    - assets/gifs/ibalong/
+    - assets/gifs/mayon/
     - assets/data/
     - assets/scenes/

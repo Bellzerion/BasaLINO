@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../app/theme/app_theme.dart';
 import '../../../core/models/vocab_hint_model.dart';
+import '../services/vocabulary_pronunciation_service.dart';
 
 class VocabularyCardOverlay extends StatefulWidget {
   const VocabularyCardOverlay({
@@ -100,7 +101,7 @@ class _VocabularyCardOverlayState extends State<VocabularyCardOverlay> {
   }
 }
 
-class StoryVocabularyCard extends StatelessWidget {
+class StoryVocabularyCard extends StatefulWidget {
   const StoryVocabularyCard({
     super.key,
     required this.hint,
@@ -108,6 +109,7 @@ class StoryVocabularyCard extends StatelessWidget {
     required this.exampleSentence,
     required this.onClose,
     this.onPlayAudio,
+    this.pronunciationService,
   });
 
   final VocabHintModel hint;
@@ -115,23 +117,126 @@ class StoryVocabularyCard extends StatelessWidget {
   final String exampleSentence;
   final VoidCallback onClose;
   final VoidCallback? onPlayAudio;
+  final VocabularyPronunciationService? pronunciationService;
 
-  String get _languageName => switch (languageCode) {
+  @override
+  State<StoryVocabularyCard> createState() => _StoryVocabularyCardState();
+}
+
+class _StoryVocabularyCardState extends State<StoryVocabularyCard> {
+  VocabularyPronunciationService? _pronunciationService;
+  StreamSubscription<VocabularyPlaybackState>? _playbackSubscription;
+  VocabularyPlaybackState _playbackState = VocabularyPlaybackState.idle;
+  bool _ownsPronunciationService = false;
+
+  String get _languageName => switch (widget.languageCode) {
     'tl' => 'Tagalog',
     'bik' => 'Bikol',
     'en' => 'English',
-    _ => languageCode.toUpperCase(),
+    _ => widget.languageCode.toUpperCase(),
   };
 
   @override
+  void initState() {
+    super.initState();
+    final service = widget.pronunciationService;
+    if (service != null) _attachService(service);
+  }
+
+  void _attachService(VocabularyPronunciationService service) {
+    _pronunciationService = service;
+    _playbackSubscription = service.playbackStates.listen((state) {
+      if (mounted) setState(() => _playbackState = state);
+    });
+  }
+
+  VocabularyPronunciationService _getPronunciationService() {
+    final existing = _pronunciationService;
+    if (existing != null) return existing;
+
+    final service = widget.pronunciationService ??
+        DeviceVocabularyPronunciationService();
+    _ownsPronunciationService = widget.pronunciationService == null;
+    _attachService(service);
+    return service;
+  }
+
+  Future<void> _togglePronunciation() async {
+    if (widget.onPlayAudio != null && widget.pronunciationService == null) {
+      widget.onPlayAudio!();
+      return;
+    }
+
+    final service = _getPronunciationService();
+    try {
+      if (_playbackState == VocabularyPlaybackState.playing) {
+        await service.stop();
+      } else {
+        setState(() => _playbackState = VocabularyPlaybackState.loading);
+        await service.pronounce(
+          word: widget.hint.word,
+          languageCode: widget.languageCode,
+          audioAsset: widget.hint.audioAsset,
+        );
+      }
+    } catch (error, stackTrace) {
+      if (mounted) {
+        setState(() => _playbackState = VocabularyPlaybackState.idle);
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Pronunciation is unavailable. Check your audio or speech settings.',
+            ),
+          ),
+        );
+      }
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stackTrace,
+          library: 'vocabulary card pronunciation',
+        ),
+      );
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant StoryVocabularyCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pronunciationService == widget.pronunciationService) return;
+    unawaited(_playbackSubscription?.cancel());
+    if (_ownsPronunciationService) {
+      unawaited(_pronunciationService?.dispose());
+    }
+    _playbackSubscription = null;
+    _pronunciationService = null;
+    _ownsPronunciationService = false;
+    _playbackState = VocabularyPlaybackState.idle;
+    final service = widget.pronunciationService;
+    if (service != null) _attachService(service);
+  }
+
+  @override
+  void dispose() {
+    unawaited(_playbackSubscription?.cancel());
+    if (_ownsPronunciationService) {
+      unawaited(_pronunciationService?.dispose());
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final hint = widget.hint;
     final colors = Theme.of(context).colorScheme;
     final cardColor =
         Theme.of(context).cardTheme.color ?? colors.surfaceContainerHigh;
     final tagalogTranslation =
-        hint.tagalogTranslation ?? (languageCode == 'tl' ? hint.word : '—');
+        hint.tagalogTranslation ??
+        (widget.languageCode == 'tl' ? hint.word : '—');
     final englishTranslation =
-        hint.englishTranslation ?? (languageCode == 'en' ? hint.word : '—');
+        hint.englishTranslation ??
+        (widget.languageCode == 'en' ? hint.word : '—');
     final illustration = hint.illustrationAsset;
 
     return Material(
@@ -178,15 +283,52 @@ class StoryVocabularyCard extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                if (hint.audioAsset != null)
-                  IconButton(
-                    tooltip: 'Play pronunciation',
-                    onPressed: onPlayAudio,
-                    icon: const Icon(Icons.volume_up_rounded),
+                Semantics(
+                  button: true,
+                  label: switch (_playbackState) {
+                    VocabularyPlaybackState.loading =>
+                      'Loading pronunciation for ${hint.word}',
+                    VocabularyPlaybackState.playing =>
+                      'Stop pronunciation of ${hint.word}',
+                    VocabularyPlaybackState.idle =>
+                      'Pronounce ${hint.word} in $_languageName',
+                  },
+                  child: IconButton(
+                    tooltip: switch (_playbackState) {
+                      VocabularyPlaybackState.loading => 'Loading audio',
+                      VocabularyPlaybackState.playing => 'Stop pronunciation',
+                      VocabularyPlaybackState.idle => 'Pronounce word',
+                    },
+                    onPressed: _playbackState == VocabularyPlaybackState.loading
+                        ? null
+                        : _togglePronunciation,
+                    icon: _playbackState == VocabularyPlaybackState.loading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Icon(
+                            _playbackState == VocabularyPlaybackState.playing
+                                ? Icons.stop_circle_outlined
+                                : Icons.volume_up_rounded,
+                          ),
+                  ),
+                ),
+                if (_playbackState == VocabularyPlaybackState.playing)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Text(
+                      'Playing',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 IconButton(
                   tooltip: 'Close vocabulary card',
-                  onPressed: onClose,
+                  onPressed: widget.onClose,
                   icon: const Icon(Icons.close_rounded),
                 ),
               ],
@@ -252,7 +394,7 @@ class StoryVocabularyCard extends StatelessWidget {
                     ?.copyWith(color: colors.onSurfaceVariant, height: 1.45),
               ),
             ],
-            if (exampleSentence.isNotEmpty) ...[
+            if (widget.exampleSentence.isNotEmpty) ...[
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,
@@ -274,7 +416,7 @@ class StoryVocabularyCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      exampleSentence,
+                      widget.exampleSentence,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: colors.onSurface,
                         height: 1.4,

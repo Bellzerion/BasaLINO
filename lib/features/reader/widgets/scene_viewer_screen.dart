@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:ui';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/models/scene_annotation_model.dart';
@@ -65,6 +67,10 @@ class SceneViewerScreen extends StatelessWidget {
                                   ),
                             ),
                           ),
+                          if (scene.soundEffectAsset?.isNotEmpty ?? false)
+                            _SceneSoundEffectButton(
+                                  assetPath: scene.soundEffectAsset!,
+                            ),
                         ],
                       ),
                       Expanded(
@@ -120,6 +126,43 @@ class SceneViewerScreen extends StatelessWidget {
                                         ),
                                         height: 1.5,
                                       ),
+                                ),
+                              ],
+                              if (scene.vocabularyContext?.isNotEmpty ??
+                                  false) ...[
+                                const SizedBox(height: 16),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'WORD TO REMEMBER',
+                                        style: TextStyle(
+                                          color: Colors.amberAccent,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.7,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        scene.vocabularyContext!,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              color: Colors.white,
+                                              height: 1.4,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                               if (scene.educationalNote?.isNotEmpty ??
@@ -190,4 +233,88 @@ class SceneViewerScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _SceneSoundEffectButton extends StatefulWidget {
+  const _SceneSoundEffectButton({required this.assetPath});
+
+  final String assetPath;
+
+  @override
+  State<_SceneSoundEffectButton> createState() =>
+      _SceneSoundEffectButtonState();
+}
+
+class _SceneSoundEffectButtonState extends State<_SceneSoundEffectButton> {
+  late final AudioPlayer _player;
+  StreamSubscription<PlayerState>? _stateSubscription;
+  bool _isLoading = false;
+  bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _player = AudioPlayer();
+    _stateSubscription = _player.onPlayerStateChanged.listen((state) {
+      if (!mounted) return;
+      setState(() {
+        _isPlaying = state == PlayerState.playing;
+        if (state == PlayerState.stopped ||
+            state == PlayerState.completed ||
+            state == PlayerState.paused) {
+          _isLoading = false;
+        }
+      });
+    });
+  }
+
+  Future<void> _toggle() async {
+    if (_isPlaying) {
+      await _player.stop();
+      return;
+    }
+    setState(() => _isLoading = true);
+    try {
+      final asset = widget.assetPath.startsWith('assets/')
+          ? widget.assetPath.substring('assets/'.length)
+          : widget.assetPath;
+      await _player.play(AssetSource(asset));
+      if (mounted) setState(() => _isLoading = false);
+    } catch (error, stackTrace) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Scene sound could not be played.')),
+        );
+      }
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stackTrace,
+          library: 'scene sound effect',
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    unawaited(_stateSubscription?.cancel());
+    unawaited(_player.dispose());
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+    tooltip: _isPlaying ? 'Stop scene sound' : 'Play scene sound',
+    onPressed: _isLoading ? null : _toggle,
+    color: Colors.white,
+    icon: _isLoading
+        ? const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : Icon(_isPlaying ? Icons.volume_off_rounded : Icons.volume_up_rounded),
+  );
 }

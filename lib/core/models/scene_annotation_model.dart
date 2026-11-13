@@ -12,7 +12,10 @@ class SceneAnnotationModel extends Equatable {
     this.sceneType,
     this.importanceLevel,
     this.imageAssetKey,
+    this.gifAsset,
     this.educationalNote,
+    this.vocabularyContext,
+    this.soundEffectAsset,
   });
 
   /// After which paragraph (0-based) this scene should be displayed.
@@ -29,7 +32,10 @@ class SceneAnnotationModel extends Equatable {
   final String? sceneType;
   final String? importanceLevel;
   final String? imageAssetKey;
+  final String? gifAsset;
   final String? educationalNote;
+  final String? vocabularyContext;
+  final String? soundEffectAsset;
 
   factory SceneAnnotationModel.fromMap(Map<String, dynamic> map) {
     return SceneAnnotationModel(
@@ -41,7 +47,10 @@ class SceneAnnotationModel extends Equatable {
       sceneType: map['sceneType'] as String?,
       importanceLevel: map['importanceLevel'] as String?,
       imageAssetKey: map['imageAssetKey'] as String?,
+      gifAsset: map['gifAsset'] as String?,
       educationalNote: map['educationalNote'] as String?,
+      vocabularyContext: map['vocabularyContext'] as String?,
+      soundEffectAsset: map['soundEffectAsset'] as String?,
     );
   }
 
@@ -54,7 +63,10 @@ class SceneAnnotationModel extends Equatable {
     if (sceneType != null) 'sceneType': sceneType,
     if (importanceLevel != null) 'importanceLevel': importanceLevel,
     if (imageAssetKey != null) 'imageAssetKey': imageAssetKey,
+    if (gifAsset != null) 'gifAsset': gifAsset,
     if (educationalNote != null) 'educationalNote': educationalNote,
+    if (vocabularyContext != null) 'vocabularyContext': vocabularyContext,
+    if (soundEffectAsset != null) 'soundEffectAsset': soundEffectAsset,
   };
 
   @override
@@ -67,6 +79,9 @@ class SceneAnnotationModel extends Equatable {
     sceneType,
     importanceLevel,
     imageAssetKey,
+    gifAsset,
     educationalNote,
+    vocabularyContext,
+    soundEffectAsset,
   ];
 }

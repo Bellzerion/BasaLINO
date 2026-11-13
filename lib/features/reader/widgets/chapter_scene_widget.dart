@@ -16,6 +16,7 @@ class ChapterSceneWidget extends StatefulWidget {
     required this.heroTag,
     this.showExplorePrompt = false,
     this.onExplorePromptShown,
+    this.storybookMode = false,
   });
 
   final SceneAnnotationModel scene;
@@ -23,6 +24,7 @@ class ChapterSceneWidget extends StatefulWidget {
   final String heroTag;
   final bool showExplorePrompt;
   final VoidCallback? onExplorePromptShown;
+  final bool storybookMode;
 
   @override
   State<ChapterSceneWidget> createState() => _ChapterSceneWidgetState();
@@ -126,7 +128,7 @@ class _ChapterSceneWidgetState extends State<ChapterSceneWidget>
                       tag: widget.heroTag,
                       child: SceneArtwork(
                         scene: widget.scene,
-                        height: 190,
+                        height: widget.storybookMode ? 280 : 190,
                         playAnimation: false,
                       ),
                     ),
@@ -228,8 +230,7 @@ class SceneArtwork extends StatelessWidget {
   final bool playAnimation;
   final BoxFit fit;
 
-  Widget _illustration(BuildContext context) {
-    final path = scene.imageAssetKey!;
+  Widget _illustration(BuildContext context, String path) {
     if (path.toLowerCase().endsWith('.svg')) {
       return SvgPicture.asset(
         path,
@@ -261,10 +262,68 @@ class SceneArtwork extends StatelessWidget {
     );
   }
 
+  Widget _fallback(BuildContext context) {
+    if (scene.assetKey.isNotEmpty && playAnimation) {
+      return _animation(context);
+    }
+    final imagePath = scene.imageAssetKey;
+    if (imagePath?.isNotEmpty ?? false) {
+      return _illustration(context, imagePath!);
+    }
+    return const _ScenePlaceholder();
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasIllustration = scene.imageAssetKey?.isNotEmpty ?? false;
+    final hasGif = scene.gifAsset?.isNotEmpty ?? false;
     final hasAnimation = scene.assetKey.isNotEmpty;
+    final reducedMotion = MediaQuery.disableAnimationsOf(context);
+
+    if (reducedMotion) {
+      if (hasIllustration) return _illustration(context, scene.imageAssetKey!);
+      if (hasAnimation) {
+        return SizedBox(
+          height: height,
+          width: double.infinity,
+          child: Center(
+            child: SizedBox(
+              width: height * 1.5,
+              height: height,
+              child: _animation(context),
+            ),
+          ),
+        );
+      }
+      return const _ScenePlaceholder();
+    }
+
+    if (hasGif) {
+      return SizedBox(
+        height: height,
+        width: double.infinity,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                scene.gifAsset!,
+                width: double.infinity,
+                height: height,
+                fit: fit,
+                errorBuilder: (context, error, stackTrace) =>
+                    _fallback(context),
+              ),
+            ),
+            if (playAnimation && hasAnimation)
+              Positioned.fill(
+                child: Opacity(opacity: 0.4, child: _animation(context)),
+              ),
+          ],
+        ),
+      );
+    }
+
     final background = Container(
       height: height,
       width: double.infinity,
@@ -276,7 +335,7 @@ class SceneArtwork extends StatelessWidget {
         ),
       ),
       child: hasIllustration
-          ? _illustration(context)
+          ? _illustration(context, scene.imageAssetKey!)
           : hasAnimation
           ? Center(
               child: SizedBox(
