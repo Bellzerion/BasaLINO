@@ -7,7 +7,7 @@ class UserProfile extends Equatable {
   const UserProfile({
     required this.uid,
     required this.email,
-    required this.nickname,
+    required this.displayName,
     required this.preferredLanguage,
     required this.approvalStatus,
     required this.totalXp,
@@ -16,7 +16,7 @@ class UserProfile extends Equatable {
 
   final String uid;
   final String email;
-  final String nickname;
+  final String? displayName;
   final String preferredLanguage;
   final ApprovalStatus approvalStatus;
   final int totalXp;
@@ -29,16 +29,15 @@ class UserProfile extends Equatable {
     }
 
     final email = map['email'];
-    final nickname = map['nickname'];
+    final displayName = map['displayName'] ?? map['nickname'];
     final preferredLanguage = map['preferredLanguage'];
     final rawApprovalStatus = map['approvalStatus'];
     final rawTotalXp = map['totalXp'];
     if (email is! String ||
-        nickname is! String ||
         preferredLanguage is! String ||
         !{'en', 'tl', 'bik'}.contains(preferredLanguage) ||
-        rawTotalXp is! int ||
-        rawTotalXp < 0) {
+        (displayName != null && displayName is! String) ||
+        (rawTotalXp != null && (rawTotalXp is! int || rawTotalXp < 0))) {
       throw const FormatException('Profile fields are missing or invalid.');
     }
 
@@ -56,10 +55,10 @@ class UserProfile extends Equatable {
     return UserProfile(
       uid: uid,
       email: email,
-      nickname: nickname,
+      displayName: displayName as String?,
       preferredLanguage: preferredLanguage,
       approvalStatus: approvalStatus,
-      totalXp: rawTotalXp.toInt(),
+      totalXp: rawTotalXp as int? ?? 0,
       createdAt: createdAt,
     );
   }
@@ -74,7 +73,7 @@ class UserProfile extends Equatable {
   List<Object?> get props => [
     uid,
     email,
-    nickname,
+    displayName,
     preferredLanguage,
     approvalStatus,
     totalXp,

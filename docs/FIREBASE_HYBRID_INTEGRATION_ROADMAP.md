@@ -15,8 +15,8 @@ authentication or progress persistence to Firebase as-is.
 | Firebase dependencies | Firebase Auth, Firestore, Functions, and Core packages are declared. | Available |
 | Firebase initialization | Firebase initialization is configured for the current app. | Implemented |
 | Firebase repository wiring | Local repositories remain active; Firebase progress reads are available behind repositories. | Partial |
-| Firebase Auth/profile | Firebase auth uses `users/{uid}` and the canonical profile contract; profile bootstrap writes `approvalStatus: approved`. | Read contract aligned |
-| Secure quiz progression | `submitAttempt` Cloud Function grades answers and writes attempt, XP, and chapter progress. | Strong starting point; hardening needed |
+| Firebase Auth/profile | Firebase auth uses `users/{uid}`; bootstrap creates a pending profile and hydrates approval from that profile. | Contract aligned; consent workflow pending |
+| Secure quiz progression | `submitAttempt` transactionally records attempts, awards XP, and updates the versioned progress projection. | Contract aligned |
 | Progress repository | A shared mutation contract and ProgressMutationService exist; Firebase story mutations still delegate to local persistence. | Sync not implemented |
 | Offline support | Local progress persists in SharedPreferences. Firestore rules disallow client progress writes. | Local mode only |
 | Reading/vocabulary sync | Reading positions and vocabulary activity are local-repository-specific. | Missing |
@@ -63,24 +63,21 @@ authentication or progress persistence to Firebase as-is.
   authoritative progression and XP.
 - The source-of-truth contracts are documented in
   [PHASE3_FOUNDATION.md](./PHASE3_FOUNDATION.md); it supersedes stale
-  pre-Phase-2.6 repository/schema statements in this roadmap.
+  pre-Phase-2.7 repository/schema statements in this roadmap.
 
 ### Backend foundations and gaps
 
-- `submitAttempt` validates answers server-side and transactionally updates
-  `users/{uid}.totalXp`, `users/{uid}/progress/{storyId}`, and
-  `attempts/{attemptId}`.
-- `awardVocabularyBonus` uses a per-user bonus record and a transaction to
-  prevent repeat XP awards.
-- The `submitAttempt` duplicate-attempt lookup occurs before its transaction.
-  Concurrent requests with the same attempt ID should be made race-safe by
-  checking/creating the idempotency record within the transaction.
-- Chapter unlock mapping is hard-coded in the function. Before expanding
-  content, use canonical chapter metadata or a validated progression service
-  so new stories do not require fragile client/server ID assumptions.
-- Current Firestore rules and indexes cover existing user/progress/attempt
-  reads, but no emulator-based rules or function integration test suite was
-  found during this assessment.
+- `submitAttempt` validates answers and, in one transaction, creates the
+  idempotency attempt, awards XP, and updates the canonical progress projection.
+- `awardVocabularyBonus` checks/creates its per-user chapter record and awards
+  XP in one transaction.
+- Chapter unlock and story completion are derived from chapter metadata;
+  duplicated derived fields are not persisted.
+- Challenge banks use variable length, and attempts select 1–5 valid
+  questions. Seed validation and emulator tests enforce this policy.
+- Rules and Functions contract tests are in
+  `functions/test/emulator-contract.test.cjs`; see
+  [SETUP.md](./SETUP.md) for the reproducible emulator command.
 
 ## Target hybrid behavior
 
@@ -105,18 +102,21 @@ Keep the existing user and progression paths as the compatibility baseline:
 
 ```text
 users/{firebaseUid}
+  uid
   email
-  nickname
+  displayName                # optional
   preferredLanguage
-  approvalStatus
-  totalXp                  # server-authoritative
+  approvalStatus            # pending at client bootstrap
   createdAt
+  totalXp                   # server-maintained; omitted until awarded
 
 users/{firebaseUid}/progress/{storyId}
   storyId
   completedChapterIds
-  currentUnlockedChapterId
+  projectionVersion
   updatedAt
+
+# storyCompleted and nextUnlockedChapter are derived, not stored
 
 attempts/{operationId}
   userId
@@ -129,7 +129,8 @@ attempts/{operationId}
   correctAnswers
   xpAwarded
   passed
-  nextChapterId
+  nextUnlockedChapter
+  storyCompleted
   attemptedAt
 
 users/{firebaseUid}/vocabularyBonuses/{chapterId}

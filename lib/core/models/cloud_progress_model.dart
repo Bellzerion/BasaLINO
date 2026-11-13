@@ -22,6 +22,7 @@ class CloudProgress extends Equatable {
     required String uid,
     required Map<String, dynamic>? profile,
     required Iterable<Map<String, dynamic>> storyProgress,
+    required Iterable<Map<String, dynamic>> chapterMetadata,
   }) {
     if (profile?['uid'] is String && profile!['uid'] != uid) {
       throw const FormatException('Progress UID does not match its document.');
@@ -29,15 +30,33 @@ class CloudProgress extends Equatable {
 
     var storiesCompleted = 0;
     var chaptersCompleted = 0;
-    var vocabularyPracticed = 0;
     DateTime? lastUpdated = _readDateTime(
       profile?['updatedAt'] ?? profile?['createdAt'],
     );
+    final chaptersByStory = <String, Set<String>>{};
+    for (final chapter in chapterMetadata) {
+      final storyId = chapter['storyId'];
+      final chapterId = chapter['id'];
+      if (storyId is String && chapterId is String) {
+        chaptersByStory.putIfAbsent(storyId, () => <String>{}).add(chapterId);
+      }
+    }
+
     for (final story in storyProgress) {
-      if (story['isStoryCompleted'] == true) storiesCompleted++;
+      final storyId = story['storyId'];
       final completed = story['completedChapterIds'];
-      if (completed is List) chaptersCompleted += completed.length;
-      vocabularyPracticed += _readInt(story['vocabularyWordsPracticed']);
+      final completedIds = completed is List
+          ? completed.whereType<String>().toSet()
+          : <String>{};
+      chaptersCompleted += completedIds.length;
+      final storyChapterIds = storyId is String
+          ? chaptersByStory[storyId]
+          : null;
+      if (storyChapterIds != null &&
+          storyChapterIds.isNotEmpty &&
+          storyChapterIds.every(completedIds.contains)) {
+        storiesCompleted++;
+      }
       final updatedAt = _readDateTime(story['updatedAt']);
       if (updatedAt != null &&
           (lastUpdated == null || updatedAt.isAfter(lastUpdated))) {
@@ -50,18 +69,18 @@ class CloudProgress extends Equatable {
       xp: _readInt(profile?['totalXp']),
       storiesCompleted: storiesCompleted,
       chaptersCompleted: chaptersCompleted,
-      vocabularyPracticed: vocabularyPracticed,
+      vocabularyPracticed: 0,
       lastUpdated: lastUpdated,
     );
   }
-
-  static int _readInt(Object? value) => value is num ? value.toInt() : 0;
 
   static DateTime? _readDateTime(Object? value) {
     if (value is Timestamp) return value.toDate();
     if (value is DateTime) return value;
     return null;
   }
+
+  static int _readInt(Object? value) => value is int && value >= 0 ? value : 0;
 
   @override
   List<Object?> get props => [

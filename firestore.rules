@@ -18,21 +18,22 @@ service cloud.firestore {
       allow read: if isOwner(userId);
       allow create: if isOwner(userId)
                     && request.resource.data.keys().hasAll([
-                      'uid', 'email', 'nickname', 'preferredLanguage',
-                      'approvalStatus', 'totalXp', 'createdAt'
+                      'uid', 'email', 'preferredLanguage',
+                      'approvalStatus', 'createdAt'
                     ])
                     && request.resource.data.keys().hasOnly([
-                      'uid', 'email', 'nickname', 'preferredLanguage',
-                      'approvalStatus', 'totalXp', 'createdAt'
+                      'uid', 'email', 'displayName', 'preferredLanguage',
+                      'approvalStatus', 'createdAt'
                     ])
                     && request.resource.data.uid == userId
                     && request.resource.data.email is string
                     && request.resource.data.email == request.auth.token.email
-                    && request.resource.data.nickname is string
+                    && (!('displayName' in request.resource.data)
+                        || (request.resource.data.displayName is string
+                            && request.resource.data.displayName.size() > 0
+                            && request.resource.data.displayName.size() <= 80))
                     && request.resource.data.preferredLanguage in ['en', 'tl', 'bik']
-                    && request.resource.data.approvalStatus == 'approved'
-                    && request.resource.data.totalXp is int
-                    && request.resource.data.totalXp == 0
+                    && request.resource.data.approvalStatus == 'pending'
                     && request.resource.data.createdAt == request.time;
       allow update, delete: if false;
     }

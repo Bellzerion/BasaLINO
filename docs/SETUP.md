@@ -34,5 +34,26 @@ write cloud progress.
 
 Apply `firestore.rules` when deploying or using the emulator. Rules allow a
 signed-in user to read only their own profile and progress documents. Profile
-creation is limited to the canonical bootstrap contract; profile updates,
-deletes, and client progress writes are denied.
+bootstrap creates a pending profile; approval changes and progress writes are
+server-only.
+
+## Contract emulator tests
+
+Install the Functions package dependencies once:
+
+```bash
+npm --prefix functions install
+```
+
+Run the Functions build and contract tests with Auth, Firestore, and Functions
+emulators:
+
+```bash
+npm --prefix functions run build
+firebase emulators:exec --project demo-basalino --only auth,firestore,functions "npm --prefix functions run test:emulator"
+```
+
+The suite checks profile validation/ownership, pending approval enforcement,
+variable-length question submission, canonical progress reads/projections,
+concurrent attempt idempotency, and one-time vocabulary bonus awards. It uses
+only emulator data and does not write to a production Firebase project.

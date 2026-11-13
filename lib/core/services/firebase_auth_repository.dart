@@ -52,7 +52,7 @@ class FirebaseAuthRepository implements AuthRepository {
       email: user.email ?? '',
       nickname: user.displayName ?? user.email?.split('@').first ?? '',
       preferredLanguage: 'en',
-      approvalStatus: ApprovalStatus.approved,
+      approvalStatus: ApprovalStatus.pending,
       createdAt: user.metadata.creationTime ?? DateTime.now(),
     );
   }

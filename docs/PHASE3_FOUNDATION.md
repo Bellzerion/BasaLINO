@@ -1,139 +1,177 @@
 # BasaLINO Phase 3 Foundation
 
-Status: Phase 2.6 contracts are in place. This document describes the current
-architecture and the constraints for future synchronization. It does not
-authorize or implement a sync queue, worker, cloud progression write, or data
-migration.
+Status: Phase 2.7 cloud contracts. This document is authoritative for cloud
+profile, progression projection, challenge-bank, and vocabulary identity
+contracts. It does not authorize or implement synchronization, a queue, an
+outbox, a worker, or local-to-cloud progress migration.
 
-## Canonical profile contract
+## Canonical profile
 
-The profile document is `users/{uid}`. `uid` must match both the Firebase Auth
-UID and the document ID.
+The profile is the `users/{uid}` document. `uid` equals the Firebase Auth UID
+and document ID.
 
-| Field | Type | Contract |
-|---|---|---|
-| `uid` | string | Firebase Auth UID |
-| `email` | string | Authenticated account email |
-| `nickname` | string | Learner display name |
-| `preferredLanguage` | string | One of `en`, `tl`, or `bik` |
-| `approvalStatus` | string | One of `pending`, `approved`, or `rejected` |
-| `totalXp` | integer | Current profile total; the Cloud Functions own cloud XP updates |
-| `createdAt` | Firestore timestamp | Set by the profile bootstrap |
+| Field | Type | Requirement and meaning | Owner |
+|---|---|---|---|
+| `uid` | string | Required; authenticated UID | Firebase Auth / server validation |
+| `email` | string | Required; must match the authenticated email on bootstrap | Firebase Auth |
+| `createdAt` | Firestore timestamp | Required; set with server timestamp | Server |
+| `approvalStatus` | string | Required; `pending`, `approved`, or `rejected` | Trusted server/admin |
+| `preferredLanguage` | string | Required; `en`, `tl`, or `bik` | User; bootstrap initializes `en` |
+| `displayName` | string | Optional display name, max 80 characters | Firebase Auth; optional profile snapshot |
+| `totalXp` | non-negative integer | Server-maintained projection; absent until the first server XP award | Cloud Functions |
 
-Profile bootstrap currently creates profiles with `approvalStatus: approved`
-and `totalXp: 0`. Firestore rules validate this bootstrap shape, the profile
-model validates the same fields, and progression Cloud Functions require an
-approved profile. This is contract alignment, not a guardian-approval flow:
-before guardian approval is a product requirement, profile approval must be
-assigned by a trusted server path rather than self-approved by profile
-bootstrap.
+`totalXp` is not accepted on client profile creation or update. Cloud
+Functions may create/update it using the server-side XP award transaction.
+No other profile fields are part of the current contract.
 
-Profile updates are currently denied by Firestore rules. Future profile
-preference events must not be used to change approval state or cloud XP.
+For read compatibility only, the profile model and Cloud Functions recognize
+the old Phase 2.6 `nickname` field when `displayName` is absent. New profile
+writers and Firestore rules do not accept or write `nickname`. This adapter is
+temporary; existing documents should be normalized by a reviewed admin
+operation before it is removed.
 
-## Canonical progress contract
+### Approval lifecycle
 
-The only canonical cloud story-progress path is:
+Client bootstrap creates a profile with `approvalStatus: pending`. Firestore
+rules require pending status at creation and deny client profile updates.
+Only a trusted admin/server process may transition status to `approved` or
+`rejected`. `submitAttempt` and `awardVocabularyBonus` validate the complete
+profile contract and require `approved`.
+
+There is not yet a guardian-consent workflow. Existing Phase 2.6 profiles may
+contain `approved` from the old client-writable bootstrap; audit those legacy
+approvals before treating them as guardian-approved. The compatibility reader
+does not convert or promote approval status.
+
+Firebase auth state hydrates approval and preferred language from this profile
+contract; it must not infer approval from successful Firebase authentication.
+
+## Canonical progress storage and projection
+
+The only cloud story-progress path is:
 
 ```text
 users/{uid}/progress/{storyId}
 ```
 
-The existing Cloud Function writes `storyId`, `completedChapterIds`,
-`currentUnlockedChapterId`, and `updatedAt`. Readers must not interpret a root
-`progress/{uid}` collection as an alternate source. The client rules allow
-owner reads and deny client writes. Attempts remain at `attempts/{attemptId}`
-and are written by trusted backend logic.
+Client rules allow only owner reads and deny client writes. Trusted
+`submitAttempt` writes the projection. Root `progress/{uid}` is not a valid
+path. Quiz attempt records remain at `attempts/{attemptId}`. Vocabulary bonus
+deduplication records remain at
+`users/{uid}/vocabularyBonuses/{chapterId}`.
 
-The local `ProgressRepository` contract covers XP, attempts, chapter/story
-completion, quiz snapshots, reading positions, vocabulary activities, and
-vocabulary bonus records. The active local implementation persists story
-progress, attempts, snapshots, reading positions, and vocabulary activity in
-`basalino.progress.v1`; XP and one-time vocabulary bonus chapter IDs retain
-their existing per-user SharedPreferences keys. Legacy progress documents
-remain readable; Phase 2.6 does not migrate stored progress.
+The authoritative story-progress document contains exactly:
 
-`isStoryCompleted` is represented locally and accepted by the progress model.
-The current quiz Cloud Function does not write that field. Cloud story
-completion should be derived from authoritative chapter metadata or added to
-the server contract in a separately reviewed backend change; clients must not
-claim an authoritative cloud completion based solely on local state.
+| Field | Type | Meaning |
+|---|---|---|
+| `storyId` | string | Must match the document ID |
+| `completedChapterIds` | string array | Chapters accepted by the server |
+| `updatedAt` | Firestore timestamp | Server write time |
+| `projectionVersion` | integer | Current projection schema version, `1` |
 
-## Progression ownership
+`storyCompleted` and `nextUnlockedChapter` are derived, not persisted.
+Derivation uses the canonical `chapters` collection (`storyId` and unique
+`orderIndex`): sort chapters by `orderIndex`, find the first chapter not in
+`completedChapterIds` as `nextUnlockedChapter`, and consider the story complete
+only when every known chapter is completed. Returned attempt results expose
+these derived values; the cloud reader derives the in-memory local-compatible
+model the same way.
 
-`AuthRepository` owns identity operations only: sign-in, registration,
-sign-out, and auth-state observation. It does not award XP or mutate learner
-progress.
+Documents written before projection version 1 may omit `projectionVersion`
+and contain the old `currentUnlockedChapterId`. Readers treat those as
+projection version 0, ignore the persisted derived field, and derive current
+values from chapter metadata. The next successful server projection write
+normalizes that story document to version 1. No progress migration runs here.
 
-`ProgressMutationService` is the application-facing owner for progression
-mutations. It coordinates XP awards, vocabulary bonuses, attempt submission
-records, chapter/story completion, reading-position changes, and vocabulary
-activity through the `ProgressRepository` abstraction. Screens depend on the
-service and repository interfaces, not on `LocalProgressRepository`.
+`CloudProgress` derives completed story counts from chapter metadata and
+completed IDs. Vocabulary activity is not in this projection and cloud
+vocabulary counts remain zero until a separately approved cloud activity
+contract exists.
 
-The Firebase story-progress repository reads cloud progress but delegates
-mutation methods to local persistence. This is a compatibility seam, not a
-cloud write or a sync implementation.
+## Question-bank contract
 
-## Sync event contract (design only)
+Policy: **variable-length banks and attempts**. A bank must contain at least
+one question, unique non-empty question IDs, non-empty choice lists, and one
+valid answer key per question. A submitted attempt selects between 1 and 5
+distinct IDs that exist in the requested bank; the answers map must contain
+exactly those IDs. Banks may contain more than five questions; the client
+selects at most five, using repeat avoidance where possible. Banks with fewer
+than five questions are submitted at their actual length.
 
-The immutable `SyncEvent` envelope contains:
+The same contract is enforced by:
 
-```json
-{
-  "eventId": "stable-operation-id",
-  "userId": "authenticated-user-id",
-  "deviceId": "stable-installation-id",
-  "type": "quiz_attempt_submitted",
-  "aggregateId": "story-or-profile-id",
-  "occurredAt": "UTC ISO-8601 timestamp",
-  "schemaVersion": 1,
-  "payload": {}
-}
-```
+- `ChallengeModel` and local/Firebase challenge repositories
+- the Cloud Function, which checks bank/chapter/story relationships and answer
+  IDs against the private answer key
+- seed validation, which checks bank metadata, IDs, choices, and answer-key
+  coverage before writing
+- emulator integration tests
 
-Supported event types are `quiz_attempt_submitted`,
-`vocabulary_activity_recorded`, `reading_position_set`, and
-`profile_preference_changed`. `eventId` is the future idempotency key and
-must remain stable when retrying the same operation. `userId` must be checked
-against the authenticated UID by any future receiver. Payloads are immutable
-JSON-compatible values. The model performs no enqueueing, persistence, upload,
-or replay.
+Scoring remains server authoritative: 60% passes; awarded XP remains 10 per
+correct answer plus 5 for a perfect score. The bank size does not change the
+formula.
+
+## Transaction and idempotency contract
+
+`attemptId` is the stable document ID at `attempts/{attemptId}`. The function
+reads the attempt document inside the same Firestore transaction that reads
+the profile/progression and creates the attempt, increments XP, and updates
+the projection. Firestore transaction retries serialize concurrent requests.
+If the ID already belongs to this user, the function returns the stored result
+with zero additional XP; if it belongs to another user, the request is denied.
+
+Vocabulary bonus identity is the chapter-specific document
+`users/{uid}/vocabularyBonuses/{chapterId}`. The function checks/creates this
+document and increments profile XP in one transaction. Replays return no
+additional award.
+
+Profile approval, challenge bank, answer key, chapter metadata, current
+projection, attempt ID, and XP effects are validated/checked before any
+transaction writes. Admin SDK writes bypass Firestore client rules; tests
+therefore cover both rules and Functions Emulator behavior.
 
 ## Vocabulary identity
 
-Every bundled vocabulary hint has a `vocabularyId` that is shared across
-translations of the same chapter concept. Vocabulary activity records carry
-that ID in addition to the display word and language code. Mastery aggregation
-should key by `vocabularyId`, not by a translated word. IDs are content
-identifiers and must remain stable when translations or definitions are
-edited. Legacy hints without an ID receive a compatibility identifier and
-must be assigned a canonical ID before they participate in cross-language
-mastery.
+Bundled vocabulary hints carry stable `vocabularyId` values shared across
+translations of the same concept. Vocabulary activity records carry that ID
+alongside the localized word and language. Future mastery must key by
+`vocabularyId`, not translated text. IDs are stable content identifiers and
+must not change when a translation or definition is edited. This phase adds
+no mastery aggregation or cloud vocabulary write.
 
-## Future synchronization assumptions
+## Cloud field ownership
 
-- Local repositories remain the active data source in local mode.
-- Preserve local write-first behavior for reading position and vocabulary
-  activity; do not silently fall back to another identity when cloud access
-  fails.
-- Quiz grading, accepted chapter completion, unlocks, and authoritative XP
-  remain server-owned for Firebase accounts.
-- Use stable operation IDs and server-side idempotency before retryable writes
-  are enabled.
-- Merge vocabulary activity by `vocabularyId` and deduplicated operation ID;
-  merge reading positions with a documented deterministic rule.
-- Do not merge XP totals by summing device snapshots.
-- Any profile-preference updates require an explicit allowed-field policy;
-  approval and XP remain server-controlled.
-- Queue storage, retry policy, retention, conflict resolution, migrations,
-  and sync-worker behavior are intentionally undecided for implementation and
-  must be reviewed before Phase 3.
+| Cloud field/data | Owner |
+|---|---|
+| Profile `uid`, `email` | Firebase Auth identity, verified by server/rules |
+| Profile `createdAt` | Server timestamp |
+| Profile `approvalStatus` | Trusted admin/server only |
+| Profile `preferredLanguage` | User preference; client bootstrap only for now |
+| Profile `displayName` | Firebase Auth; optional profile snapshot |
+| Profile `totalXp` | Cloud Function transaction |
+| Progress `storyId`, `completedChapterIds`, `updatedAt`, `projectionVersion` | Cloud Function projection |
+| `storyCompleted`, `nextUnlockedChapter` | Derived by readers/functions from canonical chapter metadata; never stored |
+| Attempt score, pass, XP, and timestamp | Cloud Function |
+| Vocabulary bonus record and XP | Cloud Function transaction |
+| Challenge bank and translations | Content/seed process |
+| Challenge answer keys | Content/seed process; server-only reads |
+| Legacy `nickname` | Existing Phase 2.6 data only; read-compatible, no new writer |
 
-## Phase 3 entry gate
+## Phase 3 prerequisites
 
-Before enabling sync, validate the profile and progress contracts against
-Firestore rules and Cloud Functions, define authoritative story-completion
-semantics, assign stable device IDs, design durable idempotency, and test
-local-data preservation across sign-in, offline, retry, and multi-device
-scenarios. No cloud progression writes are enabled by Phase 2.6.
+- Audit/reset legacy approval statuses that were client-created as approved;
+  implement the actual guardian-consent lifecycle.
+- Normalize legacy profile `nickname` documents to optional `displayName`.
+- Define server-generated chapter IDs/order metadata and ensure every story
+  has unique contiguous-or-documented `orderIndex` values.
+- Keep server transactions and idempotency IDs authoritative when any future
+  offline operation replay is introduced.
+- Design a separate vocabulary-activity cloud contract before syncing mastery.
+- Define preference update rules, stable device identity, queue retention,
+  failure handling, and cross-device conflict behavior.
+- Validate the current contracts on the emulators and supported platforms
+  before enabling any Phase 3 writes.
+
+No synchronization queue, outbox, worker, retry system, connectivity monitor,
+local progress migration, or gameplay cloud-write path is implemented by
+Phase 2.7.

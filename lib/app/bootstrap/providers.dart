@@ -12,10 +12,14 @@ import '../../core/services/local_challenge_repository.dart';
 import '../../core/services/local_progress_repository.dart';
 import '../../core/models/user_model.dart';
 import '../../core/services/progress_mutation_service.dart';
+import '../../core/services/firebase_profile_repository.dart';
 
 // Repositories
 final authModeProvider = Provider<AuthMode>((ref) => authMode);
 final dataModeProvider = Provider<DataMode>((ref) => dataMode);
+final firebaseProfileRepositoryProvider = Provider<FirebaseProfileRepository>(
+  (ref) => FirebaseProfileRepository(),
+);
 
 final localAuthRepositoryProvider = Provider<LocalAuthRepository>((ref) {
   return LocalAuthRepository();
@@ -55,7 +59,25 @@ final progressMutationServiceProvider = Provider<ProgressMutationService>((ref) 
 // Auth state stream
 final authStateProvider = StreamProvider<UserModel?>((ref) {
   final repo = ref.watch(authRepositoryProvider);
-  return repo.authStateChanges;
+  final mode = ref.watch(authModeProvider);
+  if (mode != AuthMode.firebase || repo is! FirebaseAuthRepository) {
+    return repo.authStateChanges;
+  }
+
+  final profiles = ref.watch(firebaseProfileRepositoryProvider);
+  return repo.authStateChanges.asyncMap((user) async {
+    if (user == null) return null;
+    await profiles.createProfileIfMissing(uid: user.uid, email: user.email);
+    final profile = await profiles.getProfile(user.uid);
+    if (profile == null) {
+      throw StateError('Authenticated user profile could not be loaded.');
+    }
+    return user.copyWith(
+      nickname: profile.displayName ?? user.nickname,
+      preferredLanguage: profile.preferredLanguage,
+      approvalStatus: profile.approvalStatus,
+    );
+  });
 });
 
 typedef AuthRoutingState = ({

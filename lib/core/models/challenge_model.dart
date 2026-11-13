@@ -55,6 +55,8 @@ class QuestionOptionModel extends Equatable {
 }
 
 class ChallengeModel extends Equatable {
+  static const maxAttemptQuestionCount = 5;
+
   const ChallengeModel({
     required this.id,
     required this.chapterId,
@@ -71,13 +73,21 @@ class ChallengeModel extends Equatable {
 
   factory ChallengeModel.fromMap(String id, Map<String, dynamic> map) {
     final rawQuestions = map['questions'] as List? ?? [];
+    final questions = rawQuestions
+        .map((e) => ChallengeQuestionModel.fromMap(e as Map<String, dynamic>))
+        .toList();
+    final questionIds = questions.map((question) => question.id).toList();
+    if (questions.isEmpty ||
+        questionIds.any((questionId) => questionId.trim().isEmpty) ||
+        questionIds.toSet().length != questionIds.length ||
+        questions.any((question) => question.options.isEmpty)) {
+      throw const FormatException('Challenge bank does not match its contract.');
+    }
     return ChallengeModel(
       id: id,
       chapterId: map['chapterId'] as String? ?? '',
       languageCode: map['languageCode'] as String? ?? 'en',
-      questions: rawQuestions
-          .map((e) => ChallengeQuestionModel.fromMap(e as Map<String, dynamic>))
-          .toList(),
+      questions: questions,
       version: map['version'] as int? ?? 1,
     );
   }

@@ -17,12 +17,16 @@ class FirebaseProgressRepository {
     final userReference = _firestore.collection('users').doc(uid);
     final profile = await userReference.get();
     final storyProgress = await userReference.collection('progress').get();
+    final chapters = await _firestore.collection('chapters').get();
     if (!profile.exists && storyProgress.docs.isEmpty) return null;
     return CloudProgress.fromCanonicalDocuments(
       uid: uid,
       profile: profile.data(),
       storyProgress: storyProgress.docs
           .map((document) => {...document.data(), 'storyId': document.id})
+          .toList(),
+      chapterMetadata: chapters.docs
+          .map((document) => {...document.data(), 'id': document.id})
           .toList(),
     );
   }
@@ -38,8 +42,7 @@ class FirebaseStoryProgressRepository implements ProgressRepository {
     FirebaseFirestore? firestore,
     ProgressRepository? localProgress,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
-       _localProgress =
-           localProgress ?? LocalProgressRepository(_storyRepo);
+       _localProgress = localProgress ?? LocalProgressRepository(_storyRepo);
 
   @override
   Future<int> getTotalXp(String userId) => _localProgress.getTotalXp(userId);
@@ -104,10 +107,7 @@ class FirebaseStoryProgressRepository implements ProgressRepository {
   Future<void> recordStoryCompletion({
     required String userId,
     required String storyId,
-  }) => _localProgress.recordStoryCompletion(
-    userId: userId,
-    storyId: storyId,
-  );
+  }) => _localProgress.recordStoryCompletion(userId: userId, storyId: storyId);
 
   @override
   Future<double?> getReadingPosition({
@@ -204,14 +204,16 @@ class FirebaseStoryProgressRepository implements ProgressRepository {
         .get();
 
     if (!doc.exists) {
+      final chapters = await _storyRepo.getChapters(storyId)
+        ..sort((left, right) => left.orderIndex.compareTo(right.orderIndex));
       return StoryProgressModel(
         storyId: storyId,
         completedChapterIds: const [],
-        currentUnlockedChapterId: '${storyId}_ch1',
+        currentUnlockedChapterId: chapters.firstOrNull?.id,
       );
     }
 
-    return StoryProgressModel.fromMap(doc.data()!);
+    return _readProgressDocument(storyId, doc.data()!);
   }
 
   @override
@@ -222,9 +224,56 @@ class FirebaseStoryProgressRepository implements ProgressRepository {
         .collection('progress')
         .get();
 
-    return snap.docs
-        .map((doc) => StoryProgressModel.fromMap(doc.data()))
-        .toList();
+    return Future.wait(
+      snap.docs.map((doc) => _readProgressDocument(doc.id, doc.data())),
+    );
+  }
+
+  Future<StoryProgressModel> _readProgressDocument(
+    String storyId,
+    Map<String, dynamic> data,
+  ) async {
+    final storedStoryId = data['storyId'];
+    final rawCompleted = data['completedChapterIds'];
+    final rawVersion = data['projectionVersion'];
+    final version = rawVersion ?? 0;
+    if (storedStoryId != storyId ||
+        rawCompleted is! List ||
+        rawCompleted.any((chapterId) => chapterId is! String) ||
+        version is! int ||
+        (version != 0 && version != 1)) {
+      throw const FormatException(
+        'Cloud story progress does not match the supported projection contract.',
+      );
+    }
+
+    final completed = rawCompleted.cast<String>().toSet();
+    final chapters = await _storyRepo.getChapters(storyId)
+      ..sort((left, right) => left.orderIndex.compareTo(right.orderIndex));
+    final chapterIds = chapters.map((chapter) => chapter.id).toSet();
+    if (completed.difference(chapterIds).isNotEmpty) {
+      throw const FormatException(
+        'Cloud story progress contains an unknown chapter.',
+      );
+    }
+    final nextUnlockedChapterId = chapters
+        .map((chapter) => chapter.id)
+        .where((chapterId) => !completed.contains(chapterId))
+        .firstOrNull;
+
+    return StoryProgressModel(
+      storyId: storyId,
+      completedChapterIds: chapters
+          .map((chapter) => chapter.id)
+          .where(completed.contains)
+          .toList(),
+      currentUnlockedChapterId: nextUnlockedChapterId,
+      isStoryCompleted:
+          chapters.isNotEmpty &&
+          chapters.every((chapter) => completed.contains(chapter.id)),
+      updatedAt: StoryProgressModel.fromMap(data).updatedAt,
+      projectionVersion: version,
+    );
   }
 
   @override

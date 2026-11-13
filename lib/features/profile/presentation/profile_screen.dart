@@ -18,8 +18,8 @@ class ProfileScreen extends ConsumerWidget {
     final cloudReadsEnabled = ref.watch(dataModeProvider) == DataMode.cloud;
     final cloudData = cloudDataAsync.asData?.value;
     final cloudProfile = cloudData?.profile;
-    final displayName = cloudProfile?.nickname.isNotEmpty == true
-        ? cloudProfile!.nickname
+    final displayName = cloudProfile?.displayName?.isNotEmpty == true
+        ? cloudProfile!.displayName!
         : user?.nickname ?? context.l10n.profileLearner;
     final email = cloudProfile?.email.isNotEmpty == true
         ? cloudProfile!.email

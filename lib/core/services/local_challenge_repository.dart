@@ -47,15 +47,23 @@ class LocalChallengeRepository implements ChallengeRepository {
     }
     if (match.isEmpty) return null;
     final bank = ChallengeModel.fromMap(match['id'] as String, match);
-    if (bank.questions.length <= 5) return bank;
+    if (bank.questions.length <= ChallengeModel.maxAttemptQuestionCount) {
+      return bank;
+    }
 
     final excluded = excludedQuestionIds.toSet();
     final eligible = bank.questions.where((q) => !excluded.contains(q.id)).toList();
     final fallback = bank.questions.where((q) => excluded.contains(q.id)).toList();
     eligible.shuffle(Random());
     fallback.shuffle(Random());
-    final selected = <ChallengeQuestionModel>[...eligible.take(5)];
-    if (selected.length < 5) selected.addAll(fallback.take(5 - selected.length));
+    final selected = <ChallengeQuestionModel>[
+      ...eligible.take(ChallengeModel.maxAttemptQuestionCount),
+    ];
+    if (selected.length < ChallengeModel.maxAttemptQuestionCount) {
+      selected.addAll(
+        fallback.take(ChallengeModel.maxAttemptQuestionCount - selected.length),
+      );
+    }
 
     final shuffled = selected
         .map((question) => ChallengeQuestionModel(

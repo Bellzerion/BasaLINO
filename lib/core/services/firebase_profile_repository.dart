@@ -38,10 +38,11 @@ class FirebaseProfileRepository {
       transaction.set(reference, {
         'uid': uid,
         'email': email,
-        'nickname': _auth.currentUser?.displayName ?? email.split('@').first,
+        if (_auth.currentUser?.displayName case final String displayName
+            when displayName.isNotEmpty)
+          'displayName': displayName,
         'preferredLanguage': 'en',
-        'approvalStatus': 'approved',
-        'totalXp': 0,
+        'approvalStatus': 'pending',
         'createdAt': FieldValue.serverTimestamp(),
       });
     });

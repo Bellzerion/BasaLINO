@@ -7,14 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/config/auth_mode.dart';
 import '../../core/models/cloud_data_state.dart';
 import '../../core/services/firebase_progress_repository.dart';
-import '../../core/services/firebase_profile_repository.dart';
 import 'providers.dart';
 
 const _cloudReadTimeout = Duration(seconds: 10);
-
-final firebaseProfileRepositoryProvider = Provider<FirebaseProfileRepository>(
-  (ref) => FirebaseProfileRepository(),
-);
 
 final firebaseProgressRepositoryProvider = Provider<FirebaseProgressRepository>(
   (ref) => FirebaseProgressRepository(),

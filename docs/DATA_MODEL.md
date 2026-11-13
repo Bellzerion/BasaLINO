@@ -5,16 +5,20 @@ This document outlines the Firestore collections and document schema for BasaLIN
 ---
 
 ### 1. `users` Collection
-Stores learner profile, role, approval state, and total accumulated XP.
+Stores the canonical learner profile and the server-maintained XP projection.
 
 - **Document ID**: `uid` (Firebase Auth UID)
 - **Fields**:
+  - `uid` (string): Must match the document ID.
   - `email` (string): Registered email address.
-  - `nickname` (string): In-app display name.
+  - `displayName` (string, optional): Firebase Auth display name.
   - `preferredLanguage` (string): `'en' | 'tl' | 'bik'`.
-  - `approvalStatus` (string): `'pending' | 'approved' | 'rejected'`. Current profile bootstrap sets `approved`; this is not a guardian-approval flow.
-  - `totalXp` (integer): Cloud XP total updated by trusted Cloud Functions.
+  - `approvalStatus` (string): `'pending' | 'approved' | 'rejected'`. Client bootstrap must use `pending`; trusted server/admin logic owns transitions.
   - `createdAt` (timestamp): Account creation timestamp.
+  - `totalXp` (integer, server-maintained): Added/updated by trusted Cloud Functions; omitted from client profile creation.
+
+Legacy profiles may still contain `nickname`; it is read as `displayName` for
+compatibility only. New writers do not use it.
 
 ---
 
@@ -60,12 +64,15 @@ Holds localized narrative text, paragraphs, and vocabulary hints.
 ---
 
 ### 5. `challenges` Collection
-Reading comprehension questions and choices.
+Reading comprehension question banks. A bank may have any positive number of
+questions; a submitted attempt contains 1–5 unique question IDs selected from
+that bank.
 
 - **Document ID**: `challengeId` (e.g. `'chal_ibalong_ch1_en'`)
 - **Fields**:
   - `chapterId` (string)
   - `languageCode` (string)
+  - `version` (integer, defaults to 1 in readers)
   - `questions` (array of objects):
     - `id` (string)
     - `questionText` (string)
@@ -78,7 +85,7 @@ Protected answer keys. **Clients have zero read/write access.**
 
 - **Document ID**: `challengeId`
 - **Fields**:
-  - `answers` (map): Key-value pair of question ID to correct answer text: `{ "q1": "Baltog", "q2": "Tandayag the wild boar" }`
+  - `answers` (map): Question ID to correct choice ID (for example, `{ "q1": "b" }`).
 
 ---
 
@@ -88,13 +95,13 @@ Canonical path: `/users/{uid}/progress/{storyId}`. There is no root progress col
 - **Fields**:
   - `storyId` (string)
   - `completedChapterIds` (array of strings)
-  - `currentUnlockedChapterId` (string)
-  - `isStoryCompleted` (boolean, optional until maintained by trusted backend logic)
   - `updatedAt` (timestamp)
+  - `projectionVersion` (integer; current version is `1`)
 
-The current Cloud Function writes the first four fields except
-`isStoryCompleted`; clients must not treat a locally derived completion flag
-as authoritative cloud state.
+`storyCompleted` and `nextUnlockedChapter` are derived from completed IDs and
+the canonical chapter order. They are never persisted in the progress
+projection. Older documents without `projectionVersion` are read as version
+zero and normalized on the next successful server projection write.
 
 ---
 
@@ -114,5 +121,5 @@ Audit log of submitted quizzes and scoring results.
   - `attemptedAt` (timestamp)
 
 See [PHASE3_FOUNDATION.md](./PHASE3_FOUNDATION.md) for the canonical
-profile/progress contracts, repository ownership, event envelope, and
-vocabulary identity rules.
+profile/progress contracts, ownership, approval lifecycle, question-bank
+policy, idempotency, and vocabulary identity rules.

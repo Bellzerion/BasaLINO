@@ -1,9 +1,12 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:uuid/uuid.dart';
+
 import 'dart:math';
+
 import '../models/challenge_model.dart';
 import '../models/attempt_result_model.dart';
 import '../services/challenge_repository.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseChallengeRepository implements ChallengeRepository {
@@ -14,8 +17,8 @@ class FirebaseChallengeRepository implements ChallengeRepository {
   FirebaseChallengeRepository({
     FirebaseFirestore? firestore,
     FirebaseFunctions? functions,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _functions = functions ?? FirebaseFunctions.instance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _functions = functions ?? FirebaseFunctions.instance;
 
   @override
   Future<ChallengeModel?> getChallenge({
@@ -32,7 +35,10 @@ class FirebaseChallengeRepository implements ChallengeRepository {
         .get();
 
     if (snap.docs.isNotEmpty) {
-      return _select(ChallengeModel.fromMap(snap.docs.first.id, snap.docs.first.data()), excludedQuestionIds);
+      return _select(
+        ChallengeModel.fromMap(snap.docs.first.id, snap.docs.first.data()),
+        excludedQuestionIds,
+      );
     }
 
     // Fallback to English challenge
@@ -44,21 +50,44 @@ class FirebaseChallengeRepository implements ChallengeRepository {
         .get();
 
     if (fallbackSnap.docs.isNotEmpty) {
-      return _select(ChallengeModel.fromMap(fallbackSnap.docs.first.id, fallbackSnap.docs.first.data()), excludedQuestionIds);
+      return _select(
+        ChallengeModel.fromMap(
+          fallbackSnap.docs.first.id,
+          fallbackSnap.docs.first.data(),
+        ),
+        excludedQuestionIds,
+      );
     }
 
     return null;
   }
 
   ChallengeModel _select(ChallengeModel bank, List<String> excludedIds) {
-    if (bank.questions.length <= 5) return bank;
+    if (bank.questions.length <= ChallengeModel.maxAttemptQuestionCount) {
+      return bank;
+    }
     final excluded = excludedIds.toSet();
-    final eligible = bank.questions.where((q) => !excluded.contains(q.id)).toList()..shuffle(Random());
-    final fallback = bank.questions.where((q) => excluded.contains(q.id)).toList()..shuffle(Random());
-    final remaining = (5 - eligible.length).clamp(0, 5) as int;
-    final questions = [...eligible.take(5), ...fallback.take(remaining)];
+    final eligible =
+        bank.questions.where((q) => !excluded.contains(q.id)).toList()
+          ..shuffle(Random());
+    final fallback =
+        bank.questions.where((q) => excluded.contains(q.id)).toList()
+          ..shuffle(Random());
+    final remaining = (ChallengeModel.maxAttemptQuestionCount - eligible.length)
+        .clamp(0, ChallengeModel.maxAttemptQuestionCount)
+        .toInt();
+    final questions = [
+      ...eligible.take(ChallengeModel.maxAttemptQuestionCount),
+      ...fallback.take(remaining),
+    ];
     questions.shuffle(Random());
-    return ChallengeModel(id: bank.id, chapterId: bank.chapterId, languageCode: bank.languageCode, version: bank.version, questions: questions);
+    return ChallengeModel(
+      id: bank.id,
+      chapterId: bank.chapterId,
+      languageCode: bank.languageCode,
+      version: bank.version,
+      questions: questions,
+    );
   }
 
   @override

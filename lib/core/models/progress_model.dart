@@ -1,4 +1,5 @@
 // lib/core/models/progress_model.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 class StoryProgressModel extends Equatable {
@@ -7,12 +8,16 @@ class StoryProgressModel extends Equatable {
     required this.completedChapterIds,
     required this.currentUnlockedChapterId,
     this.isStoryCompleted = false,
+    this.updatedAt,
+    this.projectionVersion = 0,
   });
 
   final String storyId;
   final List<String> completedChapterIds;
   final String? currentUnlockedChapterId;
   final bool isStoryCompleted;
+  final DateTime? updatedAt;
+  final int projectionVersion;
 
   int get completedCount => completedChapterIds.length;
 
@@ -23,7 +28,16 @@ class StoryProgressModel extends Equatable {
           List<String>.from(map['completedChapterIds'] as List? ?? []),
       currentUnlockedChapterId: map['currentUnlockedChapterId'] as String?,
       isStoryCompleted: map['isStoryCompleted'] as bool? ?? false,
+      updatedAt: _readDateTime(map['updatedAt']),
+      projectionVersion: map['projectionVersion'] as int? ?? 0,
     );
+  }
+
+  static DateTime? _readDateTime(Object? value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
   }
 
   @override
@@ -32,6 +46,8 @@ class StoryProgressModel extends Equatable {
     completedChapterIds,
     currentUnlockedChapterId,
     isStoryCompleted,
+    updatedAt,
+    projectionVersion,
   ];
 }
 
