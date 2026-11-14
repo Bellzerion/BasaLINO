@@ -2,17 +2,27 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:basalino/core/models/scene_annotation_model.dart';
+import 'package:basalino/core/models/scene_hotspot_model.dart';
 import 'package:basalino/core/models/vocab_hint_model.dart';
+import 'package:basalino/core/services/story_discovery_tracker.dart';
 import 'package:basalino/features/reader/widgets/chapter_scene_widget.dart';
 import 'package:basalino/features/reader/widgets/vocabulary_card.dart';
+import 'package:basalino/features/reader/presentation/story_codex_screen.dart';
 import 'package:basalino/features/reader/services/vocabulary_pronunciation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   test('chapter scene and vocabulary media references are bundled', () async {
     final chapterBytes = await rootBundle.load('assets/data/chapters.json');
     final chapters = jsonDecode(
@@ -31,15 +41,38 @@ void main() {
         addAsset(scene['gifAsset']);
         addAsset(scene['imageAssetKey']);
         addAsset(scene['soundEffectAsset']);
+        addAsset(scene['ambientAudioAsset']);
+        for (final rawHotspot in (scene['hotspots'] as List<dynamic>? ?? [])) {
+          if (rawHotspot is! Map<String, dynamic>) continue;
+          addAsset(rawHotspot['imageAsset']);
+          expect(rawHotspot['id'], isNotEmpty);
+          expect(rawHotspot['positionX'], inInclusiveRange(0, 1));
+          expect(rawHotspot['positionY'], inInclusiveRange(0, 1));
+        }
       }
 
       final translations = chapter['translations'] as Map<String, dynamic>;
-      for (final translation in translations.values) {
+      for (final translationEntry in translations.entries) {
+        final translation = translationEntry.value;
         if (translation is! Map<String, dynamic>) continue;
+        final audioFolder = switch (translationEntry.key) {
+          'en' => 'english',
+          'tl' => 'tagalog',
+          'bik' => 'bikol',
+          _ => null,
+        };
         for (final hint
             in (translation['vocabularyHints'] as List<dynamic>? ?? [])) {
           if (hint is! Map<String, dynamic>) continue;
-          addAsset(hint['audioAsset']);
+          final audioAsset = hint['audioAsset'];
+          addAsset(audioAsset);
+          if (audioAsset is String && audioFolder != null) {
+            expect(
+              audioAsset.startsWith('assets/audio/$audioFolder/'),
+              isTrue,
+              reason: 'Pronunciation audio must match ${translationEntry.key}.',
+            );
+          }
           addAsset(hint['illustrationAsset']);
         }
       }
@@ -105,6 +138,49 @@ void main() {
         'vocabularyContext': 'sumabog means to erupt.',
       });
     });
+
+    test('round-trips optional hotspots and ambient audio', () {
+      final scene = SceneAnnotationModel.fromMap({
+        'paragraphIndex': 0,
+        'ambientAudioAsset': 'assets/audio/ambience/forest.mp3',
+        'hotspots': [
+          {
+            'id': 'mayon-volcano',
+            'title': 'Mount Mayon',
+            'description': 'A volcano in Albay.',
+            'positionX': 0.55,
+            'positionY': 0.26,
+            'vocabularyIds': ['mayon-ch3-erupts'],
+            'category': 'location',
+          },
+        ],
+      });
+
+      expect(scene.ambientAudioAsset, 'assets/audio/ambience/forest.mp3');
+      expect(scene.hotspots.single.id, 'mayon-volcano');
+      expect(scene.hotspots.single.vocabularyIds, ['mayon-ch3-erupts']);
+      expect(scene.toMap()['hotspots'], [
+        {
+          'id': 'mayon-volcano',
+          'title': 'Mount Mayon',
+          'description': 'A volcano in Albay.',
+          'positionX': 0.55,
+          'positionY': 0.26,
+          'vocabularyIds': ['mayon-ch3-erupts'],
+          'category': 'location',
+        },
+      ]);
+    });
+  });
+
+  test('story discovery tracking persists unique IDs locally', () async {
+    final tracker = StoryDiscoveryTracker();
+    await tracker.markDiscovered('mayon/mayon-magayon');
+    await tracker.markDiscovered('mayon/mayon-magayon');
+    await tracker.markDiscovered('ibalong/ibalong-baltog');
+
+    final restored = await StoryDiscoveryTracker().getDiscoveredIds();
+    expect(restored, {'mayon/mayon-magayon', 'ibalong/ibalong-baltog'});
   });
 
   test('vocabulary model preserves an optional recorded pronunciation', () {
@@ -282,6 +358,105 @@ void main() {
     expect(controller.offset, 350);
     controller.dispose();
   });
+
+  testWidgets('scene hotspots open learning cards and link vocabulary', (
+    tester,
+  ) async {
+    final tracker = StoryDiscoveryTracker();
+    const hotspot = SceneHotspotModel(
+      id: 'mayon-magayon',
+      title: 'Magayon',
+      description: "Makusog's daughter, remembered for her kindness.",
+      positionX: 0.43,
+      positionY: 0.45,
+      category: 'character',
+      role: "Chieftain's daughter",
+      imageAsset: 'assets/images/mayon/magayon_introduction.svg',
+      vocabularyIds: ['mayon-ch1-grace'],
+      educationalNote: 'Magayon means beautiful in Bikol.',
+    );
+    final hint = VocabHintModel(
+      vocabularyId: 'mayon-ch1-grace',
+      word: 'grace',
+      definition: 'Elegant movement or manner.',
+      englishTranslation: 'grace',
+      tagalogTranslation: 'grasya',
+    );
+    const scene = SceneAnnotationModel(
+      paragraphIndex: 0,
+      title: 'Meet Magayon',
+      description: 'A story begins in Bikol.',
+      imageAssetKey: 'assets/images/mayon/magayon_introduction.svg',
+      hotspots: [hotspot],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: child!,
+        ),
+        home: Scaffold(
+          body: ChapterSceneWidget(
+            scene: scene,
+            storyTitle: 'The Legend of Mount Mayon',
+            heroTag: 'scene-mayon-discovery',
+            storyId: 'mayon',
+            languageCode: 'en',
+            vocabularyHints: [hint],
+            discoveryTracker: tracker,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('Meet Magayon'));
+    await tester.pump();
+
+    expect(find.byTooltip('Magayon'), findsOneWidget);
+    expect(find.byTooltip('Play ambience'), findsNothing);
+    await tester.tap(find.byTooltip('Magayon'));
+    await tester.pump();
+
+    expect(find.text("Chieftain's daughter"), findsOneWidget);
+    expect(find.text('Magayon means beautiful in Bikol.'), findsOneWidget);
+    expect(await tracker.getDiscoveredIds(), contains('mayon/mayon-magayon'));
+
+    await tester.drag(
+      find.byType(SingleChildScrollView),
+      const Offset(0, -400),
+    );
+    await tester.pump();
+    await tester.tap(find.text('grace'));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byTooltip('Pronounce word'), findsOneWidget);
+    expect(find.text('grasya'), findsOneWidget);
+  });
+
+  testWidgets(
+    'story codex hides undiscovered details and shows unlocked cards',
+    (tester) async {
+      final tracker = StoryDiscoveryTracker();
+      await tracker.markDiscovered('mayon/mayon-magayon');
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: StoryCodexScreen(
+            storyId: 'mayon',
+            languageCode: 'en',
+            discoveryTracker: tracker,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Story Codex'), findsOneWidget);
+      expect(find.text('Magayon'), findsOneWidget);
+      expect(find.text("Chieftain's daughter"), findsOneWidget);
+      expect(find.text('Chief Makusog'), findsOneWidget);
+      expect(find.text('Discover in Mayon to unlock'), findsWidgets);
+    },
+  );
 
   testWidgets('scene viewer uses static art when reduced motion is enabled', (
     tester,

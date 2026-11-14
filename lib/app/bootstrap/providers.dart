@@ -13,6 +13,7 @@ import '../../core/services/local_progress_repository.dart';
 import '../../core/models/user_model.dart';
 import '../../core/services/progress_mutation_service.dart';
 import '../../core/services/firebase_profile_repository.dart';
+import '../../core/services/story_discovery_tracker.dart';
 
 // Repositories
 final authModeProvider = Provider<AuthMode>((ref) => authMode);
@@ -39,6 +40,10 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 final storyRepositoryProvider = Provider<StoryRepository>((ref) {
   return LocalStoryRepository();
 });
+
+final storyDiscoveryTrackerProvider = Provider<StoryDiscoveryTracker>(
+  (ref) => StoryDiscoveryTracker(),
+);
 
 final challengeRepositoryProvider = Provider<ChallengeRepository>((ref) {
   return LocalChallengeRepository();

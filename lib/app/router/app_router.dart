@@ -12,6 +12,7 @@ import '../../features/stories/presentation/home_screen.dart';
 import '../../features/stories/presentation/cleared_stories_screen.dart';
 import '../../features/stories/presentation/chapter_list_screen.dart';
 import '../../features/reader/presentation/reader_screen.dart';
+import '../../features/reader/presentation/story_codex_screen.dart';
 import '../../features/challenges/presentation/challenge_screen.dart';
 import '../../features/challenges/presentation/chapter_cleared_screen.dart';
 import '../../features/challenges/presentation/chapter_completion_screen.dart';
@@ -76,6 +77,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           final storyId = state.pathParameters['storyId']!;
           final chapterId = state.pathParameters['chapterId']!;
           return ReaderScreen(storyId: storyId, chapterId: chapterId);
+        },
+      ),
+      GoRoute(
+        path: '/story-codex/:storyId',
+        builder: (context, state) {
+          final languageCode = state.extra is String
+              ? state.extra! as String
+              : 'en';
+          return StoryCodexScreen(
+            storyId: state.pathParameters['storyId']!,
+            languageCode: languageCode,
+            discoveryTracker: ref.read(storyDiscoveryTrackerProvider),
+          );
         },
       ),
       GoRoute(

@@ -1,6 +1,8 @@
 // lib/core/models/scene_annotation_model.dart
 import 'package:equatable/equatable.dart';
 
+import 'scene_hotspot_model.dart';
+
 /// Describes an optional illustrated and/or animated moment in a story.
 class SceneAnnotationModel extends Equatable {
   const SceneAnnotationModel({
@@ -16,6 +18,8 @@ class SceneAnnotationModel extends Equatable {
     this.educationalNote,
     this.vocabularyContext,
     this.soundEffectAsset,
+    this.ambientAudioAsset,
+    this.hotspots = const [],
   });
 
   /// After which paragraph (0-based) this scene should be displayed.
@@ -36,8 +40,11 @@ class SceneAnnotationModel extends Equatable {
   final String? educationalNote;
   final String? vocabularyContext;
   final String? soundEffectAsset;
+  final String? ambientAudioAsset;
+  final List<SceneHotspotModel> hotspots;
 
   factory SceneAnnotationModel.fromMap(Map<String, dynamic> map) {
+    final rawHotspots = map['hotspots'] as List? ?? const [];
     return SceneAnnotationModel(
       paragraphIndex: map['paragraphIndex'] as int? ?? 0,
       assetKey: map['assetKey'] as String? ?? '',
@@ -51,6 +58,10 @@ class SceneAnnotationModel extends Equatable {
       educationalNote: map['educationalNote'] as String?,
       vocabularyContext: map['vocabularyContext'] as String?,
       soundEffectAsset: map['soundEffectAsset'] as String?,
+      ambientAudioAsset: map['ambientAudioAsset'] as String?,
+      hotspots: rawHotspots
+          .map((item) => SceneHotspotModel.fromMap(item as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -67,6 +78,9 @@ class SceneAnnotationModel extends Equatable {
     if (educationalNote != null) 'educationalNote': educationalNote,
     if (vocabularyContext != null) 'vocabularyContext': vocabularyContext,
     if (soundEffectAsset != null) 'soundEffectAsset': soundEffectAsset,
+    if (ambientAudioAsset != null) 'ambientAudioAsset': ambientAudioAsset,
+    if (hotspots.isNotEmpty)
+      'hotspots': hotspots.map((hotspot) => hotspot.toMap()).toList(),
   };
 
   @override
@@ -83,5 +97,7 @@ class SceneAnnotationModel extends Equatable {
     educationalNote,
     vocabularyContext,
     soundEffectAsset,
+    ambientAudioAsset,
+    hotspots,
   ];
 }

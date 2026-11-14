@@ -285,6 +285,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             scene: scene,
             storyTitle: trans.title,
             heroTag: sceneKey,
+            storyId: widget.storyId,
+            languageCode: trans.languageCode,
+            vocabularyHints: trans.vocabularyHints,
+            discoveryTracker: ref.read(storyDiscoveryTrackerProvider),
             showExplorePrompt:
                 !_hasShownSceneDiscoveryPrompt && !hasSceneInThisBuild,
             onExplorePromptShown: _markSceneDiscoveryPromptShown,
@@ -310,6 +314,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             scene: scene,
             storyTitle: trans.title,
             heroTag: sceneKey,
+            storyId: widget.storyId,
+            languageCode: trans.languageCode,
+            vocabularyHints: trans.vocabularyHints,
+            discoveryTracker: ref.read(storyDiscoveryTrackerProvider),
             showExplorePrompt:
                 !_hasShownSceneDiscoveryPrompt && !hasSceneInThisBuild,
             onExplorePromptShown: _markSceneDiscoveryPromptShown,
@@ -356,6 +364,14 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             icon: const Icon(Icons.auto_stories_rounded),
             tooltip: 'Enter storybook mode',
             onPressed: () => setState(() => _storybookMode = true),
+          ),
+          IconButton(
+          icon: const Icon(Icons.menu_book_rounded),
+          tooltip: 'Open story codex',
+          onPressed: () => context.push(
+            '/story-codex/${widget.storyId}',
+            extra: currentLang,
+          ),
           ),
           IconButton(
             icon: const Icon(Icons.text_fields),

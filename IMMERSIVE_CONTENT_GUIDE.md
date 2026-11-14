@@ -105,3 +105,39 @@ Keep sound effects short and non-essential to understanding the story.
 After adding content, run the immersive reader tests and verify every referenced
 file exists. Reduced-motion mode keeps illustrations visible and disables
 animated scene motion.
+
+## Add interactive hotspots and codex entries
+
+Add a `hotspots` array to a scene annotation. Coordinates are normalized from
+`0.0` to `1.0` across the scene image. Use a stable, story-unique `id`; learners
+unlock its codex entry when they tap the hotspot in the scene viewer.
+
+```json
+{
+  "id": "mayon-volcano",
+  "title": "Mount Mayon",
+  "description": "The volcano formed from the legend of Magayon.",
+  "positionX": 0.55,
+  "positionY": 0.26,
+  "category": "location",
+  "imageAsset": "assets/images/mayon/mountain_formation.svg",
+  "vocabularyIds": ["mayon-ch3-erupts"],
+  "educationalNote": "Mayon is an active volcano in Albay."
+}
+```
+
+Supported categories are `character`, `location`, `creature`, and `culture`.
+Character hotspots can also provide a `role`. `imageAsset` and
+`educationalNote` are optional. `vocabularyIds` must match vocabulary IDs in
+the chapter translations; matching words open the existing vocabulary card and
+pronunciation controls. The Story Codex is derived from these hotspot records,
+and discovery IDs are stored locally only. Discovery does not award XP or
+change chapter progression.
+
+## Add optional scene audio
+
+`soundEffectAsset` plays a short effect only after the learner taps its button.
+`ambientAudioAsset` adds a separate, looping ambience control inside the scene
+viewer. Ambience is off by default, never starts automatically, and stops when
+the viewer closes. Keep both fields optional and reference only bundled audio
+files.

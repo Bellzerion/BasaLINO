@@ -6,6 +6,8 @@ import 'package:lottie/lottie.dart';
 
 import '../../../app/theme/app_theme.dart';
 import '../../../core/models/scene_annotation_model.dart';
+import '../../../core/models/vocab_hint_model.dart';
+import '../../../core/services/story_discovery_tracker.dart';
 import 'scene_viewer_screen.dart';
 
 class ChapterSceneWidget extends StatefulWidget {
@@ -14,6 +16,10 @@ class ChapterSceneWidget extends StatefulWidget {
     required this.scene,
     required this.storyTitle,
     required this.heroTag,
+    this.storyId = '',
+    this.languageCode = 'en',
+    this.vocabularyHints = const [],
+    this.discoveryTracker,
     this.showExplorePrompt = false,
     this.onExplorePromptShown,
     this.storybookMode = false,
@@ -22,6 +28,10 @@ class ChapterSceneWidget extends StatefulWidget {
   final SceneAnnotationModel scene;
   final String storyTitle;
   final String heroTag;
+  final String storyId;
+  final String languageCode;
+  final List<VocabHintModel> vocabularyHints;
+  final StoryDiscoveryTracker? discoveryTracker;
   final bool showExplorePrompt;
   final VoidCallback? onExplorePromptShown;
   final bool storybookMode;
@@ -93,6 +103,10 @@ class _ChapterSceneWidgetState extends State<ChapterSceneWidget>
               scene: widget.scene,
               storyTitle: widget.storyTitle,
               heroTag: widget.heroTag,
+              storyId: widget.storyId,
+              languageCode: widget.languageCode,
+              vocabularyHints: widget.vocabularyHints,
+              discoveryTracker: widget.discoveryTracker,
             ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             FadeTransition(opacity: animation, child: child),
