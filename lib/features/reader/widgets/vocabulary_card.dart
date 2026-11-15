@@ -333,7 +333,12 @@ class _StoryVocabularyCardState extends State<StoryVocabularyCard> {
                 ),
               ],
             ),
-            if (illustration != null) ...[
+            if (hint.gifAsset?.isNotEmpty ?? false) ...[
+              _VocabGifPopWidget(
+                gifAsset: hint.gifAsset!,
+                fallbackIllustration: hint.illustrationAsset,
+              ),
+            ] else if (illustration != null) ...[
               const SizedBox(height: 4),
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
@@ -479,6 +484,154 @@ class _TranslationRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _VocabGifPopWidget extends StatefulWidget {
+  const _VocabGifPopWidget({
+    required this.gifAsset,
+    this.fallbackIllustration,
+  });
+
+  final String gifAsset;
+  final String? fallbackIllustration;
+
+  @override
+  State<_VocabGifPopWidget> createState() => _VocabGifPopWidgetState();
+}
+
+class _VocabGifPopWidgetState extends State<_VocabGifPopWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnimation;
+  late final Animation<double> _fadeAnimation;
+  Timer? _delayTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 380),
+    );
+    _scaleAnimation = Tween<double>(begin: 0.2, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutBack,
+      ),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.65, curve: Curves.easeOut),
+      ),
+    );
+
+    _delayTimer = Timer(const Duration(milliseconds: 120), () {
+      if (mounted) {
+        if (MediaQuery.disableAnimationsOf(context)) {
+          _controller.value = 1.0;
+        } else {
+          _controller.forward();
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _delayTimer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _buildFallback(BuildContext context) {
+    final fallback = widget.fallbackIllustration;
+    if (fallback != null && fallback.isNotEmpty) {
+      if (fallback.toLowerCase().endsWith('.svg')) {
+        return SvgPicture.asset(
+          fallback,
+          height: 130,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        );
+      }
+      return Image.asset(
+        fallback,
+        height: 130,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final reducedMotion = MediaQuery.disableAnimationsOf(context);
+    final content = Container(
+      height: 135,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: AppTheme.secondaryColor.withValues(alpha: 0.22),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.10),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        widget.gifAsset,
+        height: 135,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+          if (wasSynchronouslyLoaded || frame != null) {
+            return child;
+          }
+          return Container(
+            color: AppTheme.primaryContainer.withValues(alpha: 0.35),
+            child: const Center(
+              child: SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) => _buildFallback(context),
+      ),
+    );
+
+    if (reducedMotion) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 8, bottom: 4),
+        child: content,
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 4),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) => FadeTransition(
+          opacity: _fadeAnimation,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: child,
+          ),
+        ),
+        child: content,
       ),
     );
   }

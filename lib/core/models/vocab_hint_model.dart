@@ -11,6 +11,7 @@ class VocabHintModel extends Equatable {
     this.tagalogTranslation,
     this.exampleSentence,
     this.illustrationAsset,
+    this.gifAsset,
     this.audioAsset,
   });
 
@@ -22,6 +23,7 @@ class VocabHintModel extends Equatable {
   final String? tagalogTranslation;
   final String? exampleSentence;
   final String? illustrationAsset;
+  final String? gifAsset;
 
   /// Optional recorded pronunciation asset; TTS is used when playback fails.
   final String? audioAsset;
@@ -36,6 +38,7 @@ class VocabHintModel extends Equatable {
       tagalogTranslation: map['tagalogTranslation'] as String?,
       exampleSentence: map['exampleSentence'] as String?,
       illustrationAsset: map['illustrationAsset'] as String?,
+      gifAsset: map['gifAsset'] as String?,
       audioAsset: map['audioAsset'] as String?,
     );
   }
@@ -49,6 +52,7 @@ class VocabHintModel extends Equatable {
     if (tagalogTranslation != null) 'tagalogTranslation': tagalogTranslation,
     if (exampleSentence != null) 'exampleSentence': exampleSentence,
     if (illustrationAsset != null) 'illustrationAsset': illustrationAsset,
+    if (gifAsset != null) 'gifAsset': gifAsset,
     if (audioAsset != null) 'audioAsset': audioAsset,
   };
 
@@ -62,6 +66,7 @@ class VocabHintModel extends Equatable {
     tagalogTranslation,
     exampleSentence,
     illustrationAsset,
+    gifAsset,
     audioAsset,
   ];
 }

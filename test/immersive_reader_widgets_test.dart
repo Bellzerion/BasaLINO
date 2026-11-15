@@ -202,10 +202,13 @@ void main() {
       'word': 'marhay',
       'definition': 'Good or beautiful.',
       'audioAsset': 'assets/audio/bikol/marhay.mp3',
+      'gifAsset': 'assets/gifs/mayon/vocab/grace.gif',
     });
 
     expect(hint.audioAsset, 'assets/audio/bikol/marhay.mp3');
+    expect(hint.gifAsset, 'assets/gifs/mayon/vocab/grace.gif');
     expect(hint.toMap()['audioAsset'], 'assets/audio/bikol/marhay.mp3');
+    expect(hint.toMap()['gifAsset'], 'assets/gifs/mayon/vocab/grace.gif');
   });
 
   testWidgets('vocabulary card shows bilingual meanings and story example', (
@@ -237,6 +240,50 @@ void main() {
     expect(find.text('English'), findsNWidgets(2));
     expect(find.text('grasya'), findsOneWidget);
     expect(find.text('Her grace made the people admire her.'), findsOneWidget);
+  });
+
+  testWidgets('vocabulary card pops and renders animated GIF when gifAsset is set', (
+    tester,
+  ) async {
+    final hint = VocabHintModel(
+      vocabularyId: 'mayon-ch1-grace',
+      word: 'grace',
+      definition: 'Elegant movement or manner.',
+      partOfSpeech: 'noun',
+      englishTranslation: 'grace',
+      tagalogTranslation: 'grasya',
+      gifAsset: 'assets/gifs/mayon/vocab/grace.gif',
+      illustrationAsset: 'assets/images/mayon/magayon_introduction.svg',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: StoryVocabularyCard(
+            hint: hint,
+            languageCode: 'en',
+            exampleSentence: 'Her grace captivated the village.',
+            onClose: () {},
+          ),
+        ),
+      ),
+    );
+
+    // Initial frame
+    await tester.pump();
+    // After delay timer (120ms) and pop animation (380ms)
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName ==
+                'assets/gifs/mayon/vocab/grace.gif',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('pronunciation uses the recorded vocabulary asset first', (
