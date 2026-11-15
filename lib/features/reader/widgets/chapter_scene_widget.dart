@@ -281,7 +281,7 @@ class SceneArtwork extends StatelessWidget {
   }
 
   Widget _fallback(BuildContext context) {
-    if (scene.assetKey.isNotEmpty && playAnimation) {
+    if (scene.assetKey.isNotEmpty) {
       return _animation(context);
     }
     final imagePath = scene.imageAssetKey;
@@ -299,24 +299,6 @@ class SceneArtwork extends StatelessWidget {
     final reducedMotion = MediaQuery.disableAnimationsOf(context);
 
     if (reducedMotion) {
-      if (hasIllustration) return _illustration(context, scene.imageAssetKey!);
-      if (hasAnimation) {
-        return SizedBox(
-          height: height,
-          width: double.infinity,
-          child: Center(
-            child: SizedBox(
-              width: height * 1.5,
-              height: height,
-              child: _animation(context),
-            ),
-          ),
-        );
-      }
-      return const _ScenePlaceholder();
-    }
-
-    if (hasGif && !playAnimation) {
       if (hasIllustration) return _illustration(context, scene.imageAssetKey!);
       if (hasAnimation) {
         return SizedBox(
@@ -354,21 +336,54 @@ class SceneArtwork extends StatelessWidget {
             ],
           ),
           clipBehavior: Clip.antiAlias,
-          child: Image.asset(
-            scene.gifAsset!,
-            width: double.infinity,
-            height: height,
-            fit: fit,
-            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-              if (wasSynchronouslyLoaded || frame != null) {
-                return child;
-              }
-              return const _SceneLoadingPlaceholder();
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final cacheWidth =
+                  (constraints.maxWidth *
+                          MediaQuery.devicePixelRatioOf(context))
+                      .round();
+              return RepaintBoundary(
+                child: Image.asset(
+                  scene.gifAsset!,
+                  width: double.infinity,
+                  height: height,
+                  cacheWidth: cacheWidth > 0 ? cacheWidth : null,
+                  fit: fit,
+                  frameBuilder:
+                      (context, child, frame, wasSynchronouslyLoaded) {
+                        if (wasSynchronouslyLoaded || frame != null) {
+                          return child;
+                        }
+                        return const _SceneLoadingPlaceholder();
+                      },
+                  errorBuilder: (context, error, stackTrace) =>
+                      _fallback(context),
+                ),
+              );
             },
-            errorBuilder: (context, error, stackTrace) => _fallback(context),
           ),
         ),
       );
+    }
+
+    if (!playAnimation) {
+      if (hasAnimation) {
+        return SizedBox(
+          height: height,
+          width: double.infinity,
+          child: Center(
+            child: SizedBox(
+              width: height * 1.5,
+              height: height,
+              child: _animation(context),
+            ),
+          ),
+        );
+      }
+      if (hasIllustration) {
+        return _illustration(context, scene.imageAssetKey!);
+      }
+      return const _ScenePlaceholder();
     }
 
     final background = Container(

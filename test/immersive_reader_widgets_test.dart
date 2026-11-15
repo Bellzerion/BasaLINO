@@ -26,6 +26,13 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
+  bool imageUsesAsset(Image image, String assetPath) {
+    final provider = image.image is ResizeImage
+        ? (image.image as ResizeImage).imageProvider
+        : image.image;
+    return provider is AssetImage && provider.assetName == assetPath;
+  }
+
   test('chapter scene and vocabulary media references are bundled', () async {
     final chapterBytes = await rootBundle.load('assets/data/chapters.json');
     final chapters = jsonDecode(
@@ -326,9 +333,7 @@ void main() {
     await pronunciation.dispose();
   });
 
-  testWidgets('scene cards use artwork before loading GIF media', (
-    tester,
-  ) async {
+  testWidgets('scene cards prioritize GIF media when provided', (tester) async {
     const gifPath = 'assets/gifs/mayon/eruption.gif';
     const scene = SceneAnnotationModel(
       paragraphIndex: 0,
@@ -346,18 +351,62 @@ void main() {
     );
     await tester.pump(const Duration(milliseconds: 150));
 
-    expect(find.byType(SvgPicture), findsOneWidget);
     expect(
       find.byWidgetPredicate(
         (widget) =>
             widget is Image &&
-            widget.image is AssetImage &&
-            (widget.image as AssetImage).assetName == gifPath,
+            imageUsesAsset(widget, gifPath),
       ),
-      findsNothing,
+      findsOneWidget,
     );
+    expect(find.byType(SvgPicture), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('scene cards prioritize Lottie before image artwork', (
+    tester,
+  ) async {
+    const scene = SceneAnnotationModel(
+      paragraphIndex: 0,
+      assetKey: 'assets/scenes/volcano_eruption.json',
+      imageAssetKey: 'assets/images/mayon/eruption.svg',
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SceneArtwork(scene: scene, height: 200, playAnimation: false),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LottieBuilder), findsOneWidget);
+    expect(find.byType(SvgPicture), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'scene cards fall back to image artwork when no animation exists',
+    (tester) async {
+      const scene = SceneAnnotationModel(
+        paragraphIndex: 0,
+        imageAssetKey: 'assets/images/mayon/eruption.svg',
+      );
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SceneArtwork(scene: scene, height: 200, playAnimation: false),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SvgPicture), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('scene viewer prioritizes GIF media when provided', (
     tester,
@@ -383,8 +432,7 @@ void main() {
       find.byWidgetPredicate(
         (widget) =>
             widget is Image &&
-            widget.image is AssetImage &&
-            (widget.image as AssetImage).assetName == gifPath,
+            imageUsesAsset(widget, gifPath),
       ),
       findsOneWidget,
     );
