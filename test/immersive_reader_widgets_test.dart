@@ -5,6 +5,9 @@ import 'package:basalino/core/models/scene_annotation_model.dart';
 import 'package:basalino/core/models/scene_hotspot_model.dart';
 import 'package:basalino/core/models/vocab_hint_model.dart';
 import 'package:basalino/core/services/story_discovery_tracker.dart';
+import 'package:basalino/features/ar/models/ar_content_model.dart';
+import 'package:basalino/features/ar/presentation/ar_explorer_screen.dart';
+import 'package:basalino/features/ar/services/ar_service.dart';
 import 'package:basalino/features/reader/widgets/chapter_scene_widget.dart';
 import 'package:basalino/features/reader/widgets/vocabulary_card.dart';
 import 'package:basalino/features/reader/presentation/story_codex_screen.dart';
@@ -81,7 +84,17 @@ void main() {
     for (final asset in mediaAssets) {
       await rootBundle.load(asset);
     }
-    expect(mediaAssets.where((asset) => asset.endsWith('.gif')).length, 2);
+    expect(mediaAssets.where((asset) => asset.endsWith('.gif')).length, 6);
+    expect(
+      mediaAssets,
+      containsAll([
+        'assets/gifs/mayon/scenes/meet magayon.gif',
+        'assets/gifs/mayon/scenes/spring_encounter.gif',
+        'assets/gifs/mayon/scenes/parotpot.gif',
+        'assets/gifs/mayon/scenes/village_rally.gif',
+      ]),
+    );
+    await rootBundle.load('assets/models/mayon_billboard.gltf');
   });
 
   group('SceneAnnotationModel', () {
@@ -266,7 +279,7 @@ void main() {
     await pronunciation.dispose();
   });
 
-  testWidgets('scene renderer displays GIF media when provided', (
+  testWidgets('scene cards use artwork before loading GIF media', (
     tester,
   ) async {
     const gifPath = 'assets/gifs/mayon/eruption.gif';
@@ -281,6 +294,39 @@ void main() {
       const MaterialApp(
         home: Scaffold(
           body: SceneArtwork(scene: scene, height: 200, playAnimation: false),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 150));
+
+    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName == gifPath,
+      ),
+      findsNothing,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('scene viewer prioritizes GIF media when provided', (
+    tester,
+  ) async {
+    const gifPath = 'assets/gifs/mayon/eruption.gif';
+    const scene = SceneAnnotationModel(
+      paragraphIndex: 0,
+      assetKey: 'assets/scenes/volcano_eruption.json',
+      gifAsset: gifPath,
+      imageAssetKey: 'assets/images/mayon/eruption.svg',
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SceneArtwork(scene: scene, height: 200, playAnimation: true),
         ),
       ),
     );
@@ -431,6 +477,224 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byTooltip('Pronounce word'), findsOneWidget);
     expect(find.text('grasya'), findsOneWidget);
+  });
+
+  test('AR content is derived from the Mayon scene and hotspot', () {
+    const hotspot = SceneHotspotModel(
+      id: 'mayon-volcano',
+      title: 'Mount Mayon',
+      description: 'The legend connects the volcano to Magayon.',
+      positionX: 0.53,
+      positionY: 0.45,
+      category: 'location',
+      imageAsset: 'assets/images/mayon/eruption.svg',
+      educationalNote: 'Mayon is an active volcano in Albay.',
+    );
+    const scene = SceneAnnotationModel(
+      paragraphIndex: 3,
+      title: 'The Volcano Erupts',
+      description: 'The legend says Magayon weeps for her lost love.',
+      sceneType: 'volcano',
+      imageAssetKey: 'assets/images/mayon/eruption.svg',
+      hotspots: [hotspot],
+    );
+
+    final content = ArContentModel.fromScene(
+      scene: scene,
+      storyId: 'mayon',
+      hotspot: scene.hotspots.single,
+    );
+
+    expect(content.id, 'mayon-ar-explorer');
+    expect(content.storyId, 'mayon');
+    expect(content.title, 'Mount Mayon');
+    expect(content.description, hotspot.description);
+    expect(content.imageAsset, hotspot.imageAsset);
+    expect(content.educationalNote, hotspot.educationalNote);
+  });
+
+  test('Mayon AR billboard is self-contained glTF 2.0', () async {
+    final bytes = await rootBundle.load('assets/models/mayon_billboard.gltf');
+    final model = jsonDecode(
+      utf8.decode(bytes.buffer.asUint8List()),
+    ) as Map<String, dynamic>;
+    final buffer =
+        (model['buffers'] as List<dynamic>).single as Map<String, dynamic>;
+    final uri = buffer['uri'] as String;
+
+    expect(model['asset']['version'], '2.0');
+    expect(uri, startsWith('data:application/octet-stream;base64,'));
+    expect(
+      base64Decode(uri.substring(uri.indexOf(',') + 1)).length,
+      buffer['byteLength'],
+    );
+    expect(
+      (model['meshes'] as List<dynamic>).single['primitives'].length,
+      greaterThan(1),
+    );
+  });
+
+  testWidgets('AR entry is limited to supported Mayon volcano scenes', (
+    tester,
+  ) async {
+    const scene = SceneAnnotationModel(
+      paragraphIndex: 3,
+      title: 'The Volcano Erupts',
+      sceneType: 'volcano',
+      imageAssetKey: 'assets/images/mayon/eruption.svg',
+    );
+    final availability = _FakeArAvailabilityService(supported: true);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: child!,
+        ),
+        home: Scaffold(
+          body: ChapterSceneWidget(
+            scene: scene,
+            storyTitle: 'The Legend of Mount Mayon',
+            heroTag: 'ar-mayon-scene',
+            storyId: 'mayon',
+            arAvailabilityService: availability,
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('The Volcano Erupts'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Explore in AR'), findsOneWidget);
+    expect(availability.checkCount, 1);
+  });
+
+  testWidgets('AR entry is not advertised for other stories', (tester) async {
+    const scene = SceneAnnotationModel(
+      paragraphIndex: 3,
+      title: 'The Volcano Erupts',
+      sceneType: 'volcano',
+      imageAssetKey: 'assets/images/mayon/eruption.svg',
+    );
+    final availability = _FakeArAvailabilityService(supported: true);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: child!,
+        ),
+        home: Scaffold(
+          body: ChapterSceneWidget(
+            scene: scene,
+            storyTitle: 'The Heroes of Ibalong',
+            heroTag: 'ar-not-ibalong',
+            storyId: 'ibalong',
+            arAvailabilityService: availability,
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('The Volcano Erupts'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Explore in AR'), findsNothing);
+    expect(availability.checkCount, 0);
+  });
+
+  testWidgets('unsupported AR offers a way back to the reader', (tester) async {
+    final availability = _FakeArAvailabilityService(supported: false);
+    final tracker = StoryDiscoveryTracker();
+    const content = ArContentModel(
+      id: 'mayon-ar-explorer',
+      title: 'Mount Mayon',
+      description: 'A volcano in Albay.',
+      imageAsset: 'assets/images/mayon/eruption.svg',
+      storyId: 'mayon',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: const Center(child: Text('Reader')),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () => Navigator.of(context).push<void>(
+                MaterialPageRoute<void>(
+                  builder: (_) => ArExplorerScreen(
+                    content: content,
+                    discoveryTracker: tracker,
+                    availabilityService: availability,
+                    onReturnToReader: () => Navigator.of(context).pop(),
+                  ),
+                ),
+              ),
+              child: const Icon(Icons.view_in_ar),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text('AR not supported on this device.'), findsOneWidget);
+    await tester.tap(find.text('Return to Reader'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reader'), findsOneWidget);
+  });
+
+  testWidgets('AR fallback returns to the reader without changing its route', (
+    tester,
+  ) async {
+    const scene = SceneAnnotationModel(
+      paragraphIndex: 3,
+      title: 'The Volcano Erupts',
+      description: 'The legend remembers Magayon.',
+      sceneType: 'volcano',
+      imageAssetKey: 'assets/images/mayon/eruption.svg',
+    );
+    final availability = _FakeArAvailabilityService(
+      supported: false,
+      results: [true, false],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: child!,
+        ),
+        home: Scaffold(
+          body: Column(
+            children: [
+              const Text('Reader'),
+              Expanded(
+                child: ChapterSceneWidget(
+                  scene: scene,
+                  storyTitle: 'The Legend of Mount Mayon',
+                  heroTag: 'ar-return-reader',
+                  storyId: 'mayon',
+                  arAvailabilityService: availability,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('The Volcano Erupts'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Explore in AR'));
+    await tester.pumpAndSettle();
+    expect(find.text('AR not supported on this device.'), findsOneWidget);
+
+    await tester.tap(find.text('Return to Reader'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Reader'), findsOneWidget);
+    expect(find.text('Explore in AR'), findsNothing);
+    expect(availability.checkCount, 2);
   });
 
   testWidgets(
@@ -609,4 +873,22 @@ class _FakeVocabularyPronunciationService
 
   @override
   Future<void> dispose() => _states.close();
+}
+
+class _FakeArAvailabilityService implements ArAvailabilityService {
+  _FakeArAvailabilityService({
+    required this.supported,
+    this._results = const [],
+  });
+
+  final bool supported;
+  final List<bool> _results;
+  int checkCount = 0;
+
+  @override
+  Future<bool> isSupported() async {
+    checkCount++;
+    if (_results.isNotEmpty) return _results.removeAt(0);
+    return supported;
+  }
 }

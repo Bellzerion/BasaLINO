@@ -4,6 +4,9 @@ import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
+import '../../ar/models/ar_content_model.dart';
+import '../../ar/presentation/ar_explorer_screen.dart';
+import '../../ar/services/ar_service.dart';
 import '../../../core/models/scene_annotation_model.dart';
 import '../../../core/models/scene_hotspot_model.dart';
 import '../../../core/models/vocab_hint_model.dart';
@@ -22,6 +25,7 @@ class SceneViewerScreen extends StatefulWidget {
     this.languageCode = 'en',
     this.vocabularyHints = const [],
     this.discoveryTracker,
+    this.arAvailabilityService = const PlatformArService(),
   });
 
   final SceneAnnotationModel scene;
@@ -31,6 +35,7 @@ class SceneViewerScreen extends StatefulWidget {
   final String languageCode;
   final List<VocabHintModel> vocabularyHints;
   final StoryDiscoveryTracker? discoveryTracker;
+  final ArAvailabilityService arAvailabilityService;
 
   @override
   State<SceneViewerScreen> createState() => _SceneViewerScreenState();
@@ -39,6 +44,71 @@ class SceneViewerScreen extends StatefulWidget {
 class _SceneViewerScreenState extends State<SceneViewerScreen> {
   SceneHotspotModel? _selectedHotspot;
   VocabHintModel? _activeVocabularyHint;
+  bool _checkingArSupport = false;
+  bool _arSupported = false;
+
+  bool get _isMayonVolcano =>
+      widget.storyId == 'mayon' &&
+      widget.scene.sceneType?.toLowerCase() == 'volcano';
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isMayonVolcano) {
+      _checkingArSupport = true;
+      unawaited(_checkArSupport());
+    }
+  }
+
+  Future<void> _checkArSupport() async {
+    try {
+      final supported = await widget.arAvailabilityService.isSupported();
+      if (!mounted) return;
+      setState(() {
+        _arSupported = supported;
+        _checkingArSupport = false;
+      });
+    } catch (error, stackTrace) {
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stackTrace,
+          library: 'AR availability check',
+        ),
+      );
+      if (mounted) setState(() => _checkingArSupport = false);
+    }
+  }
+
+  void _openArExplorer() {
+    SceneHotspotModel? hotspot;
+    for (final item in widget.scene.hotspots) {
+      if (item.category == 'location' &&
+          item.title.toLowerCase().contains('mount mayon')) {
+        hotspot = item;
+        break;
+      }
+    }
+    final content = ArContentModel.fromScene(
+      scene: widget.scene,
+      storyId: widget.storyId,
+      hotspot: hotspot,
+    );
+    final navigator = Navigator.of(context);
+    navigator.push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => ArExplorerScreen(
+          content: content,
+          discoveryTracker: widget.discoveryTracker ?? StoryDiscoveryTracker(),
+          availabilityService: widget.arAvailabilityService,
+          onReturnToReader: () {
+            if (navigator.canPop()) navigator.pop();
+            if (navigator.canPop()) navigator.pop();
+          },
+        ),
+      ),
+    );
+  }
 
   void _selectHotspot(SceneHotspotModel hotspot) {
     final closing = _selectedHotspot?.id == hotspot.id;
@@ -152,6 +222,8 @@ class _SceneViewerScreenState extends State<SceneViewerScreen> {
                                         Hero(
                                           tag: widget.heroTag,
                                           child: Material(
+                                            elevation: 18,
+                                            shadowColor: Colors.black54,
                                             color: Colors.transparent,
                                             borderRadius: BorderRadius.circular(
                                               28,
@@ -211,9 +283,7 @@ class _SceneViewerScreenState extends State<SceneViewerScreen> {
                                         key: ValueKey('no-hotspot-selected'),
                                       )
                                     : Padding(
-                                        key: ValueKey(
-                                          _selectedHotspot!.id,
-                                        ),
+                                        key: ValueKey(_selectedHotspot!.id),
                                         padding: const EdgeInsets.only(top: 14),
                                         child: _buildHotspotCard(
                                           context,
@@ -271,6 +341,37 @@ class _SceneViewerScreenState extends State<SceneViewerScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
+                      if (_isMayonVolcano && _arSupported)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: _openArExplorer,
+                              icon: const Icon(Icons.view_in_ar_rounded),
+                              label: const Text('Explore in AR'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                side: BorderSide(
+                                  color: Colors.white.withValues(alpha: 0.72),
+                                ),
+                                minimumSize: const Size.fromHeight(50),
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (_isMayonVolcano &&
+                          !_checkingArSupport &&
+                          !_arSupported)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            'AR not supported on this device.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.white70),
+                          ),
+                        ),
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton.icon(
@@ -295,8 +396,7 @@ class _SceneViewerScreenState extends State<SceneViewerScreen> {
               key: ValueKey(_activeVocabularyHint!.vocabularyId),
               hint: _activeVocabularyHint!,
               languageCode: widget.languageCode,
-              exampleSentence:
-                  _activeVocabularyHint!.exampleSentence ?? '',
+              exampleSentence: _activeVocabularyHint!.exampleSentence ?? '',
               onClose: () {
                 if (mounted) setState(() => _activeVocabularyHint = null);
               },
@@ -429,9 +529,8 @@ class _SceneHotspotInformationCard extends StatelessWidget {
           children: [
             Text(
               hotspot.title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 4),
             Text(
@@ -444,10 +543,8 @@ class _SceneHotspotInformationCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               hotspot.description,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-                height: 1.4,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: colors.onSurfaceVariant, height: 1.4),
             ),
             if (hotspot.educationalNote?.isNotEmpty ?? false) ...[
               const SizedBox(height: 10),
@@ -523,10 +620,8 @@ class _SceneNote extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 text,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                  height: 1.4,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: Colors.white, height: 1.4),
               ),
             ],
           ),
@@ -699,11 +794,7 @@ String _assetSource(String assetPath) => assetPath.startsWith('assets/')
     ? assetPath.substring('assets/'.length)
     : assetPath;
 
-void _reportAudioError(
-  Object error,
-  StackTrace stackTrace,
-  String library,
-) {
+void _reportAudioError(Object error, StackTrace stackTrace, String library) {
   FlutterError.reportError(
     FlutterErrorDetails(exception: error, stack: stackTrace, library: library),
   );

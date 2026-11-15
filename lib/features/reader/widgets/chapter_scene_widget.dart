@@ -8,6 +8,7 @@ import '../../../app/theme/app_theme.dart';
 import '../../../core/models/scene_annotation_model.dart';
 import '../../../core/models/vocab_hint_model.dart';
 import '../../../core/services/story_discovery_tracker.dart';
+import '../../ar/services/ar_service.dart';
 import 'scene_viewer_screen.dart';
 
 class ChapterSceneWidget extends StatefulWidget {
@@ -23,6 +24,7 @@ class ChapterSceneWidget extends StatefulWidget {
     this.showExplorePrompt = false,
     this.onExplorePromptShown,
     this.storybookMode = false,
+    this.arAvailabilityService = const PlatformArService(),
   });
 
   final SceneAnnotationModel scene;
@@ -35,6 +37,7 @@ class ChapterSceneWidget extends StatefulWidget {
   final bool showExplorePrompt;
   final VoidCallback? onExplorePromptShown;
   final bool storybookMode;
+  final ArAvailabilityService arAvailabilityService;
 
   @override
   State<ChapterSceneWidget> createState() => _ChapterSceneWidgetState();
@@ -107,6 +110,7 @@ class _ChapterSceneWidgetState extends State<ChapterSceneWidget>
               languageCode: widget.languageCode,
               vocabularyHints: widget.vocabularyHints,
               discoveryTracker: widget.discoveryTracker,
+              arAvailabilityService: widget.arAvailabilityService,
             ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             FadeTransition(opacity: animation, child: child),
@@ -312,28 +316,57 @@ class SceneArtwork extends StatelessWidget {
       return const _ScenePlaceholder();
     }
 
+    if (hasGif && !playAnimation) {
+      if (hasIllustration) return _illustration(context, scene.imageAssetKey!);
+      if (hasAnimation) {
+        return SizedBox(
+          height: height,
+          width: double.infinity,
+          child: Center(
+            child: SizedBox(
+              width: height * 1.5,
+              height: height,
+              child: _animation(context),
+            ),
+          ),
+        );
+      }
+      return const _ScenePlaceholder();
+    }
+
     if (hasGif) {
       return SizedBox(
         height: height,
         width: double.infinity,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Positioned.fill(
-              child: Image.asset(
-                scene.gifAsset!,
-                width: double.infinity,
-                height: height,
-                fit: fit,
-                errorBuilder: (context, error, stackTrace) =>
-                    _fallback(context),
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppTheme.secondaryColor.withValues(alpha: 0.25),
+              width: 1.0,
             ),
-            if (playAnimation && hasAnimation)
-              Positioned.fill(
-                child: Opacity(opacity: 0.4, child: _animation(context)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.14),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-          ],
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Image.asset(
+            scene.gifAsset!,
+            width: double.infinity,
+            height: height,
+            fit: fit,
+            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+              if (wasSynchronouslyLoaded || frame != null) {
+                return child;
+              }
+              return const _SceneLoadingPlaceholder();
+            },
+            errorBuilder: (context, error, stackTrace) => _fallback(context),
+          ),
         ),
       );
     }
@@ -581,6 +614,33 @@ class _SceneMotionPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _SceneMotionPainter oldDelegate) =>
       sceneType != oldDelegate.sceneType || progress != oldDelegate.progress;
+}
+
+class _SceneLoadingPlaceholder extends StatelessWidget {
+  const _SceneLoadingPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppTheme.primaryContainer, AppTheme.secondaryContainer],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 26,
+          height: 26,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.2,
+            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _ScenePlaceholder extends StatelessWidget {
