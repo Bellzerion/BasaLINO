@@ -66,7 +66,8 @@ class ExploreSceneScreen extends StatelessWidget {
             const SizedBox(height: 14),
             const _FeatureNote(
               icon: Icons.threed_rotation_rounded,
-              text: 'Rotate and zoom the animated volcano model.',
+              text: 'Choose and explore Mayon, Daragang Magayon, and story '
+                  'scenes in 3D.',
             ),
             const SizedBox(height: 8),
             const _FeatureNote(
