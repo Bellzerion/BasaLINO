@@ -3,10 +3,8 @@ import 'dart:ui';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../ar/models/ar_content_model.dart';
-import '../../ar/presentation/ar_explorer_screen.dart';
-import '../../ar/services/ar_service.dart';
 import '../../../core/models/scene_annotation_model.dart';
 import '../../../core/models/scene_hotspot_model.dart';
 import '../../../core/models/vocab_hint_model.dart';
@@ -25,7 +23,6 @@ class SceneViewerScreen extends StatefulWidget {
     this.languageCode = 'en',
     this.vocabularyHints = const [],
     this.discoveryTracker,
-    this.arAvailabilityService = const PlatformArService(),
   });
 
   final SceneAnnotationModel scene;
@@ -35,7 +32,6 @@ class SceneViewerScreen extends StatefulWidget {
   final String languageCode;
   final List<VocabHintModel> vocabularyHints;
   final StoryDiscoveryTracker? discoveryTracker;
-  final ArAvailabilityService arAvailabilityService;
 
   @override
   State<SceneViewerScreen> createState() => _SceneViewerScreenState();
@@ -44,71 +40,12 @@ class SceneViewerScreen extends StatefulWidget {
 class _SceneViewerScreenState extends State<SceneViewerScreen> {
   SceneHotspotModel? _selectedHotspot;
   VocabHintModel? _activeVocabularyHint;
-  bool _checkingArSupport = false;
-  bool _arSupported = false;
 
   bool get _isMayonVolcano =>
       widget.storyId == 'mayon' &&
       widget.scene.sceneType?.toLowerCase() == 'volcano';
 
-  @override
-  void initState() {
-    super.initState();
-    if (_isMayonVolcano) {
-      _checkingArSupport = true;
-      unawaited(_checkArSupport());
-    }
-  }
-
-  Future<void> _checkArSupport() async {
-    try {
-      final supported = await widget.arAvailabilityService.isSupported();
-      if (!mounted) return;
-      setState(() {
-        _arSupported = supported;
-        _checkingArSupport = false;
-      });
-    } catch (error, stackTrace) {
-      FlutterError.reportError(
-        FlutterErrorDetails(
-          exception: error,
-          stack: stackTrace,
-          library: 'AR availability check',
-        ),
-      );
-      if (mounted) setState(() => _checkingArSupport = false);
-    }
-  }
-
-  void _openArExplorer() {
-    SceneHotspotModel? hotspot;
-    for (final item in widget.scene.hotspots) {
-      if (item.category == 'location' &&
-          item.title.toLowerCase().contains('mount mayon')) {
-        hotspot = item;
-        break;
-      }
-    }
-    final content = ArContentModel.fromScene(
-      scene: widget.scene,
-      storyId: widget.storyId,
-      hotspot: hotspot,
-    );
-    final navigator = Navigator.of(context);
-    navigator.push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => ArExplorerScreen(
-          content: content,
-          discoveryTracker: widget.discoveryTracker ?? StoryDiscoveryTracker(),
-          availabilityService: widget.arAvailabilityService,
-          onReturnToReader: () {
-            if (navigator.canPop()) navigator.pop();
-            if (navigator.canPop()) navigator.pop();
-          },
-        ),
-      ),
-    );
-  }
+  void _openMayonExplore() => context.push('/explore/mayon');
 
   void _selectHotspot(SceneHotspotModel hotspot) {
     final closing = _selectedHotspot?.id == hotspot.id;
@@ -341,15 +278,15 @@ class _SceneViewerScreenState extends State<SceneViewerScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      if (_isMayonVolcano && _arSupported)
+                      if (_isMayonVolcano)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: SizedBox(
                             width: double.infinity,
                             child: OutlinedButton.icon(
-                              onPressed: _openArExplorer,
+                              onPressed: _openMayonExplore,
                               icon: const Icon(Icons.view_in_ar_rounded),
-                              label: const Text('Explore in AR'),
+                              label: const Text('Explore in AR-Style'),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.white,
                                 side: BorderSide(
@@ -358,18 +295,6 @@ class _SceneViewerScreenState extends State<SceneViewerScreen> {
                                 minimumSize: const Size.fromHeight(50),
                               ),
                             ),
-                          ),
-                        ),
-                      if (_isMayonVolcano &&
-                          !_checkingArSupport &&
-                          !_arSupported)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: Text(
-                            'AR not supported on this device.',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: Colors.white70),
                           ),
                         ),
                       SizedBox(

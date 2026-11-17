@@ -12,11 +12,13 @@ import 'package:basalino/features/reader/widgets/chapter_scene_widget.dart';
 import 'package:basalino/features/reader/widgets/vocabulary_card.dart';
 import 'package:basalino/features/reader/presentation/story_codex_screen.dart';
 import 'package:basalino/features/reader/services/vocabulary_pronunciation_service.dart';
+import 'package:basalino/features/explore/presentation/explore_scene_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -629,7 +631,7 @@ void main() {
     );
   });
 
-  testWidgets('AR entry is limited to supported Mayon volcano scenes', (
+  testWidgets('camera-based explore entry is shown for Mayon volcano scenes', (
     tester,
   ) async {
     const scene = SceneAnnotationModel(
@@ -638,8 +640,6 @@ void main() {
       sceneType: 'volcano',
       imageAssetKey: 'assets/images/mayon/eruption.svg',
     );
-    final availability = _FakeArAvailabilityService(supported: true);
-
     await tester.pumpWidget(
       MaterialApp(
         builder: (context, child) => MediaQuery(
@@ -652,7 +652,6 @@ void main() {
             storyTitle: 'The Legend of Mount Mayon',
             heroTag: 'ar-mayon-scene',
             storyId: 'mayon',
-            arAvailabilityService: availability,
           ),
         ),
       ),
@@ -660,19 +659,18 @@ void main() {
     await tester.tap(find.text('The Volcano Erupts'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Explore in AR'), findsOneWidget);
-    expect(availability.checkCount, 1);
+    expect(find.text('Explore in AR-Style'), findsOneWidget);
   });
 
-  testWidgets('AR entry is not advertised for other stories', (tester) async {
+  testWidgets('camera-based explore entry is absent for other stories', (
+    tester,
+  ) async {
     const scene = SceneAnnotationModel(
       paragraphIndex: 3,
       title: 'The Volcano Erupts',
       sceneType: 'volcano',
       imageAssetKey: 'assets/images/mayon/eruption.svg',
     );
-    final availability = _FakeArAvailabilityService(supported: true);
-
     await tester.pumpWidget(
       MaterialApp(
         builder: (context, child) => MediaQuery(
@@ -685,7 +683,6 @@ void main() {
             storyTitle: 'The Heroes of Ibalong',
             heroTag: 'ar-not-ibalong',
             storyId: 'ibalong',
-            arAvailabilityService: availability,
           ),
         ),
       ),
@@ -693,8 +690,7 @@ void main() {
     await tester.tap(find.text('The Volcano Erupts'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Explore in AR'), findsNothing);
-    expect(availability.checkCount, 0);
+    expect(find.text('Explore in AR-Style'), findsNothing);
   });
 
   testWidgets('unsupported AR offers a way back to the reader', (tester) async {
@@ -739,58 +735,65 @@ void main() {
     expect(find.text('Reader'), findsOneWidget);
   });
 
-  testWidgets('AR fallback returns to the reader without changing its route', (
-    tester,
-  ) async {
-    const scene = SceneAnnotationModel(
-      paragraphIndex: 3,
-      title: 'The Volcano Erupts',
-      description: 'The legend remembers Magayon.',
-      sceneType: 'volcano',
-      imageAssetKey: 'assets/images/mayon/eruption.svg',
-    );
-    final availability = _FakeArAvailabilityService(
-      supported: false,
-      results: [true, false],
-    );
+  testWidgets(
+    'AR-style scene entry opens the landing screen and returns to the reader',
+    (tester) async {
+      const scene = SceneAnnotationModel(
+        paragraphIndex: 3,
+        title: 'The Volcano Erupts',
+        description: 'The legend remembers Magayon.',
+        sceneType: 'volcano',
+        imageAssetKey: 'assets/images/mayon/eruption.svg',
+      );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        builder: (context, child) => MediaQuery(
-          data: const MediaQueryData(disableAnimations: true),
-          child: child!,
-        ),
-        home: Scaffold(
-          body: Column(
-            children: [
-              const Text('Reader'),
-              Expanded(
-                child: ChapterSceneWidget(
-                  scene: scene,
-                  storyTitle: 'The Legend of Mount Mayon',
-                  heroTag: 'ar-return-reader',
-                  storyId: 'mayon',
-                  arAvailabilityService: availability,
-                ),
+      final router = GoRouter(
+        initialLocation: '/reader',
+        routes: [
+          GoRoute(
+            path: '/reader',
+            builder: (context, state) => Scaffold(
+              body: Column(
+                children: [
+                  const Text('Reader'),
+                  Expanded(
+                    child: ChapterSceneWidget(
+                      scene: scene,
+                      storyTitle: 'The Legend of Mount Mayon',
+                      heroTag: 'ar-return-reader',
+                      storyId: 'mayon',
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
+          ),
+          GoRoute(
+            path: '/explore/mayon',
+            builder: (context, state) => const ExploreSceneScreen(),
+          ),
+        ],
+      );
+      await tester.pumpWidget(
+        MaterialApp.router(
+          routerConfig: router,
+          builder: (context, child) => MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: child!,
           ),
         ),
-      ),
-    );
-    await tester.tap(find.text('The Volcano Erupts'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Explore in AR'));
-    await tester.pumpAndSettle();
-    expect(find.text('AR not supported on this device.'), findsOneWidget);
+      );
+      await tester.tap(find.text('The Volcano Erupts'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Explore in AR-Style'));
+      await tester.pumpAndSettle();
+      expect(find.text('Mayon Volcano'), findsOneWidget);
 
-    await tester.tap(find.text('Return to Reader'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Reader'), findsOneWidget);
-    expect(find.text('Explore in AR'), findsNothing);
-    expect(availability.checkCount, 2);
-  });
+      await tester.tap(find.byTooltip('Back'));
+      await tester.pumpAndSettle();
+      expect(find.text('Reader'), findsOneWidget);
+      router.dispose();
+    },
+  );
 
   testWidgets(
     'story codex hides undiscovered details and shows unlocked cards',
@@ -971,19 +974,14 @@ class _FakeVocabularyPronunciationService
 }
 
 class _FakeArAvailabilityService implements ArAvailabilityService {
-  _FakeArAvailabilityService({
-    required this.supported,
-    this._results = const [],
-  });
+  _FakeArAvailabilityService({required this.supported});
 
   final bool supported;
-  final List<bool> _results;
   int checkCount = 0;
 
   @override
   Future<bool> isSupported() async {
     checkCount++;
-    if (_results.isNotEmpty) return _results.removeAt(0);
     return supported;
   }
 }
