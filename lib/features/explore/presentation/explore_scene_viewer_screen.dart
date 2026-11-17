@@ -17,6 +17,34 @@ class ExploreSceneViewerScreen extends StatefulWidget {
 
 class _ExploreSceneViewerScreenState extends State<ExploreSceneViewerScreen>
     with WidgetsBindingObserver {
+  static const _models = <_ExploreModel>[
+    _ExploreModel(
+      title: 'Mayon Volcano',
+      src: 'assets/models/mount_mayon_animated.gltf',
+      alt: 'Animated 3D illustration of Mount Mayon',
+      animationName: 'Mayon_Eruption_Loop',
+      cameraOrbit: '0deg 75deg 2.5m',
+      cameraTarget: '0m 0.5m 0m',
+      scale: '0.08 0.08 0.08',
+    ),
+    _ExploreModel(
+      title: 'Daragang Magayon',
+      src: 'assets/models/daragang_magayon.gltf',
+      alt: '3D scene of Daragang Magayon with falling petals',
+      animationName: 'Petals_Drifting_Down',
+    ),
+    _ExploreModel(
+      title: 'Spring Encounter',
+      src: 'assets/models/spring_encounter.gltf',
+      alt: '3D scene of the spring encounter',
+    ),
+    _ExploreModel(
+      title: 'Village Rally',
+      src: 'assets/models/village_rally.gltf',
+      alt: '3D scene of a village rally',
+    ),
+  ];
+
   static const _hotspots = <_ExploreHotspot>[
     _ExploreHotspot(
       title: 'Volcano Facts',
@@ -46,6 +74,7 @@ class _ExploreSceneViewerScreenState extends State<ExploreSceneViewerScreen>
 
   CameraController? _cameraController;
   WebViewController? _modelViewerController;
+  _ExploreModel _selectedModel = _models.first;
   bool _cameraLoading = true;
   bool _cameraUnavailable = false;
   bool _cameraStarting = false;
@@ -172,12 +201,13 @@ class _ExploreSceneViewerScreenState extends State<ExploreSceneViewerScreen>
   Future<void> _resetModelView() async {
     final controller = _modelViewerController;
     if (controller == null) return;
+    final model = _selectedModel;
     try {
       await controller.runJavaScript('''
         const viewer = document.querySelector('model-viewer');
         if (viewer) {
-          viewer.cameraOrbit = '0deg 75deg 2.5m';
-          viewer.cameraTarget = '0m 0.5m 0m';
+          viewer.cameraOrbit = '${model.cameraOrbit ?? 'auto auto auto'}';
+          viewer.cameraTarget = '${model.cameraTarget ?? 'auto auto auto'}';
           viewer.jumpCameraToGoal();
         }
       ''');
@@ -186,10 +216,18 @@ class _ExploreSceneViewerScreenState extends State<ExploreSceneViewerScreen>
         FlutterErrorDetails(
           exception: error,
           stack: stackTrace,
-          library: 'Mayon model view reset',
+          library: '3D model view reset',
         ),
       );
     }
+  }
+
+  void _selectModel(_ExploreModel model) {
+    if (model == _selectedModel) return;
+    setState(() {
+      _selectedModel = model;
+      _modelViewerController = null;
+    });
   }
 
   void _showHotspot(_ExploreHotspot hotspot) {
@@ -305,10 +343,12 @@ class _ExploreSceneViewerScreenState extends State<ExploreSceneViewerScreen>
                         icon: const Icon(Icons.arrow_back_rounded),
                       ),
                       const SizedBox(width: 8),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Mayon Volcano',
-                          style: TextStyle(
+                          _selectedModel.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 21,
                             fontWeight: FontWeight.w800,
@@ -317,6 +357,24 @@ class _ExploreSceneViewerScreenState extends State<ExploreSceneViewerScreen>
                             ],
                           ),
                         ),
+                      ),
+                      PopupMenuButton<_ExploreModel>(
+                        tooltip: 'Choose model',
+                        icon: const Icon(Icons.view_in_ar_rounded),
+                        onSelected: _selectModel,
+                        itemBuilder: (context) => [
+                          for (final model in _models)
+                            PopupMenuItem(
+                              value: model,
+                              child: Row(
+                                children: [
+                                  Expanded(child: Text(model.title)),
+                                  if (model == _selectedModel)
+                                    const Icon(Icons.check_rounded, size: 18),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
                       IconButton.filledTonal(
                         tooltip: 'Reset model view',
@@ -366,21 +424,22 @@ class _ExploreSceneViewerScreenState extends State<ExploreSceneViewerScreen>
                   ),
                 Expanded(
                   child: ModelViewer(
-                    key: const ValueKey('mayon-camera-model'),
-                    src: 'assets/models/mount_mayon_animated.gltf',
-                    alt: 'Animated 3D illustration of Mount Mayon',
+                    key: ValueKey(_selectedModel.src),
+                    src: _selectedModel.src,
+                    alt: _selectedModel.alt,
                     backgroundColor: Colors.transparent,
                     ar: false,
                     autoRotate: false,
-                    autoPlay: true,
-                    animationName: 'Mayon_Eruption_Loop',
+                    autoPlay: _selectedModel.animationName != null,
+                    animationName: _selectedModel.animationName,
                     cameraControls: true,
                     disablePan: true,
                     disableZoom: false,
                     touchAction: TouchAction.none,
-                    cameraOrbit: '0deg 75deg 2.5m',
-                    cameraTarget: '0m 0.5m 0m',
-                    scale: '0.08 0.08 0.08',
+                    cameraOrbit: _selectedModel.cameraOrbit ?? 'auto auto auto',
+                    cameraTarget:
+                        _selectedModel.cameraTarget ?? 'auto auto auto',
+                    scale: _selectedModel.scale ?? '1 1 1',
                     shadowIntensity: 0.8,
                     interactionPrompt: InteractionPrompt.none,
                     debugLogging: false,
@@ -427,6 +486,26 @@ class _ExploreSceneViewerScreenState extends State<ExploreSceneViewerScreen>
       ),
     );
   }
+}
+
+class _ExploreModel {
+  const _ExploreModel({
+    required this.title,
+    required this.src,
+    required this.alt,
+    this.animationName,
+    this.cameraOrbit,
+    this.cameraTarget,
+    this.scale,
+  });
+
+  final String title;
+  final String src;
+  final String alt;
+  final String? animationName;
+  final String? cameraOrbit;
+  final String? cameraTarget;
+  final String? scale;
 }
 
 class _ExploreHotspot {

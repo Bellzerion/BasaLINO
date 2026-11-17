@@ -29,6 +29,36 @@ void main() {
     },
   );
 
+  test('additional exploration models are bundled locally', () async {
+    const modelPaths = [
+      'assets/models/daragang_magayon.gltf',
+      'assets/models/spring_encounter.gltf',
+      'assets/models/village_rally.gltf',
+    ];
+
+    for (final path in modelPaths) {
+      final model =
+          jsonDecode(await rootBundle.loadString(path)) as Map<String, dynamic>;
+      final buffer =
+          (model['buffers'] as List<dynamic>).single as Map<String, dynamic>;
+
+      expect(model['asset']['version'], '2.0', reason: path);
+      expect(
+        buffer['uri'],
+        startsWith('data:application/octet-stream;base64,'),
+        reason: path,
+      );
+    }
+
+    final magayon = jsonDecode(
+      await rootBundle.loadString(modelPaths.first),
+    ) as Map<String, dynamic>;
+    expect(
+      (magayon['animations'] as List<dynamic>).single['name'],
+      'Petals_Drifting_Down',
+    );
+  });
+
   testWidgets('Mayon exploration landing explains and starts the experience', (
     tester,
   ) async {
