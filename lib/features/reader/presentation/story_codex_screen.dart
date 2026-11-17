@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/models/scene_annotation_model.dart';
 import '../../../core/models/scene_hotspot_model.dart';
@@ -115,6 +116,12 @@ class _StoryCodexScreenState extends State<StoryCodexScreen> {
       appBar: AppBar(
         title: const Text('Story Codex'),
         actions: [
+          if (widget.storyId == 'mayon')
+            IconButton(
+              tooltip: 'Explore in AR-Style',
+              onPressed: () => context.push('/explore/mayon'),
+              icon: const Icon(Icons.threed_rotation_rounded),
+            ),
           IconButton(
             tooltip: 'Clear search',
             onPressed: _query.isEmpty

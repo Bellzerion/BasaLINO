@@ -8,7 +8,6 @@ import '../../../app/theme/app_theme.dart';
 import '../../../core/models/scene_annotation_model.dart';
 import '../../../core/models/vocab_hint_model.dart';
 import '../../../core/services/story_discovery_tracker.dart';
-import '../../ar/services/ar_service.dart';
 import 'scene_viewer_screen.dart';
 
 class ChapterSceneWidget extends StatefulWidget {
@@ -24,7 +23,6 @@ class ChapterSceneWidget extends StatefulWidget {
     this.showExplorePrompt = false,
     this.onExplorePromptShown,
     this.storybookMode = false,
-    this.arAvailabilityService = const PlatformArService(),
   });
 
   final SceneAnnotationModel scene;
@@ -37,7 +35,6 @@ class ChapterSceneWidget extends StatefulWidget {
   final bool showExplorePrompt;
   final VoidCallback? onExplorePromptShown;
   final bool storybookMode;
-  final ArAvailabilityService arAvailabilityService;
 
   @override
   State<ChapterSceneWidget> createState() => _ChapterSceneWidgetState();
@@ -110,7 +107,6 @@ class _ChapterSceneWidgetState extends State<ChapterSceneWidget>
               languageCode: widget.languageCode,
               vocabularyHints: widget.vocabularyHints,
               discoveryTracker: widget.discoveryTracker,
-              arAvailabilityService: widget.arAvailabilityService,
             ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             FadeTransition(opacity: animation, child: child),

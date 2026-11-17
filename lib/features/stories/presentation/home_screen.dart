@@ -84,6 +84,35 @@ class HomeScreen extends ConsumerWidget {
                                   story: story,
                                   chapters: chapters,
                                 ),
+                                if (story.id == 'mayon') ...[
+                                  const SizedBox(height: 12),
+                                  Card(
+                                    child: ListTile(
+                                      onTap: () =>
+                                          context.push('/explore/mayon'),
+                                      leading: const CircleAvatar(
+                                        backgroundColor: Color(0xFFDCEDE7),
+                                        child: Icon(
+                                          Icons.threed_rotation_rounded,
+                                          color: Color(0xFF075C31),
+                                        ),
+                                      ),
+                                      title: const Text(
+                                        'Explore in AR-Style',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                      subtitle: const Text(
+                                        'Discover Mayon Volcano in an '
+                                        'interactive 3D scene.',
+                                      ),
+                                      trailing: const Icon(
+                                        Icons.chevron_right_rounded,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                                 const SizedBox(height: 16),
                                 Text(
                                   context.l10n.homeAdventureMap,

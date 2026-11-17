@@ -7,6 +7,7 @@
         android:label="basalino"
         android:name="${applicationName}"
         android:forceDarkAllowed="false"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

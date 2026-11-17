@@ -509,6 +509,15 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                         icon: const Icon(Icons.fact_check_outlined),
                         label: Text(context.l10n.readerCheckKnowledge),
                       ),
+                      if (widget.storyId == 'mayon' &&
+                          widget.chapterId == 'mayon_ch3') ...[
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(
+                          onPressed: () => context.push('/explore/mayon'),
+                          icon: const Icon(Icons.threed_rotation_rounded),
+                          label: const Text('Explore in AR-Style'),
+                        ),
+                      ],
                     ],
                   ),
                 );
